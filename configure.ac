@@ -1,8 +1,11 @@
-dnl Initialization for autoconf and automake
-AC_PREREQ(2.63)
+dnl Initialization for autoconf, automake, and libtool
+AC_PREREQ([2.63])
 AC_INIT([lux framework], m4_esyscmd([head -c8 .version]), [ckchan@cfa.harvard.edu], [lux])
 AC_CONFIG_AUX_DIR([.build-aux])
+AC_CONFIG_MACRO_DIR([.build-m4])
 AC_CONFIG_SRCDIR([lux.hin])
+LT_PREREQ([2.2.6b])
+LT_INIT([dlopen])
 AM_INIT_AUTOMAKE([1.11 -Wall -Werror gnu]) dnl cannot use gnits because of version number and the missing "THANKS" file
 
 dnl Checks for programs and compiler characteristics

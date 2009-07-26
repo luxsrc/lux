@@ -1,3 +1,5 @@
+ACLOCAL_AMFLAGS = -I .build-m4
+
 SUBDIRS = src
 
 EXTRA_DIST = .autom4te.cfg .version bootstrap

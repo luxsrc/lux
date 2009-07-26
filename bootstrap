@@ -8,7 +8,7 @@ if [ -f Makefile ]; then
     make distclean
 fi
 
-rm -fr .autom4te.cache .build-aux
+rm -fr .autom4te.cache .build-{aux,m4}
 rm -f  aclocal.m4 configure lux.hin INSTALL
 find . -name 'Makefile.in' -type f -exec rm {} \;
 [ -d .git ] && rm -f .version AUTHORS NEWS ChangeLog
@@ -20,6 +20,7 @@ if [ "x$1" != "xclean" ]; then
         git shortlog -nse  | cut -c7-  >> AUTHORS
         touch NEWS ChangeLog # TODO: generate from git commit messages
     fi
+    mkdir .build-{aux,m4}
     autoreconf --install --symlink --force --verbose
     autoreconf --install --symlink --force --verbose
     autoreconf --install --symlink --force --verbose
