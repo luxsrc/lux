@@ -5,6 +5,11 @@ AC_CONFIG_AUX_DIR([.build-aux])
 AC_CONFIG_SRCDIR([lux.hin])
 AM_INIT_AUTOMAKE([1.11 -Wall -Werror gnu]) dnl cannot use gnits because of version number and the missing "THANKS" file
 
+dnl Checks for programs and compiler characteristics
+AC_PROG_CPP
+AC_PROG_CC_STDC
+AM_PROG_CC_C_O
+
 dnl Customize "config.h" and rename it to "lux.h"
 # The `configure` script produces a customized public header "lux.h"
 # instead of the standard configuration header "config.h".  This
