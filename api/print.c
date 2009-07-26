@@ -18,15 +18,14 @@
  * along with lux.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include <lux.h>
-#include <stdlib.h> /* for EXIT_SUCCESS */
+#include <stdarg.h>
+#include <stdio.h> /* for vprintf() */
 
-int
-main(int argc, char *argv[])
+void
+lux_print(const char *restrict fmt, ...)
 {
-	lux_print("lux ("PACKAGE_NAME") commit '"PACKAGE_VERSION"'\n");
-
-	return EXIT_SUCCESS;
-
-	(void)argc; /* silence unused parameter warning */
-	(void)argv; /* silence unused parameter warning */
+	va_list ap;
+	va_start(ap, fmt);
+	vprintf(fmt, ap);
+	va_end(ap);
 }
