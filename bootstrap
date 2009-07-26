@@ -9,7 +9,7 @@ if [ -f Makefile ]; then
 fi
 
 rm -fr .autom4te.cache .build-aux
-rm -f  aclocal.m4 configure INSTALL
+rm -f  aclocal.m4 configure lux.hin INSTALL
 find . -name 'Makefile.in' -type f -exec rm {} \;
 [ -d .git ] && rm -f .version AUTHORS NEWS ChangeLog
 
@@ -23,4 +23,5 @@ if [ "x$1" != "xclean" ]; then
     autoreconf --install --symlink --force --verbose
     autoreconf --install --symlink --force --verbose
     autoreconf --install --symlink --force --verbose
+    rm -f lux.hin~
 fi
