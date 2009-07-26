@@ -11,11 +11,13 @@ fi
 rm -fr .autom4te.cache .build-aux
 rm -f  aclocal.m4 configure INSTALL
 find . -name 'Makefile.in' -type f -exec rm {} \;
-[ -d .git ] && rm -f .version NEWS ChangeLog
+[ -d .git ] && rm -f .version AUTHORS NEWS ChangeLog
 
 if [ "x$1" != "xclean" ]; then
     if [ -d .git ]; then
         git rev-parse HEAD > .version
+        printf 'Author(s) of lux:\n\n' >  AUTHORS
+        git shortlog -nse  | cut -c7-  >> AUTHORS
         touch NEWS ChangeLog # TODO: generate from git commit messages
     fi
     autoreconf --install --symlink --force --verbose
