@@ -1,1 +1,1 @@
-EXTRA_DIST = .autom4te.cfg bootstrap
+EXTRA_DIST = .autom4te.cfg .version bootstrap

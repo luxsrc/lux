@@ -1,6 +1,6 @@
 dnl Initialization for autoconf and automake
 AC_PREREQ(2.63)
-AC_INIT([lux framework], m4_esyscmd([git rev-parse HEAD | head -c8]), [ckchan@cfa.harvard.edu], [lux])
+AC_INIT([lux framework], m4_esyscmd([head -c8 .version]), [ckchan@cfa.harvard.edu], [lux])
 AC_CONFIG_AUX_DIR([.build-aux])
 AM_INIT_AUTOMAKE([1.11 -Wall -Werror gnu]) dnl cannot use gnits because of version number and the missing "THANKS" file
 

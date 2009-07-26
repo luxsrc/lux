@@ -10,12 +10,14 @@ fi
 
 rm -fr .autom4te.cache .build-aux
 rm -f  aclocal.m4 configure INSTALL
-rm -f  NEWS ChangeLog
 find . -name 'Makefile.in' -type f -exec rm {} \;
+[ -d .git ] && rm -f .version NEWS ChangeLog
 
 if [ "x$1" != "xclean" ]; then
-    touch NEWS ChangeLog # TODO: generate from git commit messages
-
+    if [ -d .git ]; then
+        git rev-parse HEAD > .version
+        touch NEWS ChangeLog # TODO: generate from git commit messages
+    fi
     autoreconf --install --symlink --force --verbose
     autoreconf --install --symlink --force --verbose
     autoreconf --install --symlink --force --verbose
