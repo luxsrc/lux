@@ -1,0 +1,22 @@
+#! /bin/sh
+#
+# NOTE: If you just want to build lux, do not use this file.  Simply
+# run the ordinary `./configure && make` commands.  To clean up all
+# the auto-generated files, use `./bootstrap clean`.
+
+if [ -f Makefile ]; then
+    make distclean
+fi
+
+rm -fr .autom4te.cache .build-aux
+rm -f  aclocal.m4 configure INSTALL
+rm -f  NEWS ChangeLog
+find . -name 'Makefile.in' -type f -exec rm {} \;
+
+if [ "x$1" != "xclean" ]; then
+    touch NEWS ChangeLog # TODO: generate from git commit messages
+
+    autoreconf --install --symlink --force --verbose
+    autoreconf --install --symlink --force --verbose
+    autoreconf --install --symlink --force --verbose
+fi
