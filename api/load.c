@@ -18,40 +18,82 @@
  * along with lux.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include <lux.h>
+#include <lux/htab.h>
 #include <stdio.h> /* for sprintf() */
 #include <dlfcn.h> /* for dlopen(), dlsym(), and dlclose() */
+
+struct load_node {
+	struct htab_node super;
+	void (*rm)(void *);
+	void  *mod;
+};
+
+static struct htab ltab = HTAB_INIT; /* the loading table */
 
 void *
 lux_load(const char *restrict name)
 {
 	char buf[256]; /* FIXME: check string length */
-	void *mod;
 
+	void   *mod;
+	void *(*mk)(void);
+	void  (*rm)(void *) = NULL;
+	void   *obj = NULL;
+
+	struct load_node *node;
+
+	/* Try to load the module */
 	(void)sprintf(buf, LUX_PREFIX "/lib/lux/%s.so", name);
 	mod = dlopen(buf, RTLD_LAZY);
-	if(mod) {
-		void *(*mk)(void);
-		void *obj;
-
-		(void)sprintf(buf, "luxC%s", name);
-		mk = (void *(*)(void))dlsym(mod, buf);
-		if(mk)
-			obj = mk();
-		else {
-			buf[3] = 'E';
-			obj = dlsym(mod, buf);
-		}
-
-		if(obj)
-			return obj;
-
-		(void)dlclose(mod);
+	if(!mod) {
+		lux_error("lux_load(\"%s\"): failed to load module\n", name);
+		goto cleanup;
 	}
+
+	/* Try to get the instance */
+	(void)sprintf(buf, "luxC%s", name);
+	mk = (void *(*)(void))dlsym(mod, buf);
+	if(mk) {
+		buf[3] = 'D';
+		rm  = (void (*)(void *))dlsym(mod, buf);
+		obj = mk();
+	} else {
+		buf[3] = 'E';
+		obj = dlsym(mod, buf);
+	}
+	if(!obj) {
+		lux_error("lux_load(\"%s\"): failed to instanize\n", name);
+		goto cleanup;
+	}
+
+	/* Try to save module to a hash table */
+	node = HADD(&ltab, obj, struct load_node);
+	if(!node) {
+		lux_error("lux_load(\"%s\"): failed to allocate node\n", name);
+		goto cleanup;
+	}
+
+	node->rm  = rm;
+	node->mod = mod;
+	return obj;
+
+ cleanup:
+	if(rm && obj)
+		rm(obj);
+	if(mod)
+		(void)dlclose(mod);
 	return NULL;
 }
 
 void
 lux_unload(void *obj)
 {
-	lux_error("[FIXME] lux_unload(%p): module needs to be freed\n", obj);
+	struct load_node *node = HPOP(&ltab, obj, struct load_node);
+	if(node) {
+		if(node->rm)
+			node->rm(obj);
+		(void)dlclose(node->mod);
+		free(node);
+	} else
+		lux_error("lux_unload(%p): module not found\n", obj);
 }
