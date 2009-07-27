@@ -23,6 +23,7 @@ dnl Customize "config.h" and rename it to "lux.h"
 # header is installed into "$prefix/include" so additional modules,
 # schemes, and runs can use it.
 AC_CONFIG_HEADERS([lux.h:lux.hin])
+AC_DEFINE_UNQUOTED(LUX_PREFIX, "$prefix", [Define to the prefix of the lux framework.])
 
 AH_TOP([/*
  * Copyright (C) 2009 Chi-kwan Chan
@@ -60,6 +61,9 @@ extern void lux_abort(void);
 
 extern void lux_print(const char *restrict, ...); /* print message to stdout */
 extern void lux_error(const char *restrict, ...); /* print message to stderr */
+
+extern void *lux_load(const char *restrict);
+extern void  lux_unload(void *);
 
 /*===========================================================================*/
 
