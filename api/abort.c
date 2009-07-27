@@ -18,25 +18,10 @@
  * along with lux.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include <lux.h>
-#include <stdlib.h> /* for atexit() */
-
-static void
-setup(void)
-{
-	/* Setup the lux environment */
-}
-
-static void
-cleanup(void)
-{
-	/* Cleanup the lux environment */
-}
+#include <stdlib.h> /* for exit() and EXIT_FAILURE */
 
 void
-lux_setup(void)
+lux_abort(void)
 {
-	if(!atexit(cleanup))
-		setup();
-	else
-		lux_abort();
+	exit(EXIT_FAILURE);
 }

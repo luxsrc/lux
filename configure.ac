@@ -56,6 +56,7 @@ AH_BOTTOM([/*===================================================================
 /* Public API */
 
 extern void lux_setup(void);
+extern void lux_abort(void);
 
 extern void lux_print(const char *restrict, ...); /* print message to stdout */
 
