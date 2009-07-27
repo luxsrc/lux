@@ -1,0 +1,29 @@
+Code conventions used by lux: based on the CONVENTIONS file in fftw3.
+
+LEARN FROM THE MASTERS: read Ken Thompson's C compiler in Plan 9 and
+  Matteo Frigo's fftw3 library.  Avoid learning from C++/Java
+  programs.
+
+INDENTATION, TAB, SPACE: follow Kernighan & Ritchie, exceptions:
+  1. use tabs for indentations and spaces for alignments (code looks
+  good even if tab size changes); 2. tabs are 8 characters (see Plan 9
+  source); 3. don't put space between a keyword and an open
+  parenthesis (avoid inconsistency); 4. put the return type of a
+  function in its own line (easy grep).
+
+NAMES: keep them consistent and short.  Shorter than you think.  The
+  Bible was written without vowels.  Don't outsmart the Bible.
+
+  Common names:
+
+    LUXC: module constructor
+    LUXD: module destructor
+    LUXE: module entry point
+
+  If a name is used often and must have the form foo_bar to avoid
+  namespace pollution, #define BAR foo_bar and use the short name.
+
+C++: the code should compile as a C++ program.  Run the code through
+  gcc -xc++.  The extra C++ restrictions are unnecessary, of course,
+  but this will save us from a flood of complaints when we release the
+  code.
