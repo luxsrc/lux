@@ -19,8 +19,10 @@
  */
 #include <lux.h>
 #include <lux/htab.h>
-#include <stdio.h> /* for sprintf() */
-#include <dlfcn.h> /* for dlopen(), dlsym(), and dlclose() */
+#include <lux/lazybuf.h>
+#include <string.h> /* for strlen() */
+#include <stdio.h>  /* for sprintf() */
+#include <dlfcn.h>  /* for dlopen(), dlsym(), and dlclose() */
 
 struct load_node {
 	struct htab_node super;
@@ -33,14 +35,21 @@ static struct htab ltab = HTAB_INIT; /* the loading table */
 void *
 lux_load(const char *restrict name)
 {
-	char buf[256]; /* FIXME: check string length */
+	char lazybuf[256], *buf;
 
-	void   *mod;
+	void   *mod = NULL;
 	void *(*mk)(void);
 	void  (*rm)(void *) = NULL;
 	void   *obj = NULL;
 
 	struct load_node *node;
+
+	/* Try to allocate more memory if name is too long */
+	buf = (char *)MALLOC(sizeof(LUX_PREFIX) + 12 + strlen(name));
+	if(!buf) {
+		lux_error("lux_load(\"%s\"): failed to allocate string\n", name);
+		goto cleanup;
+	}
 
 	/* Try to load the module */
 	(void)sprintf(buf, LUX_PREFIX "/lib/lux/%s.so", name);
@@ -75,6 +84,7 @@ lux_load(const char *restrict name)
 
 	node->rm  = rm;
 	node->mod = mod;
+	FREE(buf);
 	return obj;
 
  cleanup:
@@ -82,6 +92,8 @@ lux_load(const char *restrict name)
 		rm(obj);
 	if(mod)
 		(void)dlclose(mod);
+	if(buf)
+		FREE(buf);
 	return NULL;
 }
 
