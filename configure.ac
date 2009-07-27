@@ -13,6 +13,10 @@ AC_PROG_CPP
 AC_PROG_CC_STDC
 AM_PROG_CC_C_O
 
+AC_C_CONST
+AC_C_INLINE
+AC_C_RESTRICT
+
 dnl Customize "config.h" and rename it to "lux.h"
 # The `configure` script produces a customized public header "lux.h"
 # instead of the standard configuration header "config.h".  This
