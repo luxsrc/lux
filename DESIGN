@@ -1,0 +1,73 @@
+lux is designed around a simple but powerful module architecture.
+Everything in lux is implemented as a module.  The lux core library,
+libux, provides basic functions to access modules/plug-ins, to
+construct numerical schemes, and to configure simulations.
+
+INTERFACE: a lux interface Lux_MOD is simply a function type or a
+  structure of function pointers that provides a type-safe way to
+  access features in a lux module.  For example, a random number
+  generator may have the following interface:
+
+	typedef int (Lux_rand)(void); /* Lux_rand is not a pointer type */
+
+  an input/output module that loads and dumps simulation data may have
+  the following interface:
+
+	typedef struct {
+		void (*load)(Lux_sim *, const char *);
+		void (*dump)(Lux_sim *, const char *);
+	} Lux_io;
+
+  This approach allows more than one implementation of the same
+  interface.  A user can choose any implementation at run time:
+
+	Lux_rand *rg = lux_load("rand", "nr"); /* numerical recipes version  */
+	Lux_io   *io = lux_load("io",   ext);  /* ext can be "hdf5" or "vtk" */
+
+  and the following function calls should work properly:
+
+	int r = rg();
+	io->load(sim, name);
+
+  The lux interface Lux_MOD is defined in a header file MOD.h, which
+  is placed in mod/ in the lux source tree, and is installed to
+  $prefix/include/lux.
+
+DYNAMIC MODULE: a lux module MOD is a dynamically loadable library
+  that contains exactly one constructor
+
+	void *LUXC(va_list);
+
+  or, for one that does not require initialization, it needs to
+  contain exactly one "entry symbol"
+
+	Lux_MOD LUXE;
+
+  which may be an exported function (e.g., of type Lux_rand in the
+  previous section) or an exported structure (e.g., of type Lux_io)
+  that provides the module interface.  The macros LUXC and LUXE expand
+  to luxCMOD and to luxEMOD, respectively, to avoid symbol conflicts.
+  When lux_load() access a module, it calls LUXC() to construct the
+  interface or returns LUXE directly.  LUXC() may take care additional
+  resource allocations.  In such a case, the lux module must implement
+  a destructor:
+
+	void LUXD(Lux_MOD *);
+
+  which expands to luxDMOD, to release the allocated resource.
+
+CORE LIBRARY: the lux core library, libux, provides basic functions
+  such as lux_load() and lux_unload() to access other lux modules/
+  plug-ins, to construct numerical schemes, and to configure
+  simulations.
+
+  The lux executable provided within this software package is a
+  lightweight frontend of the lux core library for Unix-like
+  environments.  The full power of the lux framework can be easily
+  used by and integrated to other codes by first calling lux_setup()
+  to setup the lux environment and then linking them with
+
+	gcc program.c -lux -o program
+
+  In fact, this is the reason we chose "libux" as the core library
+  name --- the name does not come from linux.
