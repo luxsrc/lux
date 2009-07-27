@@ -56,6 +56,12 @@ DYNAMIC MODULE: a lux module MOD is a dynamically loadable library
 
   which expands to luxDMOD, to release the allocated resource.
 
+STATIC MODULE: sometimes it is overkill to pack some small functions
+  into a dynamic lux module.  Calling functions via pointers can also
+  reduce the performance.  Hence, we introduce the concept of "static
+  modules", which are just header files that contain static inline
+  functions and/or macros.
+
 CORE LIBRARY: the lux core library, libux, provides basic functions
   such as lux_load() and lux_unload() to access other lux modules/
   plug-ins, to construct numerical schemes, and to configure
