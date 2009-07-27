@@ -32,6 +32,11 @@ struct load_node {
 
 static struct htab ltab = HTAB_INIT; /* the loading table */
 
+#define FAILED_TO(s) do {                                               \
+		lux_error("lux_load(\"%s\"): failed to " s "\n", name); \
+		goto cleanup;                                           \
+	} while(0)
+
 void *
 lux_load(const char *restrict name)
 {
@@ -46,18 +51,14 @@ lux_load(const char *restrict name)
 
 	/* Try to allocate more memory if name is too long */
 	buf = (char *)MALLOC(sizeof(LUX_PREFIX) + 12 + strlen(name));
-	if(!buf) {
-		lux_error("lux_load(\"%s\"): failed to allocate string\n", name);
-		goto cleanup;
-	}
+	if(!buf)
+		FAILED_TO("allocate string");
 
 	/* Try to load the module */
 	(void)sprintf(buf, LUX_PREFIX "/lib/lux/%s.so", name);
 	mod = dlopen(buf, RTLD_LAZY);
-	if(!mod) {
-		lux_error("lux_load(\"%s\"): failed to load module\n", name);
-		goto cleanup;
-	}
+	if(!mod)
+		FAILED_TO("load module");
 
 	/* Try to get the instance */
 	(void)sprintf(buf, "luxC%s", name);
@@ -70,17 +71,13 @@ lux_load(const char *restrict name)
 		buf[3] = 'E';
 		obj = dlsym(mod, buf);
 	}
-	if(!obj) {
-		lux_error("lux_load(\"%s\"): failed to instanize\n", name);
-		goto cleanup;
-	}
+	if(!obj)
+		FAILED_TO("instanize module");
 
 	/* Try to save module to a hash table */
 	node = HADD(&ltab, obj, struct load_node);
-	if(!node) {
-		lux_error("lux_load(\"%s\"): failed to allocate node\n", name);
-		goto cleanup;
-	}
+	if(!node)
+		FAILED_TO("allocate loading table node");
 
 	node->rm  = rm;
 	node->mod = mod;
