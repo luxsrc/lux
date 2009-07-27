@@ -1,3 +1,3 @@
 lib_LTLIBRARIES = libux.la
 
-libux_la_SOURCES = print.c
+libux_la_SOURCES = print.c setup.c

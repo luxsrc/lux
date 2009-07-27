@@ -18,17 +18,25 @@
  * along with lux.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include <lux.h>
-#include <stdlib.h> /* for EXIT_SUCCESS */
+#include <stdlib.h> /* for atexit(), exit(), and EXIT_FAILURE */
 
-int
-main(int argc, char *argv[])
+static void
+setup(void)
 {
-	lux_setup();
+	/* Setup the lux environment */
+}
 
-	lux_print("lux ("PACKAGE_NAME") commit '"PACKAGE_VERSION"'\n");
+static void
+cleanup(void)
+{
+	/* Cleanup the lux environment */
+}
 
-	return EXIT_SUCCESS;
-
-	(void)argc; /* silence unused parameter warning */
-	(void)argv; /* silence unused parameter warning */
+void
+lux_setup(void)
+{
+	if(!atexit(cleanup))
+		setup();
+	else
+		exit(EXIT_FAILURE);
 }
