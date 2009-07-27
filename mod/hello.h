@@ -17,25 +17,9 @@
  * You should have received a copy of the GNU General Public License
  * along with lux.  If not, see <http://www.gnu.org/licenses/>.
  */
-#include <lux.h>
-#include <lux/hello.h>
-#include <stdlib.h> /* for EXIT_SUCCESS and EXIT_FAILURE */
+#ifndef _LUX_HELLO_H_
+#define _LUX_HELLO_H_
 
-int
-main(int argc, char *argv[])
-{
-	lux_setup();
+typedef void Lux_hello(void);
 
-	if(argc <= 1)
-		lux_print("lux ("PACKAGE_NAME") commit '"PACKAGE_VERSION"'\n");
-	else {
-		Lux_hello *hello = (Lux_hello *)lux_load(argv[1]);
-		if(hello) {
-			hello();
-			lux_unload((void *)hello);
-		} else
-			return EXIT_FAILURE;
-	}
-
-	return EXIT_SUCCESS;
-}
+#endif /* _LUX_HELLO_H_ */

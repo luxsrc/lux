@@ -17,6 +17,8 @@ AC_C_CONST
 AC_C_INLINE
 AC_C_RESTRICT
 
+AC_PROG_LN_S
+
 dnl Customize "config.h" and rename it to "lux.h"
 # The `configure` script produces a customized public header "lux.h"
 # instead of the standard configuration header "config.h".  This
@@ -54,6 +56,24 @@ extern "C" {
 /*===========================================================================*/])
 
 AH_BOTTOM([/*===========================================================================*/
+/* Macros for token transformation */
+
+#define LUX_STR1NG(s) #s
+#define LUX_STRING(s) LUX_STR1NG(s)
+
+#define LUX_C0NCAT(s, t) s ## t
+#define LUX_CONCAT(s, t) LUX_C0NCAT(s, t)
+
+/*---------------------------------------------------------------------------*/
+/* Name mangling by passing a cpp-flag "-DLUX_MOD_NAME=name" */
+
+#ifdef LUX_MOD_NAME
+#define LUXC LUX_CONCAT(luxC, LUX_MOD_NAME) /* constructor */
+#define LUXD LUX_CONCAT(luxD, LUX_MOD_NAME) /* destructor  */
+#define LUXE LUX_CONCAT(luxE, LUX_MOD_NAME) /* entry-point */
+#endif
+
+/*===========================================================================*/
 /* Public API */
 
 extern void lux_setup(void);
@@ -76,3 +96,8 @@ extern void  lux_unload(void *);
 dnl Output files
 AC_CONFIG_FILES(m4_esyscmd([find . -name 'Makefile.am' -type f | sed 's/\.\/\(.*\).am/\1/']))
 AC_OUTPUT
+
+# Ugly hack so '#include <lux/interface.h>' works
+if [[ ! -e $ac_pwd/lux ]]; then
+	$LN_S $srcdir/mod $ac_pwd/lux
+fi

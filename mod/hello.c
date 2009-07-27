@@ -19,23 +19,9 @@
  */
 #include <lux.h>
 #include <lux/hello.h>
-#include <stdlib.h> /* for EXIT_SUCCESS and EXIT_FAILURE */
 
-int
-main(int argc, char *argv[])
+void
+LUXE(void)
 {
-	lux_setup();
-
-	if(argc <= 1)
-		lux_print("lux ("PACKAGE_NAME") commit '"PACKAGE_VERSION"'\n");
-	else {
-		Lux_hello *hello = (Lux_hello *)lux_load(argv[1]);
-		if(hello) {
-			hello();
-			lux_unload((void *)hello);
-		} else
-			return EXIT_FAILURE;
-	}
-
-	return EXIT_SUCCESS;
+	lux_print("hello, world\n");
 }
