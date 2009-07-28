@@ -18,8 +18,10 @@
  * along with lux.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include <lux.h>
+#include <lux/lazybuf.h>
 #include <lux/task.h>
 #include <stdlib.h> /* for EXIT_SUCCESS and EXIT_FAILURE */
+#include <stdio.h>  /* for sprintf() */
 
 int
 main(int argc, char *argv[])
@@ -29,7 +31,16 @@ main(int argc, char *argv[])
 	if(argc <= 1)
 		lux_print("lux ("PACKAGE_NAME") commit '"PACKAGE_VERSION"'\n");
 	else {
-		Lux_task *task = (Lux_task *)lux_load(argv[1]);
+		char lazybuf[256], *buf;
+		Lux_task *task;
+
+		buf = (char *)MALLOC(6 + strlen(argv[1]));
+		if(!buf)
+			return EXIT_FAILURE;
+		(void)sprintf(buf, "task/%s", argv[1]);
+		task = (Lux_task *)lux_load(buf);
+		FREE(buf);
+
 		if(!task)
 			return EXIT_FAILURE;
 		task->exec(task);
