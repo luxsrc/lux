@@ -81,6 +81,10 @@ exec(Lux_task *task)
 	R *rhs = TASK->rhs;
 
 	W h;
+
+	icond(rho, n);
+	print(rho, n);
+
 	for(h = 0; h < n; ++h) {
 		bcond(rhs, rho, n, TASK->c / dx);
 		flux (rhs, rho, n, TASK->c / dx);
@@ -110,9 +114,6 @@ LUXC(va_list ap)
 			free(adv);
 			return NULL;
 		}
-
-		icond(adv->rho, adv->n);
-		print(adv->rho, adv->n);
 	}
 	return adv;
 }
