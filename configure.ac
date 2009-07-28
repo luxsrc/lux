@@ -29,7 +29,7 @@ AC_CHECK_TYPE([hrtime_t], [AC_DEFINE(HAVE_HRTIME_T, 1, [Define to 1 if hrtime_t 
 #endif])
 
 dnl Checks for functions
-AC_CHECK_FUNCS([gethrtime read_real_time time_base_to_time clock_gettime mach_absolute_time])
+AC_CHECK_FUNCS([BSDgettimeofday gettimeofday gethrtime read_real_time time_base_to_time clock_gettime mach_absolute_time])
 
 dnl Cray UNICOS _rtc() (real-time clock) intrinsic
 AC_MSG_CHECKING([for _rtc intrinsic])
