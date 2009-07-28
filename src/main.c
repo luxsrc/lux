@@ -18,22 +18,26 @@
  * along with lux.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include "src.h"
+#include <lux/switch.h>
 #include <lux/task.h>
 #include <string.h> /* for strcmp() */
 #include <stdlib.h> /* for EXIT_SUCCESS and EXIT_FAILURE */
+
+#define FLAG(s) CASE(!strcmp(argv[1], s))
 
 int
 main(int argc, char *argv[])
 {
 	lux_setup();
 
-	if(argc <= 1)
+	SWITCH {
+	CASE(argc <= 1)
 		return version();
-	else if(!strcmp(argv[1], "--help"))
+	FLAG("--help")
 		return usage(EXIT_SUCCESS);
-	else if(!strcmp(argv[1], "--version"))
+	FLAG("--version")
 		return version();
-	else {
+	DEFAULT
 		Lux_task *task = (Lux_task *)lux_load("task", argc-1, argv+1);
 		if(!task)
 			return EXIT_FAILURE;
