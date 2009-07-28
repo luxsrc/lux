@@ -18,24 +18,19 @@
  * along with lux.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include "src.h"
-#include <lux/task.h>
-#include <string.h> /* for strcmp() */
-#include <stdlib.h> /* for EXIT_SUCCESS and EXIT_FAILURE */
 
 int
-main(int argc, char *argv[])
+version(void)
 {
-	lux_setup();
+	lux_print("\
+lux (" LUX_NAME ") commit '" LUX_VERSION "'\n\
+\n\
+Copyright (C) 2009 Chi-kwan Chan\n\
+Copyright (C) 2009 Harvard-Smithsonian Center for Astrophysics\n\
+\n\
+License GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>.\n\
+This is free software: you are free to change and redistribute it.\n\
+There is NO WARRANTY, to the extent permitted by law.\n");
 
-	if(argc <= 1 || !strcmp(argv[1], "--version"))
-		return version();
-	else {
-		Lux_task *task = (Lux_task *)lux_load("task", argc-1, argv+1);
-		if(!task)
-			return EXIT_FAILURE;
-		task->exec(task);
-		lux_unload(task);
-	}
-
-	return EXIT_SUCCESS;
+	return 0;
 }
