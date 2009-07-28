@@ -18,14 +18,21 @@
  * along with lux.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include <lux.h>
+#include <errno.h>
 #include <stdarg.h>
 #include <stdio.h> /* for vprintf() */
 
 void
 lux_print(const char *restrict fmt, ...)
 {
+	int n, e = errno;
+
 	va_list ap;
 	va_start(ap, fmt);
-	vprintf(fmt, ap);
+	n = vprintf(fmt, ap);
 	va_end(ap);
+
+	if(n < 0)
+		errno = e; /* restore e to hide possible error emitted by
+		              vprintf(); TODO: make lux_print() more robust */
 }
