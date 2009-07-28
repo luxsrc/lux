@@ -56,6 +56,16 @@ DYNAMIC MODULE: a lux module MOD is a dynamically loadable library
 
   which expands to luxDMOD, to release the allocated resource.
 
+  A lux module MOD is implemented in mod/ in the lux source tree, and
+  is installed to $prefix/lib/lux.  In order to access dynamic
+  modules, libux requires an external dynamic linker, which may make
+  symbols from loaded modules globally accessible.  Therefore, module
+  developers may want to put all the source code into a single file
+  and define all private functions as static functions.  LUXC() or
+  LUXE can then interface all of these static functions.  This is an
+  ultimate way to avoid symbol conflicts because LUXC and LUXD, or
+  LUXE, are the only exported symbols.
+
 STATIC MODULE: sometimes it is overkill to pack some small functions
   into a dynamic lux module.  Calling functions via pointers can also
   reduce the performance.  Hence, we introduce the concept of "static
