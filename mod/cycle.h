@@ -105,7 +105,7 @@ typedef hrtime_t ticks;
 
 INLINE_ELAPSED(inline)
 
-#define HAVE_TICK_COUNTER
+#define HAVE_TICK_COUNTER 1
 #endif
 
 /*----------------------------------------------------------------*/
@@ -128,7 +128,7 @@ static __inline double elapsed(ticks t1, ticks t0) /* time in nanoseconds */
 	     ((double)t1.tb_low - (double)t0.tb_low));
 }
 
-#define HAVE_TICK_COUNTER
+#define HAVE_TICK_COUNTER 1
 #endif
 
 /*----------------------------------------------------------------*/
@@ -153,7 +153,7 @@ static __inline__ ticks getticks(void)
 
 INLINE_ELAPSED(__inline__)
 
-#define HAVE_TICK_COUNTER
+#define HAVE_TICK_COUNTER 1
 #endif
 
 /* MacOS/Mach (Darwin) time-base register interface (unlike UpTime,
@@ -163,7 +163,7 @@ INLINE_ELAPSED(__inline__)
 typedef uint64_t ticks;
 #define getticks mach_absolute_time
 INLINE_ELAPSED(__inline__)
-#define HAVE_TICK_COUNTER
+#define HAVE_TICK_COUNTER 1
 #endif
 
 /*----------------------------------------------------------------*/
@@ -184,7 +184,7 @@ static __inline__ ticks getticks(void)
 
 INLINE_ELAPSED(__inline__)
 
-#define HAVE_TICK_COUNTER
+#define HAVE_TICK_COUNTER 1
 #define TIME_MIN 5000.0   /* unreliable pentium IV cycle counter */
 #endif
 
@@ -211,7 +211,7 @@ static __inline double elapsed(ticks t1, ticks t0)
      return (double)t1.QuadPart - (double)t0.QuadPart;
 }  
 
-#define HAVE_TICK_COUNTER
+#define HAVE_TICK_COUNTER 1
 #define TIME_MIN 5000.0   /* unreliable pentium IV cycle counter */
 #endif
 
@@ -231,7 +231,7 @@ static __inline__ ticks getticks(void)
 
 INLINE_ELAPSED(__inline__)
 
-#define HAVE_TICK_COUNTER
+#define HAVE_TICK_COUNTER 1
 #endif
 
 /* PGI compiler, courtesy Cristiano Calonaci, Andrea Tarsi, & Roberto Gori.
@@ -244,7 +244,7 @@ static ticks getticks(void)
     asm(" rdtsc; shl    $0x20,%rdx; mov    %eax,%eax; or     %rdx,%rax;    ");
 }
 INLINE_ELAPSED(__inline__)
-#define HAVE_TICK_COUNTER
+#define HAVE_TICK_COUNTER 1
 #endif
 
 /* Visual C++, courtesy of Dirk Michaelis */
@@ -256,7 +256,7 @@ typedef unsigned __int64 ticks;
 #define getticks __rdtsc
 INLINE_ELAPSED(__inline)
 
-#define HAVE_TICK_COUNTER
+#define HAVE_TICK_COUNTER 1
 #endif
 
 /*----------------------------------------------------------------*/
@@ -276,7 +276,7 @@ static __inline__ ticks getticks(void)
  
 INLINE_ELAPSED(__inline__)
  
-#define HAVE_TICK_COUNTER
+#define HAVE_TICK_COUNTER 1
 #endif
 
 /* gcc */
@@ -293,7 +293,7 @@ static __inline__ ticks getticks(void)
 
 INLINE_ELAPSED(__inline__)
 
-#define HAVE_TICK_COUNTER
+#define HAVE_TICK_COUNTER 1
 #endif
 
 /* HP/UX IA64 compiler, courtesy Teresa L. Johnson: */
@@ -311,7 +311,7 @@ static inline ticks getticks(void)
 
 INLINE_ELAPSED(inline)
 
-#define HAVE_TICK_COUNTER
+#define HAVE_TICK_COUNTER 1
 #endif
 
 /* Microsoft Visual C++ */
@@ -333,7 +333,7 @@ static __inline ticks getticks(void)
 
 INLINE_ELAPSED(inline)
 
-#define HAVE_TICK_COUNTER
+#define HAVE_TICK_COUNTER 1
 #endif
 
 /*----------------------------------------------------------------*/
@@ -364,7 +364,7 @@ static inline unsigned long getticks(void)
 
 INLINE_ELAPSED(inline)
 
-#define HAVE_TICK_COUNTER
+#define HAVE_TICK_COUNTER 1
 #endif
 
 /*----------------------------------------------------------------*/
@@ -381,7 +381,7 @@ static __inline__ ticks getticks(void)
 
 INLINE_ELAPSED(__inline__)
 
-#define HAVE_TICK_COUNTER
+#define HAVE_TICK_COUNTER 1
 #endif
 /*----------------------------------------------------------------*/
 #if defined(__GNUC__) && defined(__alpha__) && !defined(HAVE_TICK_COUNTER)
@@ -400,7 +400,7 @@ static __inline__ ticks getticks(void)
 
 INLINE_ELAPSED(__inline__)
 
-#define HAVE_TICK_COUNTER
+#define HAVE_TICK_COUNTER 1
 #endif
 
 /*----------------------------------------------------------------*/
@@ -416,7 +416,7 @@ static __inline__ ticks getticks(void)
 
 INLINE_ELAPSED(__inline__)
 
-#define HAVE_TICK_COUNTER
+#define HAVE_TICK_COUNTER 1
 #endif
 
 /*----------------------------------------------------------------*/
@@ -433,7 +433,7 @@ static __inline ticks getticks(void)
 
 INLINE_ELAPSED(__inline)
 
-#define HAVE_TICK_COUNTER
+#define HAVE_TICK_COUNTER 1
 #endif
 /*----------------------------------------------------------------*/
 /* SGI/Irix */
@@ -452,7 +452,7 @@ static inline double elapsed(ticks t1, ticks t0)
      return ((double)t1.tv_sec - (double)t0.tv_sec) * 1.0E9 +
 	  ((double)t1.tv_nsec - (double)t0.tv_nsec);
 }
-#define HAVE_TICK_COUNTER
+#define HAVE_TICK_COUNTER 1
 #endif
 
 /*----------------------------------------------------------------*/
@@ -468,7 +468,7 @@ typedef long long ticks;
 
 INLINE_ELAPSED(inline)
 
-#define HAVE_TICK_COUNTER
+#define HAVE_TICK_COUNTER 1
 #endif
 
 /*----------------------------------------------------------------*/
@@ -510,7 +510,7 @@ static inline ticks getticks(void)
 
 INLINE_ELAPSED(inline)
 
-#define HAVE_TICK_COUNTER
+#define HAVE_TICK_COUNTER 1
 #endif
 #endif /* HAVE_MIPS_ZBUS_TIMER */
 

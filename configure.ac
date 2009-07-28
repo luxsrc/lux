@@ -34,7 +34,7 @@ AC_CHECK_FUNCS([BSDgettimeofday gettimeofday gethrtime read_real_time time_base_
 dnl Cray UNICOS _rtc() (real-time clock) intrinsic
 AC_MSG_CHECKING([for _rtc intrinsic])
 rtc_ok=yes
-AC_TRY_LINK([#ifdef HAVE_INTRINSICS_H
+AC_TRY_LINK([#if HAVE_INTRINSICS_H
 #include <intrinsics.h>
 #endif], [_rtc()], [AC_DEFINE(HAVE__RTC, 1, [Define if you have the UNICOS _rtc() intrinsic.])], [rtc_ok=no])
 AC_MSG_RESULT($rtc_ok)
@@ -117,7 +117,7 @@ AH_BOTTOM([/*===================================================================
 /*---------------------------------------------------------------------------*/
 /* Typedef numerical types */
 
-#ifdef HAVE_STDDEF_H
+#if HAVE_STDDEF_H
 typedef size_t    Lux_whole;
 typedef ptrdiff_t Lux_int;
 #else
