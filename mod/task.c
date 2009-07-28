@@ -18,23 +18,35 @@
  * along with lux.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include <lux.h>
+#include <lux/lazybuf.h>
 #include <lux/task.h>
-#include <stdlib.h> /* for EXIT_SUCCESS and EXIT_FAILURE */
+#include <stdarg.h>
+#include <string.h> /* for strlen() */
+#include <stdio.h>  /* for sprintf() */
 
-int
-main(int argc, char *argv[])
+void *
+LUXC(va_list ap)
 {
-	lux_setup();
+	void  *task;
 
-	if(argc <= 1)
-		lux_print("lux (" LUX_NAME ") commit '" LUX_VERSION "'\n");
-	else {
-		Lux_task *task = (Lux_task *)lux_load("task", argc-1, argv+1);
-		if(!task)
-			return EXIT_FAILURE;
-		task->exec(task);
-		lux_unload(task);
-	}
+	int    argc = va_arg(ap, int);
+	char **argv = va_arg(ap, char **);
 
-	return EXIT_SUCCESS;
+	char lazybuf[256], *buf;
+	buf = (char *)MALLOC(sizeof("task/") + strlen(argv[0]));
+	if(!buf)
+		return NULL;
+
+	(void)sprintf(buf, "task/%s", argv[0]);
+	task = lux_load(buf, argc, argv); /* "chain-loading" works as expected
+	                                     because of the array-of-stacks
+	                                     design of the hash table.  */
+	FREE(buf);
+	return task;
+}
+
+void
+LUXD(Lux_task *task)
+{
+	lux_unload(task);
 }

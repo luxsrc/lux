@@ -54,7 +54,13 @@ DYNAMIC MODULE: a lux module MOD is a dynamically loadable library
 
 	void LUXD(Lux_MOD *);
 
-  which expands to luxDMOD, to release the allocated resource.
+  which expands to luxDMOD, to release the allocated resource.  Note
+  that chain-loading, i.e., using
+
+	return lux_load(...);
+
+  in a constructor, is allowed.  It works as expected because of the
+  last-in-first-out nature of the stack used in the hash table.
 
   A lux module MOD is implemented in mod/ in the lux source tree, and
   is installed to $prefix/lib/lux.  In order to access dynamic
