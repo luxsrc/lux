@@ -18,7 +18,7 @@
  * along with lux.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include <lux.h>
-#include <lux/hello.h>
+#include <lux/task.h>
 #include <stdlib.h> /* for EXIT_SUCCESS and EXIT_FAILURE */
 
 int
@@ -29,12 +29,11 @@ main(int argc, char *argv[])
 	if(argc <= 1)
 		lux_print("lux ("PACKAGE_NAME") commit '"PACKAGE_VERSION"'\n");
 	else {
-		Lux_hello *hello = (Lux_hello *)lux_load(argv[1]);
-		if(hello) {
-			hello();
-			lux_unload((void *)hello);
-		} else
+		Lux_task *task = (Lux_task *)lux_load(argv[1]);
+		if(!task)
 			return EXIT_FAILURE;
+		task();
+		lux_unload((void *)task);
 	}
 
 	return EXIT_SUCCESS;

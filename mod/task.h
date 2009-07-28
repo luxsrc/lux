@@ -17,9 +17,9 @@
  * You should have received a copy of the GNU General Public License
  * along with lux.  If not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef _LUX_HELLO_H_
-#define _LUX_HELLO_H_
+#ifndef _LUX_TASK_H_
+#define _LUX_TASK_H_
 
-typedef void Lux_hello(void);
+typedef void Lux_task(void);
 
-#endif /* _LUX_HELLO_H_ */
+#endif /* _LUX_TASK_H_ */

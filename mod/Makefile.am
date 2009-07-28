@@ -1,8 +1,8 @@
 AM_LDFLAGS = -export-dynamic -module
 
-pkginclude_HEADERS = hash.h hello.h htab.h lazybuf.h
-pkglib_LTLIBRARIES = hello.la
+pkginclude_HEADERS = hash.h htab.h lazybuf.h task.h
+pkglib_LTLIBRARIES = task.la
 
-hello_la_CPPFLAGS = -DLUX_MOD_NAME=hello
-hello_la_SOURCES  = hello.h hello.c
-hello_la_LIBADD   = ../api/libux.la
+task_la_CPPFLAGS = -DLUX_MOD_NAME=task
+task_la_SOURCES  = task.h task.c
+task_la_LIBADD   = ../api/libux.la

@@ -18,10 +18,24 @@
  * along with lux.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include <lux.h>
-#include <lux/hello.h>
+
+static void
+task(void)
+{
+	lux_print("Hello World!\n");
+}
+
+void *
+LUXC(void)
+{
+	lux_print("Running constructor\n");
+	return (void *)task;
+}
 
 void
-LUXE(void)
+LUXD(void *obj)
 {
-	lux_print("hello, world\n");
+	lux_print("Running destructor\n");
+
+	(void)obj; /* silence unused parameter warning */
 }
