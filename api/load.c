@@ -18,6 +18,7 @@
  * along with lux.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include <lux.h>
+#include <lux/basename.h>
 #include <lux/htab.h>
 #include <lux/lazybuf.h>
 #include <string.h> /* for strlen() */
@@ -61,7 +62,7 @@ lux_load(const char *restrict name)
 		FAILED_TO("load module");
 
 	/* Try to get the instance */
-	(void)sprintf(buf, "luxC%s", name);
+	(void)sprintf(buf, "luxC%s", basename(name));
 	mk = (void *(*)(void))dlsym(mod, buf);
 	if(mk) {
 		buf[3] = 'D';
