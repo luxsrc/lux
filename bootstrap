@@ -29,6 +29,11 @@ if [ "x$1" != "xclean" ]; then
         -e'/full name and version of this package/{N;N;d;}' \
         -e'/Version number of package/{N;N;d;}' \
         -e'2d' \
+        -e's/by\ autoheader/by autoheader, edited by bootstrap/' \
+        -e's/this\ package/lux/g' \
+        -e's/PACKAGE_/LUX_/g' \
         -i~ lux.hin
-    rm  -f lux.hin~
+    sed -e's/\#define\ PACKAGE/#define LUX/g' \
+        -i~ configure
+    rm  -f lux.hin~ configure~
 fi

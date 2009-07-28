@@ -29,7 +29,7 @@ main(int argc, char *argv[])
 	lux_setup();
 
 	if(argc <= 1)
-		lux_print("lux ("PACKAGE_NAME") commit '"PACKAGE_VERSION"'\n");
+		lux_print("lux ("LUX_NAME") commit '"LUX_VERSION"'\n");
 	else {
 		char lazybuf[256], *buf;
 		Lux_task *task;
