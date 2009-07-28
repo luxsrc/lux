@@ -24,5 +24,11 @@ if [ "x$1" != "xclean" ]; then
     autoreconf --install --symlink --force --verbose
     autoreconf --install --symlink --force --verbose
     autoreconf --install --symlink --force --verbose
-    rm -f lux.hin~
+    sed -e'/libtool stores uninstalled libraries/{N;N;N;d;}' \
+        -e'/Name of package/{N;N;d;}' \
+        -e'/full name and version of this package/{N;N;d;}' \
+        -e'/Version number of package/{N;N;d;}' \
+        -e'2d' \
+        -i~ lux.hin
+    rm  -f lux.hin~
 fi
