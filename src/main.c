@@ -23,11 +23,14 @@
 #include <string.h> /* for strcmp() */
 #include <stdlib.h> /* for EXIT_SUCCESS and EXIT_FAILURE */
 
-#define FLAG(s) CASE(!strcmp(argv[1], s))
+#define UNLESS(e) CASE(!(e))
+#define FLAG(s)   UNLESS(strcmp(argv[1], s))
 
 int
 main(int argc, char *argv[])
 {
+	Lux_task *task = NULL;
+
 	lux_setup();
 
 	SWITCH {
@@ -37,10 +40,16 @@ main(int argc, char *argv[])
 		return usage(EXIT_SUCCESS);
 	FLAG("--version")
 		return version();
+	UNLESS(task = (Lux_task *)lux_load("task", argc-1, argv+1))
+		return unknown(argv[1]);
 	DEFAULT
-		Lux_task *task = (Lux_task *)lux_load("task", argc-1, argv+1);
-		if(!task)
-			return unknown(argv[1]);
+		lux_print("\n\
+  ,--.                     a flexible and extendable framework\n\
+  |  ,--.,--,--.  ,--.         for scientific computation\n\
+  |  |  ||  |\\  `'  /\n\
+  |  |  ''  ;/  /.  \\                alpha version\n\
+  `--'`----''--'  `--`             commit '" LUX_VERSION "'\n\n");
+
 		task->exec(task);
 		lux_unload(task);
 	}
