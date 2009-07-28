@@ -18,32 +18,11 @@
  * along with lux.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include "src.h"
-#include <lux/switch.h>
-#include <lux/task.h>
-#include <string.h> /* for strcmp() */
-#include <stdlib.h> /* for EXIT_SUCCESS and EXIT_FAILURE */
-
-#define FLAG(s) CASE(!strcmp(argv[1], s))
 
 int
-main(int argc, char *argv[])
+unknown(const char *restrict task)
 {
-	lux_setup();
+	lux_error("Task \"%s\" not found.\n", task);
 
-	SWITCH {
-	CASE(argc <= 1)
-		return version();
-	FLAG("--help")
-		return usage(EXIT_SUCCESS);
-	FLAG("--version")
-		return version();
-	DEFAULT
-		Lux_task *task = (Lux_task *)lux_load("task", argc-1, argv+1);
-		if(!task)
-			return unknown(argv[1]);
-		task->exec(task);
-		lux_unload(task);
-	}
-
-	return EXIT_SUCCESS;
+	return 64; /* EX_USAGE in <sysexits.h> */
 }

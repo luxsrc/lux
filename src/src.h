@@ -22,6 +22,7 @@
 
 #include <lux.h>
 
+extern int unknown(const char *restrict);
 extern int usage(int);
 extern int version(void);
 
