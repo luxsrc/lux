@@ -1,8 +1,6 @@
-AM_LDFLAGS = -export-dynamic -module
+# Static modules
+pkginclude_HEADERS  = basename.h hash.h htab.h lazybuf.h shorthand.h
 
-pkginclude_HEADERS = basename.h hash.h htab.h lazybuf.h shorthand.h task.h
-pkglib_LTLIBRARIES = advect.la
-
-advect_la_CPPFLAGS = -DLUX_MOD_NAME=advect
-advect_la_SOURCES  = task.h advect.c
-advect_la_LIBADD   = ../api/libux.la
+# Interfaces to dynamic modules
+pkginclude_HEADERS += task.h
+SUBDIRS             = task
