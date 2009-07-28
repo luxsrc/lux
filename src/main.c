@@ -27,7 +27,11 @@ main(int argc, char *argv[])
 {
 	lux_setup();
 
-	if(argc <= 1 || !strcmp(argv[1], "--version"))
+	if(argc <= 1)
+		return version();
+	else if(!strcmp(argv[1], "--help"))
+		return usage(EXIT_SUCCESS);
+	else if(!strcmp(argv[1], "--version"))
 		return version();
 	else {
 		Lux_task *task = (Lux_task *)lux_load("task", argc-1, argv+1);

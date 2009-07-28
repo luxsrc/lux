@@ -17,12 +17,20 @@
  * You should have received a copy of the GNU General Public License
  * along with lux.  If not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef _SRC_H_
-#define _SRC_H_
+#include "src.h"
 
-#include <lux.h>
+int
+usage(int status)
+{
+	lux_print("\
+Usage: lux [OPTION ...] TASK [ARGUMENT ...]\n\
+Perform a scientific computation task.\n\
+\n\
+Options:\n\
+      --help     display this help and exit\n\
+      --version  output version information and exit\n\
+\n\
+Report lux (" LUX_NAME ") bugs to <" LUX_BUGREPORT ">.\n");
 
-extern int usage(int);
-extern int version(void);
-
-#endif /* _SRC_H_ */
+	return status;
+}
