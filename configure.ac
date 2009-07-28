@@ -28,7 +28,6 @@ dnl Customize "config.h" and rename it to "lux.h"
 # header is installed into "$prefix/include" so additional modules,
 # schemes, and runs can use it.
 AC_CONFIG_HEADERS([lux.h:lux.hin])
-AC_DEFINE_UNQUOTED(LUX_PREFIX, "$prefix", [Define to the prefix of the lux framework.])
 
 AH_TOP([/*
  * Copyright (C) 2009 Chi-kwan Chan
@@ -57,6 +56,9 @@ extern "C" {
 #endif
 
 /*===========================================================================*/])
+
+dnl Define module path
+AC_DEFINE_UNQUOTED(LUX_MOD_PATH, "$prefix/lib/lux", [Define to the default module path.])
 
 dnl Make single-precision a configure option
 AC_ARG_ENABLE(single, [AC_HELP_STRING([--enable-single],[compile lux in single precision])], ok=$enableval, ok=no)

@@ -34,6 +34,12 @@ struct load_node {
 
 static struct htab ltab = HTAB_INIT; /* the loading table */
 
+static inline size_t
+max(size_t a, size_t b)
+{
+	return a > b ? a : b;
+}
+
 #define FAILED_TO(s) do {                                               \
 		lux_error("lux_load(\"%s\"): failed to " s "\n", name); \
 		goto cleanup;                                           \
@@ -52,12 +58,15 @@ lux_load(const char *restrict name, ...)
 	struct load_node *node;
 
 	/* Try to allocate more memory if name is too long */
-	buf = (char *)MALLOC(sizeof(LUX_PREFIX) + 12 + strlen(name));
+	buf = (char *)MALLOC(max(sizeof(LUX_MOD_PATH)+
+	                         4, /* == strlen("/.so") */
+	                         5) /* == sizeof("luxC") */
+	                     + strlen(name));
 	if(!buf)
 		FAILED_TO("allocate string");
 
 	/* Try to load the module */
-	(void)sprintf(buf, LUX_PREFIX "/lib/lux/%s.so", name);
+	(void)sprintf(buf, LUX_MOD_PATH "/%s.so", name);
 	mod = dlopen(buf, RTLD_LAZY);
 	if(!mod)
 		FAILED_TO("load module");
