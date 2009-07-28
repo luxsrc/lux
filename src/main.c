@@ -32,8 +32,8 @@ main(int argc, char *argv[])
 		Lux_task *task = (Lux_task *)lux_load(argv[1]);
 		if(!task)
 			return EXIT_FAILURE;
-		task();
-		lux_unload((void *)task);
+		task->exec(task);
+		lux_unload(task);
 	}
 
 	return EXIT_SUCCESS;

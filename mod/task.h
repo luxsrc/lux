@@ -20,6 +20,10 @@
 #ifndef _LUX_TASK_H_
 #define _LUX_TASK_H_
 
-typedef void Lux_task(void);
+typedef struct LuxStask Lux_task;
+
+struct LuxStask {
+	void (*exec)(Lux_task *);
+};
 
 #endif /* _LUX_TASK_H_ */
