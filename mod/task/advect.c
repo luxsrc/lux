@@ -21,6 +21,7 @@
 #include <lux/shorthand.h>
 #include <lux/task.h>
 #include <stdlib.h>
+#include <stdarg.h>
 
 struct advect {
 	Lux_task super;
@@ -89,20 +90,30 @@ exec(Lux_task *task)
 }
 
 void *
-LUXC(void)
+LUXC(va_list ap)
 {
+	int    argc = va_arg(ap, int);
+	char **argv = va_arg(ap, char **);
+
 	struct advect *adv = (struct advect *)malloc(sizeof(struct advect));
+	if(adv) {
+		adv->super.exec = exec;
 
-	adv->super.exec = exec;
+		adv->n = argc > 1 ? atoi(argv[1]) : 10;
+		adv->c = argc > 2 ? atof(argv[2]) : 1.0;
 
-	adv->n   = 10;
-	adv->c   = 1.0;
-	adv->rho = (R *)malloc(sizeof(R) * adv->n);
-	adv->rhs = (R *)malloc(sizeof(R) * adv->n);
+		adv->rho = (R *)malloc(sizeof(R) * adv->n);
+		adv->rhs = (R *)malloc(sizeof(R) * adv->n);
+		if(!adv->rho || !adv->rhs) {
+			if(adv->rho) free(adv->rho);
+			if(adv->rhs) free(adv->rhs);
+			free(adv);
+			return NULL;
+		}
 
-	icond(adv->rho, adv->n);
-	print(adv->rho, adv->n);
-
+		icond(adv->rho, adv->n);
+		print(adv->rho, adv->n);
+	}
 	return adv;
 }
 

@@ -38,7 +38,7 @@ main(int argc, char *argv[])
 		if(!buf)
 			return EXIT_FAILURE;
 		(void)sprintf(buf, "task/%s", argv[1]);
-		task = (Lux_task *)lux_load(buf);
+		task = (Lux_task *)lux_load(buf, argc-1, argv+1);
 		FREE(buf);
 
 		if(!task)

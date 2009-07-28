@@ -127,7 +127,7 @@ extern void lux_abort(void);
 extern void lux_print(const char *restrict, ...); /* print message to stdout */
 extern void lux_error(const char *restrict, ...); /* print message to stderr */
 
-extern void *lux_load(const char *restrict);
+extern void *lux_load(const char *restrict, ...);
 extern void  lux_unload(void *);
 
 /*===========================================================================*/

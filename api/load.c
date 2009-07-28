@@ -21,6 +21,7 @@
 #include <lux/basename.h>
 #include <lux/htab.h>
 #include <lux/lazybuf.h>
+#include <stdarg.h>
 #include <string.h> /* for strlen() */
 #include <stdio.h>  /* for sprintf() */
 #include <dlfcn.h>  /* for dlopen(), dlsym(), and dlclose() */
@@ -39,12 +40,12 @@ static struct htab ltab = HTAB_INIT; /* the loading table */
 	} while(0)
 
 void *
-lux_load(const char *restrict name)
+lux_load(const char *restrict name, ...)
 {
 	char lazybuf[256], *buf;
 
 	void   *mod = NULL;
-	void *(*mk)(void);
+	void *(*mk)(va_list);
 	void  (*rm)(void *) = NULL;
 	void   *obj = NULL;
 
@@ -63,11 +64,15 @@ lux_load(const char *restrict name)
 
 	/* Try to get the instance */
 	(void)sprintf(buf, "luxC%s", basename(name));
-	mk = (void *(*)(void))dlsym(mod, buf);
+	mk = (void *(*)(va_list))dlsym(mod, buf);
 	if(mk) {
+		va_list ap;
+		va_start(ap, name);
+		obj = mk(ap);
+		va_end(ap);
+
 		buf[3] = 'D';
-		rm  = (void (*)(void *))dlsym(mod, buf);
-		obj = mk();
+		rm = (void (*)(void *))dlsym(mod, buf);
 	} else {
 		buf[3] = 'E';
 		obj = dlsym(mod, buf);
