@@ -77,6 +77,8 @@
 */
 
 /***************************************************************************/
+#ifndef _FFTW3_CYCLE_H_
+#define _FFTW3_CYCLE_H_
 
 #if TIME_WITH_SYS_TIME
 # include <sys/time.h>
@@ -512,3 +514,4 @@ INLINE_ELAPSED(inline)
 #endif
 #endif /* HAVE_MIPS_ZBUS_TIMER */
 
+#endif /* _FFTW3_CYCLE_H_ */
