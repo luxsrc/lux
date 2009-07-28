@@ -19,6 +19,9 @@ AC_C_RESTRICT
 
 AC_PROG_LN_S
 
+dnl Check for headers
+AC_CHECK_HEADERS([stddef.h])
+
 dnl Customize "config.h" and rename it to "lux.h"
 # The `configure` script produces a customized public header "lux.h"
 # instead of the standard configuration header "config.h".  This
@@ -55,6 +58,14 @@ extern "C" {
 
 /*===========================================================================*/])
 
+dnl Make single-precision a configure option
+AC_ARG_ENABLE(single, [AC_HELP_STRING([--enable-single],[compile lux in single precision])], ok=$enableval, ok=no)
+AC_ARG_ENABLE(float,  [AC_HELP_STRING([--enable-float], [synonym for --enable-single])],     ok=$enableval)
+if test "$ok" = "yes"; then
+	AC_DEFINE(LUX_SINGLE, [1], [Define to 1 if single precision is used as the default precision.])
+fi
+AM_CONDITIONAL(USING_SINGLE, test "$ok" = "yes")
+
 AH_BOTTOM([/*===========================================================================*/
 /* Macros for token transformation */
 
@@ -72,6 +83,40 @@ AH_BOTTOM([/*===================================================================
 #define LUXD LUX_CONCAT(luxD, LUX_MOD_NAME) /* destructor  */
 #define LUXE LUX_CONCAT(luxE, LUX_MOD_NAME) /* entry-point */
 #endif
+
+/*===========================================================================*/
+/* Include a standard header file to get size_t */
+
+#if HAVE_STDDEF_H
+#include <stddef.h>
+#elif HAVE_SYS_TYPES_H
+#include <sys/types.h>
+#else
+#include <stdio.h>
+#endif
+
+/*---------------------------------------------------------------------------*/
+/* Typedef numerical types */
+
+#ifdef HAVE_STDDEF_H
+typedef size_t    Lux_whole;
+typedef ptrdiff_t Lux_int;
+#else
+typedef unsigned  Lux_whole;
+typedef int       Lux_int;
+#endif
+
+#ifdef LUX_SINGLE
+typedef float  Lux_real;
+#else
+typedef double Lux_real;
+#endif
+
+typedef double Lux_xreal; /* real numbers with possibly extra precision */
+
+typedef struct {Lux_int   n, m;} Lux_rational;
+typedef struct {Lux_real  r, i;} Lux_complex;
+typedef struct {Lux_xreal r, i;} Lux_xcomplex;
 
 /*===========================================================================*/
 /* Public API */

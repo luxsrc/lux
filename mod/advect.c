@@ -22,23 +22,23 @@
 #include <stdlib.h>
 
 struct advect {
-	Lux_task super;
-	size_t n;
-	double c, *rho, *rhs;
+	Lux_task  super;
+	Lux_whole n;
+	Lux_real  c, *rho, *rhs;
 };
 
 #define TASK ((struct advect *)task)
 
 static inline void
-icond(double *rho, size_t n)
+icond(Lux_real *rho, Lux_whole n)
 {
-	size_t i;
+	Lux_whole i;
 	for(i = 0; i < n; ++i)
 		rho[i] = 0.0;
 }
 
 static inline void
-bcond(double *rhs, const double *rho, size_t n, double g)
+bcond(Lux_real *rhs, const Lux_real *rho, Lux_whole n, Lux_real g)
 {
 	rhs[0] = -g * (rho[0] - 1.0);
 
@@ -46,25 +46,25 @@ bcond(double *rhs, const double *rho, size_t n, double g)
 }
 
 static inline void
-flux(double *rhs, const double *rho, size_t n, double g)
+flux(Lux_real *rhs, const Lux_real *rho, Lux_whole n, Lux_real g)
 {
-	size_t i;
+	Lux_whole i;
 	for(i = 1; i < n; ++i)
 		rhs[i] = -g * (rho[i] - rho[i-1]);
 }
 
 static inline void
-Euler(double *rho, const double *rhs, size_t n, double dt)
+Euler(Lux_real *rho, const Lux_real *rhs, Lux_whole n, Lux_real dt)
 {
-	size_t i;
+	Lux_whole i;
 	for(i = 0; i < n; ++i)
 		rho[i] += dt * rhs[i];
 }
 
 static inline void
-print(const double *rho, size_t n)
+print(const Lux_real *rho, Lux_whole n)
 {
-	size_t i;
+	Lux_whole i;
 	for(i = 0; i < n-1; ++i)
 		lux_print("%7.5f\t", rho[i]);
 	lux_print("%7.5f\n", rho[i]);
@@ -73,12 +73,12 @@ print(const double *rho, size_t n)
 static void
 exec(Lux_task *task)
 {
-	size_t  n   = TASK->n;
-	double  dx  = 1.0 / n;
-	double *rho = TASK->rho;
-	double *rhs = TASK->rhs;
+	Lux_whole n   = TASK->n;
+	Lux_real  dx  = 1.0 / n;
+	Lux_real *rho = TASK->rho;
+	Lux_real *rhs = TASK->rhs;
 
-	size_t  h;
+	Lux_whole h;
 	for(h = 0; h < n; ++h) {
 		bcond(rhs, rho, n, TASK->c / dx);
 		flux (rhs, rho, n, TASK->c / dx);
@@ -95,8 +95,8 @@ LUXC(void)
 
 	adv->n   = 10;
 	adv->c   = 1.0;
-	adv->rho = (double *)malloc(sizeof(double) * adv->n);
-	adv->rhs = (double *)malloc(sizeof(double) * adv->n);
+	adv->rho = (Lux_real *)malloc(sizeof(Lux_real) * adv->n);
+	adv->rhs = (Lux_real *)malloc(sizeof(Lux_real) * adv->n);
 
 	icond(adv->rho, adv->n);
 	print(adv->rho, adv->n);
