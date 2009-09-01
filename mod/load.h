@@ -22,6 +22,7 @@
 
 #include <lux.h>
 #include <lux/basename.h>
+#include <lux/failed.h>
 #include <lux/htab.h>
 #include <lux/lazybuf.h>
 #include <stdarg.h>
@@ -36,9 +37,10 @@ struct load_node {
 
 static struct htab ltab = HTAB_INIT; /* the loading table */
 
-#define FAILED_TO(s) do {                                            \
-		lux_error("vload(\"%s\"): failed to " s "\n", name); \
-		goto cleanup;                                        \
+#define FAILED_AS(f) do {        \
+		failed = f;      \
+		(void)dlerror(); \
+		goto cleanup;    \
 	} while(0)
 
 static inline void *
@@ -57,33 +59,39 @@ vload(const char *restrict name, va_list ap)
 	   5 == sizeof("luxC") > sizeof(".so")*/
 	buf = (char *)MALLOC(5 + strlen(name));
 	if(!buf)
-		FAILED_TO("allocate string");
+		goto cleanup; /* failure code was set by MALLOC() */
 
 	/* Try to load the module */
 	(void)strcat(strcpy(buf, name), ".so");
 	mod = dlopen(buf, RTLD_LAZY);
 	if(!mod)
-		FAILED_TO("load module");
+		FAILED_AS(FNOMOD);
 
 	/* Try to get the instance */
 	(void)strcat(strcpy(buf, "luxC"), basename(name));
 	mk = (void *(*)(va_list))dlsym(mod, buf);
 	if(mk) {
-		obj = mk(ap);
-
+		int f = failed;
 		buf[3] = 'D';
 		rm = (void (*)(void *))dlsym(mod, buf);
+		if(!rm) {
+			failed = f;
+			(void)dlerror();
+		}
+		obj = mk(ap);
+		if(!obj)
+			FAILED_AS(F2CONS);
 	} else {
 		buf[3] = 'E';
 		obj = dlsym(mod, buf);
+		if(!obj)
+			FAILED_AS(FNOSYM);
 	}
-	if(!obj)
-		FAILED_TO("instanize module");
 
 	/* Try to save module to a hash table */
 	node = HADD(&ltab, obj, struct load_node);
 	if(!node)
-		FAILED_TO("allocate loading table node");
+		goto cleanup; /* failure code was set by HADD() */
 
 	node->rm  = rm;
 	node->mod = mod;
@@ -110,7 +118,7 @@ uload(void *obj)
 		(void)dlclose(node->mod);
 		free(node);
 	} else
-		lux_error("uload(%p): module not loaded\n", obj);
+		failed = FNOMOD;
 }
 
 #endif /* _LUX_LOAD_H_ */

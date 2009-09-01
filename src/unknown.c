@@ -18,11 +18,17 @@
  * along with lux.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include "src.h"
+#include <lux/failed.h>
 
 int
 unknown(const char *restrict task)
 {
-	lux_error("Task \"%s\" not found.\n", task);
+	const char *s = failure_msg(failed);
+
+	if(s)
+		lux_error("Failed to load task \"%s\" [%s].\n", task, s);
+	else
+		lux_error("Failed to load task \"%s\".\n", task);
 
 	return 64; /* EX_USAGE in <sysexits.h> */
 }

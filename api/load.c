@@ -59,11 +59,8 @@ lux_load(const char *restrict name, ...)
 
 	/* Try to allocate more memory if name is too long */
 	buf = (char *)MALLOC(maxlen + sizeof("/") + strlen(name));
-	if(!buf) {
-		lux_error("lux_load(\"%s\"): failed to allocate string\n",
-		          name);
-		return NULL;
-	}
+	if(!buf)
+		return NULL; /* failure code was set by MALLOC() */
 
 	/* Try to load the module */
 	va_start(ap, name);
