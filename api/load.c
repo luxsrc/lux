@@ -20,13 +20,13 @@
 #include <lux.h>
 #include <lux/lazybuf.h>
 #include <lux/load.h>
-#include <unistd.h> /* for getcwd() */
+#include <unistd.h> /* for getcwd() and getenv() */
 #include <string.h> /* for strcat(), strcpy(), and strlen() */
 #include <stdarg.h>
 
 #define COUNT_OF(a) (sizeof(a) / sizeof(a[0]))
 
-static const char *paths[] = {NULL, LUX_MOD_PATH};
+static const char *paths[] = {NULL, NULL, LUX_MOD_PATH};
 
 static inline size_t
 max(size_t a, size_t b)
@@ -46,6 +46,13 @@ lux_load(const char *restrict name, ...)
 
 	if(!paths[0])
 		paths[0] = getcwd(NULL, 0);
+	if(!paths[1]) {
+		char *home = getenv("HOME");
+		char *path = (char *)malloc(strlen(home) +
+		                          sizeof("/.lux/lib/lux"));
+		paths[1] = strcat(strcpy(path, home), "/.lux/lib/lux");
+	}
+	/* TODO: free paths[0] and paths[1] in lux-wise cleanup */
 
 	for(i = 1, maxlen = strlen(paths[0]); i < COUNT_OF(paths); ++i)
 		maxlen = max(maxlen, strlen(paths[i]));
