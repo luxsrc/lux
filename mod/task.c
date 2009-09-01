@@ -21,8 +21,7 @@
 #include <lux/lazybuf.h>
 #include <lux/task.h>
 #include <stdarg.h>
-#include <string.h> /* for strlen() */
-#include <stdio.h>  /* for sprintf() */
+#include <string.h> /* for strcat(), strcpy(), and strlen() */
 
 void *
 LUXC(va_list ap)
@@ -37,7 +36,7 @@ LUXC(va_list ap)
 	if(!buf)
 		return NULL;
 
-	(void)sprintf(buf, "task/%s", argv[0]);
+	(void)strcat(strcpy(buf, "task/"), argv[0]);
 	task = lux_load(buf, argc, argv); /* "chain-loading" works as expected
 	                                     because of the array-of-stacks
 	                                     design of the hash table.  */

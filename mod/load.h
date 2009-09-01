@@ -25,8 +25,7 @@
 #include <lux/htab.h>
 #include <lux/lazybuf.h>
 #include <stdarg.h>
-#include <string.h> /* for strlen() */
-#include <stdio.h>  /* for sprintf() */
+#include <string.h> /* for strcat(), strcpy(), and strlen() */
 #include <dlfcn.h>  /* for dlopen(), dlsym(), and dlclose() */
 
 struct load_node {
@@ -61,13 +60,13 @@ vload(const char *restrict name, va_list ap)
 		FAILED_TO("allocate string");
 
 	/* Try to load the module */
-	(void)sprintf(buf, "%s.so", name);
+	(void)strcat(strcpy(buf, name), ".so");
 	mod = dlopen(buf, RTLD_LAZY);
 	if(!mod)
 		FAILED_TO("load module");
 
 	/* Try to get the instance */
-	(void)sprintf(buf, "luxC%s", basename(name));
+	(void)strcat(strcpy(buf, "luxC"), basename(name));
 	mk = (void *(*)(va_list))dlsym(mod, buf);
 	if(mk) {
 		obj = mk(ap);

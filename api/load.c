@@ -20,8 +20,7 @@
 #include <lux.h>
 #include <lux/lazybuf.h>
 #include <lux/load.h>
-#include <string.h> /* for strlen() */
-#include <stdio.h>  /* for sprintf() */
+#include <string.h> /* for strcat(), strcpy(), and strlen() */
 #include <stdarg.h>
 
 static const char *path = LUX_MOD_PATH;
@@ -41,7 +40,7 @@ lux_load(const char *restrict name, ...)
 		          name);
 		return NULL;
 	}
-	(void)sprintf(buf, "%s/%s", path, name);
+	(void)strcat(strcat(strcpy(buf, path), "/"), name);
 
 	/* Try to load the module */
 	va_start(ap, name);
