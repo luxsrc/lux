@@ -22,6 +22,26 @@ AC_PROG_LN_S
 dnl Check for headers
 AC_CHECK_HEADERS([stddef.h])
 
+dnl Check for types
+AC_COMPUTE_INT([ibits], [sizeof(int) * CHAR_BIT], [#include <limits.h>], [AC_MSG_ERROR([failed to compute the size of int in bits])])
+
+dnl Find out the number of bits required to hold all error codes
+AC_COMPUTE_INT([elast], [ELAST],   [#include <errno.h>], [
+AC_COMPUTE_INT([elast], [EDQUOT],  [#include <errno.h>], [
+AC_COMPUTE_INT([elast], [ERFKILL], [#include <errno.h>], [
+	elast=255
+])])])
+
+if test $ibits -lt 32; then
+	if   test $elast -lt 1024; then ebits=11
+	elif test $elast -lt 3072; then ebits=12
+	elif test $elast -lt 7168; then ebits=13
+	else AC_MSG_ERROR([ELAST = $elast is too large for 16-bit architecture])
+	fi
+elif test $elast -lt 64512; then ebits=16
+else AC_MSG_ERROR([ELAST = $elast is unexpectedly large])
+fi
+
 dnl Customize "config.h" and rename it to "lux.h"
 # The `configure` script produces a customized public header "lux.h"
 # instead of the standard configuration header "config.h".  This
@@ -59,6 +79,11 @@ extern "C" {
 
 dnl Define module path
 AC_DEFINE_UNQUOTED(LUX_MOD_PATH, "$prefix/lib/lux", [Define to the default module path.])
+
+dnl Define error code related macros
+AC_DEFINE_UNQUOTED(LUX_ELAST,     $elast, [Define to the largest system error code.])
+AC_DEFINE_UNQUOTED(LUX_ERRNO_BIT, $ebits, [Define to the required bits to hold all error codes.])
+AC_DEFINE_UNQUOTED(LUX_INT_BIT,   $ibits, [Define to the size of int in bits.])
 
 dnl Make single-precision a configure option
 AC_ARG_ENABLE(single, [AC_HELP_STRING([--enable-single],[compile lux in single precision])], ok=$enableval, ok=no)
