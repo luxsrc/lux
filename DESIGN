@@ -108,6 +108,16 @@ ERROR HANDLING: the term "error" in this section refers to a
   convention---the null pointer is an indication of error and
   developers are expected to check errno for the error code manually.
 
+  The lvalue errno has type int, which is at least 16-bit in C.  The
+  maximum defined error code (ELAST for BSD and EMAXERRNO for
+  Linux/MIPS, which are unified as LUX_ELAST in lux) is usually only a
+  few hundreds.  Therefore, we can encode additional information in
+  errno to help handling errors.  lux allows at least 1024 customized
+  error codes and defines LUX_ERRNO_BIT to be the required bits of
+  holding both system and customized error codes.  lux reserves
+  exactly 3 bits to encode the error level and at least 1 bit to
+  indicate if any error message is attached to the error code.
+
 CORE LIBRARY: the lux core library, libux, provides basic functions
   such as lux_load() and lux_unload() to access other lux modules/
   plug-ins, to construct numerical schemes, and to configure
