@@ -78,23 +78,24 @@ STATIC MODULE: sometimes it is overkill to pack some small functions
   modules", which are just header files that contain static inline
   functions and/or macros.
 
-ERROR HANDLING: the term "error" in this section refers to a
-  recoverable and expected runtime error.  It is the type of errors
-  typically handled by exceptions in object oriented languages such as
-  C++ and Java.  Examples include "out of memory" by allocating memory
-  and "permission denied" by opening a file.  It is not a programming
-  bug that the developer can fixed.  However, ignoring such a runtime
-  error in lux is considered a bug.
+ERROR/FAILURE HANDLING: the terms "error" here refers to a recoverable
+  and expected runtime error.  It is the type of errors typically
+  handled by exceptions in object oriented languages such as C++ and
+  Java.  Examples include "out of memory" by allocating memory and
+  "permission denied" by opening a file.  It is not a programming bug
+  that the developer can fixed.  However, ignoring such a runtime
+  error in lux is considered a bug.  We use the term "failure" in lux
+  for recoverable runtime errors to avoid confusions.
 
   In C, ad-hoc special values of the returned variable are used to
-  indicate errors.  Once an error is identified, the special global
-  variable errno is checked to obtain the detail of the error.  This
+  indicate failures.  Once a failure is identified, the special global
+  variable errno is checked to obtain the detail of the failure.  This
   overcomes the limitation that a C function can only return a single
   variable.  Usually, a message is then logged before other action is
-  taken to resolve the error:
+  taken to resolve the failure:
 
 	int fid = open(path, flag, mode);
-	if(fid < 0) { /* handle error */
+	if(fid < 0) { /* handle failure */
 		int err = errno;
 		(void)fprintf(stderr,
 		              "Failed to open \"%s\" [%d: %s]\n",
@@ -102,21 +103,27 @@ ERROR HANDLING: the term "error" in this section refers to a
 		...
 	}
 
-  To avoid infinite recursion of error logging, lux loggers never emit
-  error themselves.  For other functions that can fail in lux, they
-  often return pointers.  It is natural to employ the standard
-  convention---the null pointer is an indication of error and
-  developers are expected to check errno for the error code manually.
+  To avoid infinite recursion of failure logging, lux loggers never
+  emit failure code themselves.  For other functions that can fail in
+  lux, they often return pointers.  It is natural to employ the
+  standard convention---the null pointer is an indication of failure
+  and developers are expected to check for the failure code manually.
 
-  The lvalue errno has type int, which is at least 16-bit in C.  The
-  maximum defined error code (ELAST for BSD and EMAXERRNO for
-  Linux/MIPS, which are unified as LUX_ELAST in lux) is usually only a
-  few hundreds.  Therefore, we can encode additional information in
-  errno to help handling errors.  lux allows at least 1024 customized
-  error codes and defines LUX_ERRNO_BIT to be the required bits of
-  holding both system and customized error codes.  lux reserves
-  exactly 3 bits to encode the error level and at least 1 bit to
-  indicate if any error message is attached to the error code.
+  lux enhances the standard <errno.h> mechanism by implement a static
+  module <lux/failed.h>, where we define the following:
+
+	#define failed errno
+
+  The macro `failed`, just like errno, is an lvalue and has type int,
+  which is at least 16-bit in C.  The maximum defined system failure
+  code (ELAST for BSD and EMAXERRNO for Linux/MIPS, which are unified
+  as LUX_ELAST in lux) is usually only a few hundreds.  Therefore, we
+  can encode additional information in `failed` to help handling
+  failures.  lux allows at least 1024 customized failure codes and
+  defines LUX_FAILURE_BIT to be the required bits of holding both
+  system and customized failure codes.  lux reserves exactly 3 bits to
+  encode the error level and at least 1 bit to indicate if any failed
+  message is attached to the failed code.
 
 CORE LIBRARY: the lux core library, libux, provides basic functions
   such as lux_load() and lux_unload() to access other lux modules/
