@@ -18,21 +18,28 @@
  * along with lux.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include <lux.h>
-#include <errno.h>
-#include <stdarg.h>
-#include <stdio.h> /* for vprintf() */
+#include <lux/failed.h>
+#include <stdio.h> /* for FILE and vfprintf() */
+
+int lux_log_debug = 0; /* debugging message is disabled by default */
+int lux_log_print = 1;
+int lux_log_error = 2;
 
 void
-lux_print(const char *restrict fmt, ...)
+lux_vlog(int flag, const char *restrict fmt, va_list ap)
 {
-	int n, e = errno;
+	FILE *stream = NULL;
+	switch(flag) {
+	case 1: stream = stdout; break;
+	case 2: stream = stderr; break;
+	}
 
-	va_list ap;
-	va_start(ap, fmt);
-	n = vprintf(fmt, ap);
-	va_end(ap);
-
-	if(n < 0)
-		errno = e; /* restore e to hide possible error emitted by
-		              vprintf(); TODO: make lux_print() more robust */
+	if(stream) {
+		int f = failed;
+		int n = vfprintf(stream, fmt, ap);
+		if(n < 0)
+			failed = f; /* restore failure code to hide possible
+			               error emitted by vfprintf();
+			               TODO: make lux_vlog() more robust */
+	}
 }

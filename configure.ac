@@ -151,15 +151,35 @@ typedef struct {Lux_xreal r, i;} Lux_xcomplex;
 
 /*===========================================================================*/
 /* Public API */
+#include <stdarg.h> /* for va_list */
 
 extern void lux_setup(void);
 extern void lux_abort(void);
 
-extern void lux_print(const char *restrict, ...); /* print message to stdout */
-extern void lux_error(const char *restrict, ...); /* print message to stderr */
+extern void lux_vlog(int, const char *restrict, va_list);
 
 extern void *lux_load(const char *restrict, ...);
 extern void  lux_unload(void *);
+
+/*===========================================================================*/
+/* Convenience Message Logging Functions */
+
+extern int lux_log_debug, lux_log_print, lux_log_error;
+
+#define LUX_DEF_MSGLOG(level) static inline void    \
+	lux_##level(const char *restrict fmt, ...)  \
+	{                                           \
+		va_list ap;                         \
+		va_start(ap, fmt);                  \
+		lux_vlog(lux_log_##level, fmt, ap); \
+		va_end(ap);                         \
+	}
+
+LUX_DEF_MSGLOG(debug)
+LUX_DEF_MSGLOG(print)
+LUX_DEF_MSGLOG(error)
+
+#undef LUX_DEF_MSGLOG
 
 /*===========================================================================*/
 
