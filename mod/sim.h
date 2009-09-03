@@ -17,34 +17,13 @@
  * You should have received a copy of the GNU General Public License
  * along with lux.  If not, see <http://www.gnu.org/licenses/>.
  */
-#include <lux.h>
-#include <lux/lazybuf.h>
-#include <lux/task.h>
-#include <string.h> /* for strcat(), strcpy(), and strlen() */
+#ifndef _LUX_SIM_H_
+#define _LUX_SIM_H_
 
-void *
-LUXC(va_list ap)
-{
-	void  *task;
+typedef struct LuxSsim Lux_sim;
 
-	int    argc = va_arg(ap, int);
-	char **argv = va_arg(ap, char **);
+struct LuxSsim {
+	void (*exec)(Lux_sim *);
+};
 
-	char lazybuf[256], *buf;
-	buf = (char *)MALLOC(sizeof("task/") + strlen(argv[0]));
-	if(!buf)
-		return NULL;
-
-	(void)strcat(strcpy(buf, "task/"), argv[0]);
-	task = lux_load(buf, argc, argv); /* "chain-loading" works as expected
-	                                     because of the array-of-stacks
-	                                     design of the hash table.  */
-	FREE(buf);
-	return task;
-}
-
-void
-LUXD(Lux_task *task)
-{
-	lux_unload(task);
-}
+#endif /* _LUX_SIM_H_ */

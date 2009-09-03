@@ -18,8 +18,8 @@
  * along with lux.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include "src.h"
+#include <lux/sim.h>
 #include <lux/switch.h>
-#include <lux/task.h>
 #include <string.h> /* for strcmp() */
 #include <stdlib.h> /* for EXIT_SUCCESS and EXIT_FAILURE */
 
@@ -29,7 +29,7 @@
 int
 main(int argc, char *argv[])
 {
-	Lux_task *task = NULL;
+	Lux_sim *sim = NULL;
 
 	lux_setup();
 
@@ -40,7 +40,7 @@ main(int argc, char *argv[])
 		return usage(EXIT_SUCCESS);
 	FLAG("--version")
 		return version();
-	UNLESS(task = (Lux_task *)lux_load("task", argc-1, argv+1))
+	UNLESS(sim = (Lux_sim *)lux_load("sim", argc-1, argv+1))
 		return unknown(argv[1]);
 	DEFAULT
 		lux_print("\n\
@@ -50,8 +50,8 @@ main(int argc, char *argv[])
   |  |  ''  ;/  /.  \\                alpha version\n\
   `--'`----''--'  `--`             commit '" LUX_VERSION "'\n\n");
 
-		task->exec(task);
-		lux_unload(task);
+		sim->exec(sim);
+		lux_unload(sim);
 	}
 
 	return EXIT_SUCCESS;

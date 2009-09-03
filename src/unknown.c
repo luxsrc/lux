@@ -21,14 +21,14 @@
 #include <lux/failed.h>
 
 int
-unknown(const char *restrict task)
+unknown(const char *restrict sim)
 {
 	const char *s = failure_msg(failed);
 	if(s) {
 		lux_fput(NULL); /* clean internal log */
-		lux_error("Failed to load task \"%s\" [%s].\n", task, s);
+		lux_error("Failed to load simulation \"%s\" [%s].\n", sim, s);
 	} else
-		lux_error("Failed to load task \"%s\".\n", task);
+		lux_error("Failed to load simulation \"%s\".\n", sim);
 
 	return 64; /* EX_USAGE in <sysexits.h> */
 }

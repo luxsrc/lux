@@ -17,20 +17,34 @@
  * You should have received a copy of the GNU General Public License
  * along with lux.  If not, see <http://www.gnu.org/licenses/>.
  */
-#include "src.h"
+#include <lux.h>
+#include <lux/lazybuf.h>
+#include <lux/sim.h>
+#include <string.h> /* for strcat(), strcpy(), and strlen() */
 
-int
-usage(int status)
+void *
+LUXC(va_list ap)
 {
-	lux_print("\
-Usage: lux [OPTION ...] SIM [ARGUMENT ...]\n\
-Perform a scientific computation simulation.\n\
-\n\
-Options:\n\
-      --help     display this help and exit\n\
-      --version  output version information and exit\n\
-\n\
-Report lux (" LUX_NAME ") bugs to <" LUX_BUGREPORT ">.\n");
+	void  *sim;
 
-	return status;
+	int    argc = va_arg(ap, int);
+	char **argv = va_arg(ap, char **);
+
+	char lazybuf[256], *buf;
+	buf = (char *)MALLOC(sizeof("sim/") + strlen(argv[0]));
+	if(!buf)
+		return NULL;
+
+	(void)strcat(strcpy(buf, "sim/"), argv[0]);
+	sim = lux_load(buf, argc, argv); /* "chain-loading" works as expected
+	                                    because of the array-of-stacks
+	                                    design of the hash table.  */
+	FREE(buf);
+	return sim;
+}
+
+void
+LUXD(Lux_sim *sim)
+{
+	lux_unload(sim);
 }
