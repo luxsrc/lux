@@ -114,16 +114,42 @@ ERROR/FAILURE HANDLING: the terms "error" here refers to a recoverable
 
 	#define failed errno
 
-  The macro `failed`, just like errno, is an lvalue and has type int,
+  The macro `failed`, expands to errno, is an lvalue and has type int,
   which is at least 16-bit in C.  The maximum defined system failure
-  code (ELAST for BSD and EMAXERRNO for Linux/MIPS, which are unified
-  as LUX_ELAST in lux) is usually only a few hundreds.  Therefore, we
-  can encode additional information in `failed` to help handling
-  failures.  lux allows at least 1024 customized failure codes and
-  defines LUX_FAILURE_BIT to be the required bits of holding both
-  system and customized failure codes.  lux reserves exactly 3 bits to
-  encode the error level and at least 1 bit to indicate if any failed
-  message is attached to the failed code.
+  code (ELAST for BSD, ERFKILL for Linux on most architectures,
+  _LAST_ERRNO for Linux/PowerPC and EDQUOT for Linux/MIPS, which are
+  all unified as LUX_ELAST in lux) is usually only a few hundreds.
+  Hence, we can encode additional information in `failed` to help
+  handling failures.
+
+  How many bits can we use to encode the additional information?  As
+  far as we can tell, BSD-based systems has ELAST up to 106 (Darwin).
+  For Linux, ERFKILL has value 132 on generic architectures.  It can
+  take larger values on SPARC (134), Alpha (138), MIPS (167), and
+  PARISC (256).  For Linux/PowerPC and Linux/MIPS, _LAST_ERRNO (516)
+  and EDQUOT (1133) are the largest failure codes, respectively.  But
+  since all these architectures are at least 32-bit, we can use 11
+  bits to store their failure codes and use the remaining 21 bits to
+  encode addition information.  Therefore, as long as we only
+  guarantee 123 == 255 - 132 customized failed codes in lux, we can
+  fit all the failure codes in 8 bits for 16-bit systems supported by
+  Linux.  And we will have at least 8 bits to encode additional
+  information.
+
+  Clearly, failure handling in lux is tightly coupled to message
+  logging (see next section).  lux reserves at least 1 bit to indicate
+  if any failed message is attached to a failed code.
+
+MESSAGE LOGGING: printing to stdout, stderr, files, or even memory are
+  all consider message logging in lux.  They are coordinated by the
+  single function
+
+	lux_vlog(unsigned flag, const char *restrict format, va_list ap);
+
+  There are 8 default flags that correspond to the standard syslog
+  security levels or linux kernel log levels.  These levels are
+  re-configurable in runtime and additional levels can be easily
+  added.
 
 CORE LIBRARY: the lux core library, libux, provides basic functions
   such as lux_load() and lux_unload() to access other lux modules/

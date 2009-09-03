@@ -27,14 +27,8 @@
 #define failed errno
 #define FAILURE_MASK (~0U >> (LUX_INT_BIT-LUX_FAILURE_BIT))
 
-#if LUX_ELAST < 256 && LUX_FAILURE_BIT >= 16
-#define FBEGIN 0x0101
-#else
-#define FBEGIN (LUX_ELAST+1)
-#endif
-
 enum failure_code {
-	FNOMOD = FBEGIN,
+	FNOMOD = LUX_ELAST+1,
 	FNOSYM,
 	F2CONS
 };

@@ -26,20 +26,24 @@ dnl Check for types
 AC_COMPUTE_INT([ibits], [sizeof(int) * CHAR_BIT], [#include <limits.h>], [AC_MSG_ERROR([failed to compute the size of int in bits])])
 
 dnl Find out the number of bits required to hold all error codes
-AC_COMPUTE_INT([elast], [ELAST],   [#include <errno.h>], [
-AC_COMPUTE_INT([elast], [EDQUOT],  [#include <errno.h>], [
-AC_COMPUTE_INT([elast], [ERFKILL], [#include <errno.h>], [
-	elast=255
-])])])
+AC_COMPUTE_INT([elast], [ELAST],       [#include <errno.h>], [
+AC_COMPUTE_INT([elast], [_LAST_ERRNO], [#include <errno.h>], [
+AC_COMPUTE_INT([elast], [EDQUOT],      [#include <errno.h>], [
+AC_COMPUTE_INT([elast], [ERFKILL],     [#include <errno.h>], [
+	AC_MSG_ERROR([Failed to obtain the last error code; please describe your platform to <$PACKAGE_BUGREPORT>])
+])])])])
 
-if test $ibits -lt 32; then
-	if   test $elast -lt 1024; then fbits=11
-	elif test $elast -lt 3072; then fbits=12
-	elif test $elast -lt 7168; then fbits=13
-	else AC_MSG_ERROR([ELAST = $elast is too large for 16-bit architecture])
-	fi
-elif test $elast -lt 64512; then fbits=16
-else AC_MSG_ERROR([ELAST = $elast is unexpectedly large])
+if   test $elast -lt  124; then fbits=8
+elif test $elast -lt  380; then fbits=9
+elif test $elast -lt  892; then fbits=10
+elif test $elast -lt 1916; then fbits=11
+else
+	AC_MSG_ERROR([ELAST == $elast is unexpectedly large; please describe your platform to <$PACKAGE_BUGREPORT>])
+fi
+
+xbits=`expr $ibits - $fbits`
+if test $xbits -lt 8; then
+	AC_MSG_ERROR([$xbits bits are not enough to encode lux-specific failure; please describe your platform to <$PACKAGE_BUGREPORT>])
 fi
 
 dnl Customize "config.h" and rename it to "lux.h"
@@ -82,7 +86,7 @@ AC_DEFINE_UNQUOTED(LUX_MOD_PATH, "$prefix/lib/lux", [Define to the default modul
 
 dnl Define error code related macros
 AC_DEFINE_UNQUOTED(LUX_ELAST,       $elast, [Define to the largest system error code.])
-AC_DEFINE_UNQUOTED(LUX_FAILURE_BIT, $fbits, [Define to the required bits to hold all failure codes.])
+AC_DEFINE_UNQUOTED(LUX_FAILURE_BIT, $fbits, [Define to the required bits to hold all lux failure codes.])
 AC_DEFINE_UNQUOTED(LUX_INT_BIT,     $ibits, [Define to the size of int in bits.])
 
 dnl Make single-precision a configure option
