@@ -25,7 +25,6 @@
 #include <lux/failed.h>
 #include <lux/htab.h>
 #include <lux/lazybuf.h>
-#include <stdarg.h>
 #include <string.h> /* for strcat(), strcpy(), and strlen() */
 #include <dlfcn.h>  /* for dlopen(), dlsym(), and dlclose() */
 

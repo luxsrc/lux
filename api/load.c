@@ -22,7 +22,6 @@
 #include <lux/load.h>
 #include <unistd.h> /* for getcwd() and getenv() */
 #include <string.h> /* for strcat(), strcpy(), and strlen() */
-#include <stdarg.h>
 
 #define COUNT_OF(a) (sizeof(a) / sizeof(a[0]))
 

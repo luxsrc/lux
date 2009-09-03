@@ -20,7 +20,6 @@
 #include <lux.h>
 #include <lux/lazybuf.h>
 #include <lux/task.h>
-#include <stdarg.h>
 #include <string.h> /* for strcat(), strcpy(), and strlen() */
 
 void *
