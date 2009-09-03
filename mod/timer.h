@@ -44,6 +44,13 @@ elapsed_time(timestamp t1, timestamp t0)
 	        (double)(t1.tv_usec - t0.tv_usec) * 1.0e-6);
 }
 
+static inline double
+elapsed_since(timestamp t0)
+{
+	timestamp t1 = gettimestamp();
+	return elapsed_time(t1, t0);
+}
+
 #define HAVE_TIMESTAMP 1
 #endif
 
