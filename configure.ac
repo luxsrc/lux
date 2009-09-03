@@ -119,15 +119,13 @@ AH_BOTTOM([/*===================================================================
 #endif
 
 /*===========================================================================*/
-/* Include a standard header file to get size_t */
+/* Include standard header files to get size_t, ptrdiff_t, FILE, and va_list */
 
 #if HAVE_STDDEF_H
-#include <stddef.h>
-#elif HAVE_SYS_TYPES_H
-#include <sys/types.h>
-#else
-#include <stdio.h>
+#include <stddef.h> /* for size_t and ptrdiff_t */
 #endif
+#include <stdio.h>  /* for size_t and FILE */
+#include <stdarg.h> /* for va_list */
 
 /*---------------------------------------------------------------------------*/
 /* Typedef numerical types */
@@ -154,8 +152,6 @@ typedef struct {Lux_xreal r, i;} Lux_xcomplex;
 
 /*===========================================================================*/
 /* Public API */
-#include <stdarg.h> /* for va_list */
-#include <stdio.h>  /* for FILE */
 
 extern void lux_setup(void);
 extern void lux_abort(void);

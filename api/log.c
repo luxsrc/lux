@@ -21,7 +21,6 @@
 #include <lux/failed.h>
 #include <lux/ringbuf.h>
 #include <lux/ringlog.h>
-#include <stdio.h> /* for FILE and vfprintf() */
 
 static struct ringbuf buf = RINGBUF_INIT;
 

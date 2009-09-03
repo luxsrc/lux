@@ -24,7 +24,6 @@
 #include <lux/failed.h>
 #include <lux/ringbuf.h>
 #include <ctype.h> /* for isspace() */
-#include <stdio.h> /* for vs[n]printf(), fputs(), and stderr */
 
 static inline void
 vringlog(struct ringbuf *b, const char *fmt, va_list ap)
