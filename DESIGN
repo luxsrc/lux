@@ -78,6 +78,77 @@ STATIC MODULE: sometimes it is overkill to pack some small functions
   modules", which are just header files that contain static inline
   functions and/or macros.
 
+OPTIMIZATION: according to the README.hacks file in the fftw2 library,
+
+    The architectural details of modern machines make performance
+    *extremely* sensitive to little details such as where your code
+    and data are placed in memory.
+
+  It is therefore very difficult to develop a library with portable
+  performance.  In lux, we follow fftw's approach to measure the wall
+  clock time of different implementations of an algorithm, and select
+  the fastest implementation dynamically.  Furthermore, lux provides a
+  standard mechanism to make developing runtime optimizable algorithms
+  more accessible to a wider range of computational scientists.
+
+  At the lowest level, a runtime optimized algorithm can be executed
+  by the following function call:
+
+	selected_driver(state, parameters, input, output);
+
+  where selected_driver is a pointer to a driver function or to the
+  actual algorithm; state holds anything needed by the algorithm that
+  would affect the performance (e.g., array stride, twiddle factors
+  for FFT, pointers to more subroutines); parameters are inputs that
+  would not affect performance (e.g., alpha in BLAS); and input and
+  output are pointers to the storage data structures.
+
+  In principle, we can pack parameters, input, and output into state.
+  We call this a task in lux,
+
+	typedef struct LuxStask {
+		void (*exec)(struct LuxStask *);
+		struct {
+	 		...;
+			struct { ... } paras;
+			Lux_data *in, *out;
+		} state;
+	} Lux_task;
+
+  which has a very simple and unified interface:
+
+	task->exec(task);
+
+  Although runtime optimization using a task can take into account,
+  e.g., memory alignments of data structures, it requires creating new
+  tasks to apply the same algorithm to different parameters and data
+  sets.  This often makes the code harder to manage.  Moreover, the
+  creation of additional tasks may sometimes be costly.  The fftw3
+  library solves the second disadvantage by caching the measured
+  performance with a hash table but this is overkill for lux.
+
+  Instead, lux provides a more flexible and lightweight struct algo:
+
+	typedef struct LuxSalgo {
+		void (*exec)();
+		struct {
+	 		...;
+		} state;
+	} Lux_algo;
+
+  where exec() takes different arguments according to the algorithm.
+  For example, for in-place FFT, it is
+
+	fft_inplace->exec(fft_inplace, array);
+
+  and for semi-implicit Runge-Kutta stepping for the Navier-Stokes
+  equations, it can be
+
+	rk4->exec(rk4, dt, nu, curr, next);
+
+  This approach mirrors the "new-array execute" functions in fftw3
+  such as fftw_execute_dft() and fftw_execute_split_dft().
+
 ERROR/FAILURE HANDLING: the terms "error" here refers to a recoverable
   and expected runtime error.  It is the type of errors typically
   handled by exceptions in object oriented languages such as C++ and
