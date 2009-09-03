@@ -1,7 +1,7 @@
 AM_LDFLAGS = -export-dynamic -module
 
 # Static modules
-pkginclude_HEADERS  = basename.h failed.h hash.h htab.h lazybuf.h load.h shorthand.h switch.h
+pkginclude_HEADERS  = basename.h failed.h hash.h htab.h lazybuf.h load.h ringbuf.h shorthand.h switch.h
 
 # Interfaces to dynamic modules
 pkginclude_HEADERS += task.h
