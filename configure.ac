@@ -22,6 +22,9 @@ AC_PROG_LN_S
 dnl Check for headers
 AC_CHECK_HEADERS([stddef.h])
 
+dnl Checks for functions
+AC_CHECK_FUNCS([vsnprintf])
+
 dnl Check for types
 AC_COMPUTE_INT([ibits], [sizeof(int) * CHAR_BIT], [#include <limits.h>], [AC_MSG_ERROR([failed to compute the size of int in bits])])
 
