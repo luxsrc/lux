@@ -85,69 +85,90 @@ OPTIMIZATION: according to the README.hacks file in the fftw2 library,
     and data are placed in memory.
 
   It is therefore very difficult to develop a library with portable
-  performance.  In lux, we follow fftw's approach to measure the wall
-  clock time of different implementations of an algorithm, and select
-  the fastest implementation dynamically.  Furthermore, lux provides a
-  standard mechanism to make developing runtime optimizable algorithms
-  more accessible to a wider range of computational scientists.
+  performance.  In lux, we follow fftw's approach (and terminology).
+  For each runtime-optimizable algorithm, we store its configuration
+  in a "problem" data structure.  The problem is passed to a planner,
+  which uses a list of "solver" modules to solve for many "solution"
+  algorithms.  We then measure the performance of each of these
+  solutions at runtime and select the fastest one.  Furthermore, lux
+  exposes this technique through a standard interface.  This makes
+  developing runtime-optimizable algorithms more accessible to a wider
+  range of computational scientists.
 
-  At the lowest level, a runtime optimized algorithm can be executed
-  by the following function call:
+  At the lowest level, a runtime-optimized algorithm can be executed
+  by the following function call in C:
 
-	selected_driver(state, parameters, input, output);
+	selected_driver(istate, xstate, paras, ro, rw, wo);
 
-  where selected_driver is a pointer to a driver function or to the
-  actual algorithm; state holds anything needed by the algorithm that
-  would affect the performance (e.g., array stride, twiddle factors
-  for FFT, pointers to more subroutines); parameters are inputs that
-  would not affect performance (e.g., alpha in BLAS); and input and
-  output are pointers to the storage data structures.
+  where `selected_driver` is a pointer to a driver function or to the
+  actual algorithm; `istate` and `xstate` are internal and external
+  states, respectively, which hold anything needed by the algorithm
+  that would affect the performance (e.g., array size, array stride,
+  twiddle factors for FFT, pointers to codelets); `paras` are input
+  parameters that would not affect performance (e.g., alpha in BLAS);
+  and `ro`, `rw`, and `wo` are pointers to the read-only, read-write,
+  and write-only storage data structures for input and/or output.
 
-  In principle, we can pack parameters, input, and output into state.
-  We call this a task in lux,
+  In principle, we can pack istate, xstate, paras, in, and out into a
+  single structure.  We call this a "task" in lux,
 
-	typedef struct LuxStask {
-		void (*exec)(struct LuxStask *);
-		struct {
-	 		...;
-			struct { ... } paras;
-			Lux_data *in, *out;
-		} state;
-	} Lux_task;
+	typedef struct LuxStask Lux_task;
+	struct LuxStask {
+		void (*exec)(Lux_task *);
+		struct { ... } istate;
+		struct { ... } xstate;
+		struct { ... } paras;
+		Lux_data *ro, *rw, *wo;
+	};
 
   which has a very simple and unified interface:
 
 	task->exec(task);
 
-  Although runtime optimization using a task can take into account,
+  Although runtime-optimization using a task can take into account,
   e.g., memory alignments of data structures, it requires creating new
   tasks to apply the same algorithm to different parameters and data
   sets.  This often makes the code harder to manage.  Moreover, the
   creation of additional tasks may sometimes be costly.  The fftw3
   library solves the second disadvantage by caching the measured
-  performance with a hash table but this is overkill for lux.
+  performance with a hash table.  This is overkill for lux (at least
+  for now).  Instead, lux provides a more flexible and lightweight
+  struct "algo":
 
-  Instead, lux provides a more flexible and lightweight struct algo:
-
-	typedef struct LuxSalgo {
+	typedef struct LuxSalgo Lux_algo;
+	struct LuxSalgo {
 		void (*exec)();
-		struct {
-	 		...;
-		} state;
-	} Lux_algo;
+		struct { ... } istate;
+		struct { ... } xstate;
+	};
 
   where exec() takes different arguments according to the algorithm.
-  For example, for in-place FFT, it is
+  For example, for an in-place FFT, it is
 
 	fft_inplace->exec(fft_inplace, array);
 
-  and for semi-implicit Runge-Kutta stepping for the Navier-Stokes
-  equations, it can be
+  and for a semi-implicit Runge-Kutta stepping for the Navier-Stokes
+  equations, it is
 
 	rk4->exec(rk4, dt, nu, curr, next);
 
   This approach mirrors the "new-array execute" functions in fftw3
   such as fftw_execute_dft() and fftw_execute_split_dft().
+
+  To summarize, the problem, algo, task, and solution data structures
+  need to store, and the planner and solver modules need to deliver,
+  at least the following information:
+
+    problem:                  xstate, paras, ro, rw, wo
+    algo:     driver, istate, xstate
+    task:     driver, istate, xstate, paras, ro, rw, wo
+    solution: driver, istate, xstate, paras, ro, rw, wo, opcnt, cost, ecost
+    solver:   driver, istate, xstate,                    opcnt        ecost
+    planner:  solver[],                                         cost
+
+  In the above table, opcnt stands for floating-operation count and
+  ecost stands for the estimated computation cost.  It is clear that
+  task is a subclass of algo and solution is a subclass of task.
 
 ERROR/FAILURE HANDLING: the terms "error" here refers to a recoverable
   and expected runtime error.  It is the type of errors typically
