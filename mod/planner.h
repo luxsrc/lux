@@ -20,15 +20,22 @@
 #ifndef _LUX_PLANNER_H_
 #define _LUX_PLANNER_H_
 
+#define LUX_PLAN_DEFAULT    LUX_PLAN_MEASURE
+
+#define LUX_PLAN_ESTIMATE   0U
+#define LUX_PLAN_MEASURE    1U
+#define LUX_PLAN_PATIENT    2U
+#define LUX_PLAN_EXHAUSTIVE 3U
+
 /* Forward declarations */
 typedef struct LuxSplanner Lux_planner;
-typedef struct LuxSproblem Lux_problem;
-typedef struct LuxSsolver  Lux_solver;
+typedef struct LuxSproblem Lux_problem; /* problem specific interface */
+typedef struct LuxStask    Lux_task;
 
 struct LuxSplanner {
         /* A Lux_planner can plan for a particular Lux_problem and
-           return an array of Lux_solver's */
-	Lux_solver **(*plan)(Lux_planner *, Lux_problem *);
+           return an optimal plan */
+	Lux_task *(*plan)(Lux_planner *, Lux_problem *, unsigned);
 };
 
 #endif /* _LUX_PLANNER_H_ */

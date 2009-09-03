@@ -20,11 +20,12 @@
 #ifndef _LUX_SOLUTION_H_
 #define _LUX_SOLUTION_H_
 
-#include <lux/algo.h>
-
+/* Forward declarations */
 typedef struct LuxSsolution Lux_solution;
+typedef struct LuxStask     Lux_task;
 
 struct LuxSsolution {
+	Lux_task *task; /* subclassing by composition */
 	struct {
 		double add;
 		double mul;
@@ -33,8 +34,6 @@ struct LuxSsolution {
 	} opcnt;      /* floating-point operation counts     */
 	double mcost; /* measured  computation cost in ticks */
 	double ecost; /* estimated computation cost in ticks */
-
-	Lux_algo algo; /* need to be last because of inheritance */
 };
 
 #endif /* _LUX_SOLUTION_H_ */

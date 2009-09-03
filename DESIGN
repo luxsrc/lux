@@ -132,12 +132,11 @@ OPTIMIZATION: according to the README.hacks file in the fftw2 library,
   creation of additional tasks may sometimes be costly.  The fftw3
   library solves the second disadvantage by caching the measured
   performance with a hash table.  This is overkill for lux (at least
-  for now).  Instead, lux provides a more flexible and lightweight
-  struct "algo":
+  for now).  Instead, lux uses a more flexible and lightweight, but
+  problem dependent, structure:
 
-	typedef struct LuxSalgo Lux_algo;
-	struct LuxSalgo {
-		void (*exec)();
+	struct algo {
+		void (*exec)(struct algo *, ...);
 		struct { ... } istate;
 		struct { ... } xstate;
 	};
@@ -159,16 +158,18 @@ OPTIMIZATION: according to the README.hacks file in the fftw2 library,
   need to store, and the planner and solver modules need to deliver,
   at least the following information:
 
-    problem:                  xstate, paras, ro, rw, wo
-    algo:     driver, istate, xstate
+    problem:                  xstate, paras, ro, rw, wo (prob. spec. interface)
+    algo:     driver, istate, xstate                    (prob. spec. interface)
     task:     driver, istate, xstate, paras, ro, rw, wo
-    solution: driver, istate, xstate, paras, ro, rw, wo, opcnt, cost, ecost
-    solver:   driver, istate, xstate,                    opcnt        ecost
-    planner:  solver[],                                         cost
+    solution: driver, istate, xstate, paras, ro, rw, wo, opcnt, mcost, ecost
+    solver:   driver, istate, xstate,                    opcnt         ecost
+    planner:  solver[],                                         mcost
 
-  In the above table, opcnt stands for floating-operation count and
-  ecost stands for the estimated computation cost.  It is clear that
-  task is a subclass of algo and solution is a subclass of task.
+  In the above table, opcnt stands for floating-operation count, ecost
+  stands for the estimated computation cost, and mcost stands for the
+  measured computation cost.  Although logically task is a subclass of
+  algo and solution is a subclass of task, task and solution are
+  implemented by composition instead of inheritance.
 
 ERROR/FAILURE HANDLING: the terms "error" here refers to a recoverable
   and expected runtime error.  It is the type of errors typically
