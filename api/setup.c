@@ -18,11 +18,20 @@
  * along with lux.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include <lux.h>
+#include <lux/timer.h>
 #include <stdlib.h> /* for atexit() */
+
+#if HAVE_TIMESTAMP
+static timestamp t0;
+#endif
 
 static void
 setup(void)
 {
+#if HAVE_TIMESTAMP
+	t0 = gettimestamp();
+#endif
+
 	/* Setup the lux environment */
 }
 
@@ -31,6 +40,9 @@ cleanup(void)
 {
 	/* Cleanup the lux environment */
 
+#if HAVE_TIMESTAMP
+	lux_debug("lux ran for %g sec.\n", elapsed_since(t0));
+#endif
 	lux_fput(stderr);
 }
 
