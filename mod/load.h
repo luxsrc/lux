@@ -36,10 +36,18 @@ struct load_node {
 
 static struct htab ltab = HTAB_INIT; /* the loading table */
 
-#define FAILED_AS(f) do {        \
-		failed = f;      \
-		(void)dlerror(); \
-		goto cleanup;    \
+#define FAILED_TO(s) do {                                          \
+		int f = failed;                                    \
+		lux_debug("vload(\"%s\"): failed to " s " [%s]\n", \
+		          name, failure_msg(f));                   \
+		goto cleanup;                                      \
+	} while(0)
+
+#define FAILED_AS(f, s) do {                                       \
+		failed = f;                                        \
+		lux_debug("vload(\"%s\"): failed to " s " [%s]\n", \
+		          name, failure_msg(f));                   \
+		goto cleanup;                                      \
 	} while(0)
 
 static inline void *
@@ -58,13 +66,13 @@ vload(const char *restrict name, va_list ap)
 	   5 == sizeof("luxC") > sizeof(".so")*/
 	buf = (char *)MALLOC(5 + strlen(name));
 	if(!buf)
-		goto cleanup; /* failure code was set by MALLOC() */
+		FAILED_TO("allocate string");
 
 	/* Try to load the module */
 	(void)strcat(strcpy(buf, name), ".so");
 	mod = dlopen(buf, RTLD_LAZY);
 	if(!mod)
-		FAILED_AS(FNOMOD);
+		FAILED_AS(FNOMOD, "load module");
 
 	/* Try to get the instance */
 	(void)strcat(strcpy(buf, "luxC"), basename(name));
@@ -79,18 +87,18 @@ vload(const char *restrict name, va_list ap)
 		}
 		obj = mk(ap);
 		if(!obj)
-			FAILED_AS(F2CONS);
+			FAILED_AS(F2CONS, "construct");
 	} else {
 		buf[3] = 'E';
 		obj = dlsym(mod, buf);
 		if(!obj)
-			FAILED_AS(FNOSYM);
+			FAILED_AS(FNOSYM, "load entry point");
 	}
 
 	/* Try to save module to a hash table */
 	node = HADD(&ltab, obj, struct load_node);
 	if(!node)
-		goto cleanup; /* failure code was set by HADD() */
+		FAILED_TO("allocate loading table node");
 
 	node->rm  = rm;
 	node->mod = mod;
@@ -101,7 +109,7 @@ vload(const char *restrict name, va_list ap)
 	if(rm && obj)
 		rm(obj);
 	if(mod)
-		(void)dlclose(mod);
+		(void)dlclose(mod); /* FIXME: should not clean up dlerror() */
 	if(buf)
 		FREE(buf);
 	return NULL;

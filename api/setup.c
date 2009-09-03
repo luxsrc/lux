@@ -30,6 +30,8 @@ static void
 cleanup(void)
 {
 	/* Cleanup the lux environment */
+
+	lux_fput(stderr);
 }
 
 void
