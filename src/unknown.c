@@ -24,10 +24,10 @@ int
 unknown(const char *restrict task)
 {
 	const char *s = failure_msg(failed);
-
-	if(s)
+	if(s) {
+		lux_fput(NULL); /* clean internal log */
 		lux_error("Failed to load task \"%s\" [%s].\n", task, s);
-	else
+	} else
 		lux_error("Failed to load task \"%s\".\n", task);
 
 	return 64; /* EX_USAGE in <sysexits.h> */

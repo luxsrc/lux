@@ -57,6 +57,12 @@ vringlog(struct ringbuf *b, const char *fmt, va_list ap)
 }
 
 static inline void
+ringerase(struct ringbuf *b)
+{
+	b->next = 0; /* logically erase ring buffer */
+}
+
+static inline void
 fputring(struct ringbuf *b, FILE *stream)
 {
 	int f;
@@ -78,7 +84,7 @@ fputring(struct ringbuf *b, FILE *stream)
 
 	f = failed;
 	if(fwrite(b->ring, 1, b->next, stream) == b->next)
-		b->next = 0; /* logically erase ring buffer */
+		ringerase(b);
 	else {
 		perror("fputring(): fail to output the internal log\n");
 		failed = f; /* restore failure code */

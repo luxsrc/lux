@@ -51,5 +51,8 @@ lux_vlog(int flag, const char *restrict fmt, va_list ap)
 void
 lux_fput(FILE *stream)
 {
-	fputring(&buf, stream);
+	if(stream)
+		fputring(&buf, stream);
+	else
+		ringerase(&buf);
 }
