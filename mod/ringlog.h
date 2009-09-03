@@ -20,6 +20,7 @@
 #ifndef _LUX_RINGLOG_H_
 #define _LUX_RINGLOG_H_
 
+#include <lux/bytewise.h>
 #include <lux/failed.h>
 #include <lux/ringbuf.h>
 #include <ctype.h> /* for isspace() */
@@ -54,6 +55,35 @@ vringlog(struct ringbuf *b, const char *fmt, va_list ap)
 
 	failed = f; /* restore failure code; vringlog() effectively
 	               cannot fail */
+}
+
+static inline void
+fputring(struct ringbuf *b, FILE *stream)
+{
+	int f;
+
+	if(b->next == 0)
+		return; /* avoid system call when ring buffer is empty */
+
+	if(b->next > b->size) {
+		size_t erased = b->next - b->size;
+		b->next = b->size; /* there are only b->size useful bytes */
+		while(b->next > b->size / 16 * 15
+		      && !isspace(b->ring[(erased+3) % b->size])) {
+			++erased;
+			--b->next;
+		}
+		leftrot(b->ring, erased, b->size);
+		b->ring[2] = b->ring[1] = b->ring[0] = '.';
+	}
+
+	f = failed;
+	if(fwrite(b->ring, 1, b->next, stream) == b->next)
+		b->next = 0; /* logically erase ring buffer */
+	else {
+		perror("fputring(): fail to output the internal log\n");
+		failed = f; /* restore failure code */
+	}
 }
 
 #endif /* _LUX_RINGLOG_H_ */

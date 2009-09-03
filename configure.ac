@@ -155,11 +155,13 @@ typedef struct {Lux_xreal r, i;} Lux_xcomplex;
 /*===========================================================================*/
 /* Public API */
 #include <stdarg.h> /* for va_list */
+#include <stdio.h>  /* for FILE */
 
 extern void lux_setup(void);
 extern void lux_abort(void);
 
 extern void lux_vlog(int, const char *restrict, va_list);
+extern void lux_fput(FILE *);
 
 extern void *lux_load(const char *restrict, ...);
 extern void  lux_unload(void *);

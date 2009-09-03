@@ -23,6 +23,8 @@
 #include <lux/ringlog.h>
 #include <stdio.h> /* for FILE and vfprintf() */
 
+static struct ringbuf buf = RINGBUF_INIT;
+
 int lux_log_debug = 0; /* debugging message is disabled by default */
 int lux_log_print = 1;
 int lux_log_error = 2;
@@ -30,8 +32,6 @@ int lux_log_error = 2;
 void
 lux_vlog(int flag, const char *restrict fmt, va_list ap)
 {
-	static struct ringbuf buf = RINGBUF_INIT;
-
 	FILE *stream = NULL;
 	switch(flag) {
 	case 1: stream = stdout; break;
@@ -47,4 +47,10 @@ lux_vlog(int flag, const char *restrict fmt, va_list ap)
 			               TODO: make lux_vlog() more robust */
 	} else
 		vringlog(&buf, fmt, ap);
+}
+
+void
+lux_fput(FILE *stream)
+{
+	fputring(&buf, stream);
 }
