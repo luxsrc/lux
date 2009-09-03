@@ -20,7 +20,7 @@
 #ifndef _LUX_HASH_H_
 #define _LUX_HASH_H_
 
-#ifdef HAVE_STDINT_H
+#if HAVE_STDINT_H
 #include <stdint.h>
 #else
 #error <stdint.h> is not found on this platform
