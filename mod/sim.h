@@ -23,7 +23,9 @@
 typedef struct LuxSsim Lux_sim;
 
 struct LuxSsim {
-	void (*exec)(Lux_sim *);
+	int (*conf)(Lux_sim *, const char *restrict);
+	int (*init)(Lux_sim *);
+	int (*exec)(Lux_sim *);
 };
 
 #endif /* _LUX_SIM_H_ */

@@ -20,25 +20,24 @@
 #include <lux.h>
 #include <lux/lazybuf.h>
 #include <lux/sim.h>
-#include <string.h> /* for strcat(), strcpy(), and strlen() */
+#include <string.h> /* for strlen() and memcpy() */
 
 void *
 LUXC(va_list ap)
 {
-	void  *sim;
+	void *sim;
 
-	int    argc = va_arg(ap, int);
-	char **argv = va_arg(ap, char **);
+	const char *arg = va_arg(ap, const char *);
+	size_t      len = strlen(arg);
 
-	char lazybuf[256], *buf;
-	buf = (char *)MALLOC(sizeof("sim/") + strlen(argv[0]));
+	char lazybuf[256] = "sim/", *buf = lazybuf;
+	buf = (char *)REALLOC(buf, sizeof("sim/") + len);
 	if(!buf)
 		return NULL;
 
-	(void)strcat(strcpy(buf, "sim/"), argv[0]);
-	sim = lux_load(buf, argc, argv); /* "chain-loading" works as expected
-	                                    because of the array-of-stacks
-	                                    design of the hash table.  */
+	(void)memcpy(buf + sizeof("sim/") - 1, arg, len + 1);
+	sim = lux_load(buf); /* chain-loading works as expected because of the
+	                        array-of-stacks design of the hash table. */
 	FREE(buf);
 	return sim;
 }

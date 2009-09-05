@@ -23,36 +23,46 @@
 #include <string.h> /* for strcmp() */
 #include <stdlib.h> /* for EXIT_SUCCESS and EXIT_FAILURE */
 
-#define UNLESS(e) CASE(!(e))
-#define FLAG(s)   UNLESS(strcmp(argv[1], s))
+#define FLAG(s) CASE(!strcmp(arg, s))
 
 int
 main(int argc, char *argv[])
 {
-	Lux_sim *sim = NULL;
+	int      status = EXIT_SUCCESS;
+	Lux_sim *sim    = NULL;
 
 	lux_setup();
 
-	SWITCH {
-	CASE(argc <= 1)
-		return version();
-	FLAG("--help")
-		return usage(EXIT_SUCCESS);
-	FLAG("--version")
-		return version();
-	UNLESS(sim = (Lux_sim *)lux_load("sim", argc-1, argv+1))
-		return unknown(argv[1]);
-	DEFAULT
-		lux_print("\n\
+	/* Parse argumnet list */
+	while(++argv, --argc) {
+		const char *arg = *argv; /* != NULL for sure */
+		SWITCH {
+		FLAG("--help")
+			return usage(status);
+		FLAG("--version")
+			return version();
+		CASE(sim ? sim->conf(sim, arg) :
+		         !(sim = (Lux_sim *)lux_load("sim", arg)))
+			return unknown(arg);
+		}
+	}
+
+	/* TODO: parse stdin; interactive mode? */
+	lux_print("\n\
   ,--.                     a flexible and extendable framework\n\
   |  ,--.,--,--.  ,--.         for scientific computation\n\
   |  |  ||  |\\  `'  /\n\
   |  |  ''  ;/  /.  \\                alpha version\n\
   `--'`----''--'  `--`             commit '" LUX_VERSION "'\n\n");
 
-		sim->exec(sim);
+	/* Perform the simulation */
+	if(sim) {
+		if(status == EXIT_SUCCESS)
+			status = sim->init(sim);
+		if(status == EXIT_SUCCESS)
+			status = sim->exec(sim);
 		lux_unload(sim);
 	}
 
-	return EXIT_SUCCESS;
+	return status;
 }
