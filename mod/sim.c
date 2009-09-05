@@ -18,8 +18,8 @@
  * along with lux.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include <lux.h>
+#include <lux/job.h>
 #include <lux/lazybuf.h>
-#include <lux/sim.h>
 #include <string.h> /* for strlen() and memcpy() */
 
 void *
@@ -43,7 +43,7 @@ LUXC(va_list ap)
 }
 
 void
-LUXD(Lux_sim *sim)
+LUXD(Lux_job *sim)
 {
 	lux_unload(sim);
 }

@@ -17,15 +17,15 @@
  * You should have received a copy of the GNU General Public License
  * along with lux.  If not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef _LUX_SIM_H_
-#define _LUX_SIM_H_
+#ifndef _LUX_JOB_H_
+#define _LUX_JOB_H_
 
-typedef struct LuxSsim Lux_sim;
+typedef struct LuxSjob Lux_job;
 
-struct LuxSsim {
-	int (*conf)(Lux_sim *, const char *restrict);
-	int (*init)(Lux_sim *);
-	int (*exec)(Lux_sim *);
+struct LuxSjob {
+	int (*conf)(Lux_job *, const char *restrict);
+	int (*init)(Lux_job *);
+	int (*exec)(Lux_job *);
 };
 
-#endif /* _LUX_SIM_H_ */
+#endif /* _LUX_JOB_H_ */

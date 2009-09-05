@@ -18,7 +18,7 @@
  * along with lux.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include "src.h"
-#include <lux/sim.h>
+#include <lux/job.h>
 #include <lux/switch.h>
 #include <string.h> /* for strcmp() */
 #include <stdlib.h> /* for EXIT_SUCCESS and EXIT_FAILURE */
@@ -29,7 +29,7 @@ int
 main(int argc, char *argv[])
 {
 	int      status = EXIT_SUCCESS;
-	Lux_sim *sim    = NULL;
+	Lux_job *sim    = NULL;
 
 	lux_setup();
 
@@ -42,7 +42,7 @@ main(int argc, char *argv[])
 		FLAG("--version")
 			return version();
 		CASE(sim ? sim->conf(sim, arg) :
-		         !(sim = (Lux_sim *)lux_load("sim", arg)))
+		         !(sim = (Lux_job *)lux_load("sim", arg)))
 			return unknown(arg);
 		}
 	}

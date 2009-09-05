@@ -1,7 +1,7 @@
 lux is designed around a simple but powerful module architecture.
 Everything in lux is implemented as a module.  The lux core library,
-libux, provides basic functions to access modules/plug-ins, to
-construct numerical schemes, and to configure simulations.
+libux, provides basic functions to access modules/plug-ins and to
+construct, configure, and run scientific computation jobs.
 
 INTERFACE: a lux interface Lux_MOD is simply a function type or a
   structure of function pointers that provides a type-safe way to
@@ -245,9 +245,8 @@ MESSAGE LOGGING: printing to stdout, stderr, files, or even memory are
   added.
 
 CORE LIBRARY: the lux core library, libux, provides basic functions
-  such as lux_load() and lux_unload() to access other lux modules/
-  plug-ins, to construct numerical schemes, and to configure
-  simulations.
+  such as lux_load() and lux_unload() to access modules/plug-ins and
+  to construct, configure, and run scientific computation jobs.
 
   The lux executable provided within this software package is a
   lightweight frontend of the lux core library for Unix-like
