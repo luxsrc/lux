@@ -20,15 +20,24 @@
 #include "src.h"
 #include <lux/failed.h>
 
+static const char *fmt_with_msg = "\
+Unknown %s \"%s\" [%s].\n\
+Try `lux --help` for more information.\n";
+
+static const char *fmt_without_msg = "\
+Unknown %s \"%s\".\n\
+Try `lux --help` for more information.\n";
+
 int
-unknown(const char *restrict sim)
+unknown(const char *restrict arg)
 {
 	const char *s = failure_msg(failed);
+	const char *k = arg[0] == '-' ? "option" : "command";
 	if(s) {
 		lux_fput(NULL); /* clean internal log */
-		lux_error("Failed to load simulation \"%s\" [%s].\n", sim, s);
+		lux_error(fmt_with_msg, k, arg, s);
 	} else
-		lux_error("Failed to load simulation \"%s\".\n", sim);
+		lux_error(fmt_without_msg, k, arg);
 
 	return 64; /* EX_USAGE in <sysexits.h> */
 }
