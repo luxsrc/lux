@@ -102,7 +102,11 @@ extern "C" {
 /*===========================================================================*/])
 
 dnl Define module path
-AC_DEFINE_UNQUOTED(LUX_MOD_PATH, "$prefix/lib/lux", [Define to the default module path.])
+if test "x$prefix" != xNONE; then
+	AC_DEFINE_UNQUOTED(LUX_MOD_PATH, "$prefix/lib/lux", [Define to the default module path.])
+else
+	AC_DEFINE_UNQUOTED(LUX_MOD_PATH, "$ac_default_prefix/lib/lux", [Define to the default module path.])
+fi
 
 dnl Define error code related macros
 AC_DEFINE_UNQUOTED(LUX_ELAST,       $elast, [Define to the largest system error code.])
