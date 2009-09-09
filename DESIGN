@@ -62,6 +62,12 @@ DYNAMIC MODULE: a lux module MOD is a dynamically loadable library
   in a constructor, is allowed.  It works as expected because of the
   last-in-first-out nature of the stack used in the hash table.
 
+  The concepts of constructor and destructor mentioned above are
+  identical to the ones used in object oriented programming paradigm.
+  Typically, a lux module with a constructor maps naturally to a
+  class; hence a loaded module maps naturally to an instance of a
+  class, i.e., an object.
+
   A lux module MOD is implemented in mod/ in the lux source tree, and
   is installed to $prefix/lib/lux.  In order to access dynamic
   modules, libux requires an external dynamic linker, which may make
@@ -77,6 +83,21 @@ STATIC MODULE: sometimes it is overkill to pack some small functions
   reduce the performance.  Hence, we introduce the concept of "static
   modules", which are just header files that contain static inline
   functions and/or macros.
+
+OBJECT ORIENTED PROGRAMMING: lux is implemented in C for performance,
+  portability, and integrability (with other programming languages).
+  This does not mean that we cannot write well-organized, object
+  oriented codes with lux.  Indeed,
+
+    Object oriented is a programming paradigm, not a computer
+    language.
+                                                  -- Michael Natterer
+
+  In the following sections, we will describe some general ideas on
+  how to implement an object system in lux.  Note that, however, the
+  interface/module system of lux is very flexible---more flexible than
+  the standard object inheritance approach.  Hence, we encourage
+  developers be open minded and explore other paradigm/pattern.
 
 OPTIMIZATION: according to the README.hacks file in the fftw2 library,
 
