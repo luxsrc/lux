@@ -66,7 +66,13 @@ DYNAMIC MODULE: a lux module MOD is a dynamically loadable library
   identical to the ones used in object oriented programming paradigm.
   Typically, a lux module with a constructor maps naturally to a
   class; hence a loaded module maps naturally to an instance of a
-  class, i.e., an object.
+  class, i.e., an object.  Sometime, we design a module in a way that
+  it always return the same handle.  This maps naturally to a
+  singleton pattern.  A more interesting situation is when this
+  singleton module provides a constructor and a destructor for other
+  types---the singleton module now becomes a dynamically loadable
+  class.  We will discuss this pattern with more details in section
+  "OBJECTS, CLASSES, and METACLASSES".
 
   A lux module MOD is implemented in mod/ in the lux source tree, and
   is installed to $prefix/lib/lux.  In order to access dynamic
@@ -98,6 +104,82 @@ OBJECT ORIENTED PROGRAMMING: lux is implemented in C for performance,
   interface/module system of lux is very flexible---more flexible than
   the standard object inheritance approach.  Hence, we encourage
   developers be open minded and explore other paradigm/pattern.
+
+OBJECTS, CLASSES, and METACLASSES: a lux interface together with an
+  (implemented) module acts very similar to a class in object oriented
+  programming languages such as C++.  As described above, loading a
+  lux module is like creating an object.  For example, calling
+
+	Lux_MOD *MOD = lux_load("MOD");
+	MOD->func(MOD, para);
+
+  has more-or-less the same effect as
+
+	class *object = new class();
+	object->method(para);
+
+  Unfortunately, using lux interfaces/modules as objects can be
+  wasteful, especially for heavy interfaces.  This is because all
+  instances in
+
+	Lux_MOD *MOD1 = lux_load("MOD");
+	Lux_MOD *MOD2 = lux_load("MOD");
+	Lux_MOD *MOD3 = lux_load("MOD");
+	...
+
+  contain the same list of function pointers.  To overcome this, we
+  can introduce one more layer of indirectness and pack all the
+  function pointers and shared information about the module into a
+  "virtual function table" vtab:
+
+	typedef struct LuxSMOD Lux_MOD;
+
+	struct vtab { /* allocated only once by lux_load() */
+		const char *name;
+		double (*f)(Lux_MOD *, ...);
+		...
+	};
+
+	struct LuxSMOD {
+		const struct vtab *vtab;
+		double x;
+		...
+	};
+
+  In the above example, vtab behaves like a metaclass.  The original
+  lux interface Lux_MOD becomes a class, and its instances are
+  objects.  Indeed, because the programmers know the relationship
+  between objects, classes, and metaclass, there is no need to store
+  the metaclass with the object.  That way, we can remove one layer of
+  indirectness by
+
+	typedef struct {
+		double x;
+		...
+	} Lux_MOD_obj; /* type of an object, i.e., a class */
+
+	typedef struct {
+		const char *name;
+		Lux_MOD_obj *(*mkobj)();
+		void (*rmobj)(Lux_MOD_obj *);
+		...
+		double (*f)(Lux_MOD_obj *, double);
+		...
+	} Lux_MOD; /* type of a class, i.e., a metaclass */
+
+	Lux_MOD     *MOD  = lux_load("MOD");
+	Lux_MOD_obj *obj1 = MOD->mkobj();
+	Lux_MOD_obj *obj2 = MOD->mkobj();
+	...
+
+	MOD->f(obj1, para);
+	MOD->f(obj2, para);
+	...
+
+  This approach can significantly reduce the instance creation
+  overhead by only loading the module once.  Indeed, this pattern
+  allows us to introduce new classes at runtime.  It is more powerful
+  than compile-time classes in C++.
 
 OPTIMIZATION: according to the README.hacks file in the fftw2 library,
 
