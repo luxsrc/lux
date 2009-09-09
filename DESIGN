@@ -99,10 +99,10 @@ OBJECT ORIENTED PROGRAMMING: lux is implemented in C for performance,
     language.
                                                   -- Michael Natterer
 
-  In the following sections, we will describe some general ideas on
-  how to implement an object system in lux.  Note that, however, the
-  interface/module system of lux is very flexible---more flexible than
-  the standard object inheritance approach.  Hence, we encourage
+  In the following two sections, we will describe some general ideas
+  on how to implement an object system in lux.  Note that, however,
+  the interface/module system of lux is very flexible---more flexible
+  than the standard object inheritance approach.  Hence, we encourage
   developers be open minded and explore other paradigm/pattern.
 
 OBJECTS, CLASSES, and METACLASSES: a lux interface together with an
@@ -180,6 +180,63 @@ OBJECTS, CLASSES, and METACLASSES: a lux interface together with an
   overhead by only loading the module once.  Indeed, this pattern
   allows us to introduce new classes at runtime.  It is more powerful
   than compile-time classes in C++.
+
+INHERITANCE vs COMPOSITION: one of the key concepts in object oriented
+  programming is inheritance.  It is nothing but a way to allow code
+  reuse.  At low level, inheritance uses a standard rule to append
+  extra data to a structure so that an object can be passed to methods
+  that are defined for its superclass.  For example,
+
+	typedef struct {
+		double area;
+		double circumference;
+	} Shape;
+
+	typedef struct {
+		Shape  super;
+		double radius;
+	} Circle;
+
+	typedef struct {
+		Shape  super;
+		double side;
+	} Square;
+
+  Now, if we define a function
+
+	double roundness(Shape *s)
+	{
+		double ar = sqrt(area / M_PI);
+		double cr = circumference / (2 * M_PI);
+		return ar / cr;
+	}
+
+  The function calls
+
+	double cr = roundness((Shape *)&circle);
+	double sr = roundness((Shape *)&square);
+
+  produce the expected results.  The above example gives an guideline
+  for developers to use object inheritance in lux.  On one hand, since
+  the developers are responsible for writing their own structure
+  appending rule, this approach is more flexible (but also more
+  verbose) compare to language-supported inheritance such as in C++.
+  On the other hand, the Gang of Four "favor object composition over
+  class inheritance".  In lux, as long as a class's size is known at
+  compile time, we have the freedom to compose an object by reference
+  or embedding:
+
+	typedef struct {
+		Shape *reference; /* standard composition uses references */
+		Shape  embedded;  /* composition by embedding */
+		double radius;
+	} Circle;
+
+  Reference introduces one layer of indirectness, which should be
+  avoided for features that are accessed by the inner loops.  In such
+  a case, embedding, which is a more flexible way for inheritance,
+  should be used instead.  For the outer loops and "shallow" objects,
+  reference and embedding can both be used.
 
 OPTIMIZATION: according to the README.hacks file in the fftw2 library,
 
@@ -308,34 +365,29 @@ MEMORY ORDER and DOPE VECTOR: in order to describe the memory layout
 		Lux_int s; /* stride */
 	} Lux_dope;
 
-  We use a "backward flexible array member" hack to embed the dope
-  vector in other structures:
+  with an offset of rank Lux_dope's.  In other word, a dope pointer
+  always points to the last element of the dope vector.
 
-	typedef struct {
-		Lux_dope dope[1]; /* embedded dope vector; must be first */
-		...
-	} Array;
+	Lux_dope *head = malloc((rank+1) * sizeof(Lux_dope));
+	Lux_dope *dope = head + rank;
 
-	Lux_dope *head = malloc(rank * sizeof(Lux_dope) + sizeof(Array));
-	Array    *arr  = (Array *)(head + rank);
+  This way, the negative elements in the dope vector dope[] store the
+  rank-number, count, and strides for each rank.  For a tightly packed
+  column-major (Fortran) array, we have the relations
 
-  This way, the negative elements in the dope vector arr->dope[] store
-  the rank-number, count, and strides for each rank.  For a tightly
-  packed column-major (Fortran) array, we have the relations
-
-	arr->dope[r].r == r + rank;
- 	arr->dope[r].s == arr->dope[r-1].c * arr->dope[r-1].s;
+	dope[r].r == r + rank;
+ 	dope[r].s == dope[r-1].c * dope[r-1].s;
 
   Hence, it is natural to extend these to the zeroth element and make
 
-    * arr->dope->r the total rank so the dope values of the r-th rank
-      can be accessed by arr->dope[r-arr->dope->r].
+    * dope->r the total rank so the dope values of the r-th rank can
+      be accessed by dope[r-dope->r].
 
-    * arr->dope->s the number total number of elements including
-      padding if the array is not tightly packed
+    * dope->s the number total number of elements including padding if
+      the array is not tightly packed
 
-    * arr->dope->c the size of each element in bytes so the total size
-      can be easily computed by arr->dope->c * arr->dope->s.
+    * dope->c the size of each element in bytes so the total size can
+      be easily computed by dope->c * dope->s.
 
   As an example, a tightly packed two-dimensional/second-rank 4 x 3
   column-major array of double has the following dope vector
@@ -344,7 +396,7 @@ MEMORY ORDER and DOPE VECTOR: in order to describe the memory layout
     -----------------+-------------
     head == dope[-2] |  0   4   1
             dope[-1] |  1   3   4
-    arr  -> dope[ 0] |  2   8  12
+            dope[ 0] |  2   8  12
 
   while the same logical array casted into row-major on a machine
   supporting 256 bits vector operator has the following dope vector
@@ -353,7 +405,7 @@ MEMORY ORDER and DOPE VECTOR: in order to describe the memory layout
     -----------------+-------------
     head == dope[-2] |  0   4   4 (extra 64-bit padding)
             dope[-1] |  1   3   1
-    arr  -> dope[ 0] |  2   8  16
+            dope[ 0] |  2   8  16
 
   The stars next to the 'r's above indicate that these dope vectors
   are sorted in rank, and hence are logical orders.  To access the
@@ -365,10 +417,21 @@ MEMORY ORDER and DOPE VECTOR: in order to describe the memory layout
     -----------------+-------------+-------------
     head == dope[-2] |  0   4   1  |  1   3   1
             dope[-1] |  1   3   4  |  0   4   4
-    acc  -> dope[ 0] |  2   8  12  |  2   8  16
+            dope[ 0] |  2   8  12  |  2   8  16
 
   For the column-major arrays like the 1st one, the logical and memory
   orders are the same.
+
+  When inheriting from Lux_dope, the dope vector is effectively a
+  "backward flexible array member" of the subclass:
+
+	typedef struct {
+		Lux_dope dope[1]; /* embedded superclass; must be first */
+		...
+	} Subclass;
+
+	Lux_dope *head = malloc(rank * sizeof(Lux_dope) + sizeof(Subclass));
+	Subclass *data = (Subclass *)(head + rank);
 
 ERROR/FAILURE HANDLING: the terms "error" here refers to a recoverable
   and expected runtime error.  It is the type of errors typically
