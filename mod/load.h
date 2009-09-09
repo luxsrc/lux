@@ -58,7 +58,7 @@ vload(const char *restrict name, va_list ap)
 	void   *mod = NULL;
 	void *(*mk)(va_list);
 	void  (*rm)(void *) = NULL;
-	void   *obj = NULL;
+	void   *ins = NULL;
 
 	struct load_node *node;
 
@@ -85,29 +85,29 @@ vload(const char *restrict name, va_list ap)
 			failed = f;
 			(void)dlerror();
 		}
-		obj = mk(ap);
-		if(!obj)
+		ins = mk(ap);
+		if(!ins)
 			FAILED_AS(F2CONS, "construct");
 	} else {
 		buf[3] = 'E';
-		obj = dlsym(mod, buf);
-		if(!obj)
+		ins = dlsym(mod, buf);
+		if(!ins)
 			FAILED_AS(FNOSYM, "load entry point");
 	}
 
 	/* Try to save module to a hash table */
-	node = HADD(&ltab, obj, struct load_node);
+	node = HADD(&ltab, ins, struct load_node);
 	if(!node)
 		FAILED_TO("allocate loading table node");
 
 	node->rm  = rm;
 	node->mod = mod;
 	FREE(buf);
-	return obj;
+	return ins;
 
  cleanup:
-	if(rm && obj)
-		rm(obj);
+	if(rm && ins)
+		rm(ins);
 	if(mod)
 		(void)dlclose(mod); /* FIXME: should not clean up dlerror() */
 	if(buf)
@@ -116,12 +116,12 @@ vload(const char *restrict name, va_list ap)
 }
 
 static inline void
-uload(void *obj)
+uload(void *ins)
 {
-	struct load_node *node = HPOP(&ltab, obj, struct load_node);
+	struct load_node *node = HPOP(&ltab, ins, struct load_node);
 	if(node) {
 		if(node->rm)
-			node->rm(obj);
+			node->rm(ins);
 		(void)dlclose(node->mod);
 		free(node);
 	} else

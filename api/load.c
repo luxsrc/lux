@@ -41,7 +41,7 @@ lux_load(const char *restrict name, ...)
 	char lazybuf[256], *buf;
 
 	va_list ap;
-	void   *obj;
+	void   *ins;
 
 	if(!paths[0])
 		paths[0] = getcwd(NULL, 0);
@@ -63,18 +63,18 @@ lux_load(const char *restrict name, ...)
 
 	/* Try to load the module */
 	va_start(ap, name);
-	for(i = 0, obj = NULL; i < COUNT_OF(paths) && !obj; ++i) {
+	for(i = 0, ins = NULL; i < COUNT_OF(paths) && !ins; ++i) {
 		(void)strcat(strcat(strcpy(buf, paths[i]), "/"), name);
-		obj = vload(buf, ap);
+		ins = vload(buf, ap);
 	}
 	va_end(ap);
 
 	FREE(buf);
-	return obj;
+	return ins;
 }
 
 void
-lux_unload(void *obj)
+lux_unload(void *ins)
 {
-	uload(obj);
+	uload(ins);
 }

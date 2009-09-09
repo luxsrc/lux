@@ -122,9 +122,9 @@ OBJECTS, CLASSES, and METACLASSES: a lux interface together with an
   wasteful, especially for heavy interfaces.  This is because all
   instances in
 
-	Lux_MOD *MOD1 = lux_load("MOD");
-	Lux_MOD *MOD2 = lux_load("MOD");
-	Lux_MOD *MOD3 = lux_load("MOD");
+	Lux_MOD *ins1 = lux_load("MOD");
+	Lux_MOD *ins2 = lux_load("MOD");
+	Lux_MOD *ins3 = lux_load("MOD");
 	...
 
   contain the same list of function pointers.  To overcome this, we
@@ -153,27 +153,27 @@ OBJECTS, CLASSES, and METACLASSES: a lux interface together with an
   the metaclass with the object.  That way, we can remove one layer of
   indirectness by
 
-	typedef struct {
+	typedef struct { /* type of an object, i.e., a class */
 		double x;
 		...
-	} Lux_MOD_obj; /* type of an object, i.e., a class */
+	} Lux_obj;
 
-	typedef struct {
+	typedef struct { /* type of a class, i.e., a metaclass */
 		const char *name;
-		Lux_MOD_obj *(*mkobj)();
-		void (*rmobj)(Lux_MOD_obj *);
+		Lux_obj *(*mkobj)();
+		void (*rmobj)(Lux_obj *);
 		...
-		double (*f)(Lux_MOD_obj *, double);
+		double (*f)(Lux_obj *, double);
 		...
-	} Lux_MOD; /* type of a class, i.e., a metaclass */
+	} Lux_MOD;
 
-	Lux_MOD     *MOD  = lux_load("MOD");
-	Lux_MOD_obj *obj1 = MOD->mkobj();
-	Lux_MOD_obj *obj2 = MOD->mkobj();
+	Lux_MOD *cls  = lux_load("MOD");
+	Lux_obj *ins1 = MOD->mkobj();
+	Lux_obj *ins2 = MOD->mkobj();
 	...
 
-	MOD->f(obj1, para);
-	MOD->f(obj2, para);
+	cls->f(ins1, para);
+	cls->f(ins2, para);
 	...
 
   This approach can significantly reduce the instance creation
