@@ -21,15 +21,15 @@
 #include <lux/failed.h>
 #include <stdio.h> /* for FILE and vfprintf() */
 
-int lux_log_debug = 0; /* debugging message is disabled by default */
-int lux_log_print = 1;
-int lux_log_error = 2;
+unsigned lux_log_debug = 0; /* debugging message is disabled by default */
+unsigned lux_log_print = 1;
+unsigned lux_log_error = 2;
 
 void
-lux_vlog(int flag, const char *restrict fmt, va_list ap)
+lux_vlog(unsigned flags, const char *restrict fmt, va_list ap)
 {
 	FILE *stream = NULL;
-	switch(flag) {
+	switch(flags) {
 	case 1: stream = stdout; break;
 	case 2: stream = stderr; break;
 	}

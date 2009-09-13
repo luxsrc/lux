@@ -94,7 +94,7 @@ ERROR/FAILURE HANDLING: the terms "error" here refers to a recoverable
   variable.  Usually, a message is then logged before other action is
   taken to resolve the failure:
 
-	int fid = open(path, flag, mode);
+	int fid = open(path, flags, mode);
 	if(fid < 0) { /* handle failure */
 		int err = errno;
 		(void)fprintf(stderr,
@@ -141,13 +141,13 @@ ERROR/FAILURE HANDLING: the terms "error" here refers to a recoverable
   if any failed message is attached to a failed code.
 
 MESSAGE LOGGING: printing to stdout, stderr, files, or even memory are
-  all consider message logging in lux.  They are coordinated by the
+  all consider message logging in lux.  They are coordinated by a
   single function
 
-	lux_vlog(unsigned flag, const char *restrict format, va_list ap);
+	lux_vlog(unsigned flags, const char *restrict format, va_list ap);
 
-  There are 8 default flags that correspond to the standard syslog
-  security levels or linux kernel log levels:
+  There are 8 default severity levels that correspond to the standard
+  syslog security levels or linux kernel log levels:
 
     level  | description                          | usage examples in lux
     -------+--------------------------------------+---------------------------
@@ -160,8 +160,8 @@ MESSAGE LOGGING: printing to stdout, stderr, files, or even memory are
     info   | normal operational message           | a sim has started
     debug  | print information for debugging      | name of called function
 
-  These levels are preconfigured by bitwise-OR-ing a combination of
-  following flags:
+  All of these levels are preconfigured by bitwise-OR-ing a
+  combination of following flags:
 
     LUX_LOG_SUSPEND    (1U << LUX_UNSIGNED_BIT - 1)
     LUX_LOG_FLAGS      (1U << LUX_UNSIGNED_BIT - 2)
