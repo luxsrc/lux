@@ -23,7 +23,8 @@ dnl Check for headers
 AC_CHECK_HEADERS([stddef.h])
 
 dnl Check for types
-AC_COMPUTE_INT([ibits], [sizeof(int) * CHAR_BIT], [#include <limits.h>], [AC_MSG_ERROR([failed to compute the size of int in bits])])
+AC_COMPUTE_INT([ibits], [sizeof(int)      * CHAR_BIT], [#include <limits.h>], [AC_MSG_ERROR([failed to compute the size of int in bits])])
+AC_COMPUTE_INT([ubits], [sizeof(unsigned) * CHAR_BIT], [#include <limits.h>], [AC_MSG_ERROR([failed to compute the size of unsigned in bits])])
 
 dnl Find out the number of bits required to hold all error codes
 AC_COMPUTE_INT([elast], [ELAST],       [#include <errno.h>], [
@@ -85,9 +86,10 @@ dnl Define module path
 AC_DEFINE_UNQUOTED(LUX_MOD_PATH, "$prefix/lib/lux", [Define to the default module path.])
 
 dnl Define error code related macros
-AC_DEFINE_UNQUOTED(LUX_ELAST,       $elast, [Define to the largest system error code.])
-AC_DEFINE_UNQUOTED(LUX_FAILURE_BIT, $fbits, [Define to the required bits to hold all lux failure codes.])
-AC_DEFINE_UNQUOTED(LUX_INT_BIT,     $ibits, [Define to the size of int in bits.])
+AC_DEFINE_UNQUOTED(LUX_ELAST,        $elast, [Define to the largest system error code.])
+AC_DEFINE_UNQUOTED(LUX_FAILURE_BIT,  $fbits, [Define to the required bits to hold all lux failure codes.])
+AC_DEFINE_UNQUOTED(LUX_INT_BIT,      $ibits, [Define to the number of bits of int.])
+AC_DEFINE_UNQUOTED(LUX_UNSIGNED_BIT, $ubits, [Define to the number of bits of unsigned.])
 
 dnl Make single-precision a configure option
 AC_ARG_ENABLE(single, [AC_HELP_STRING([--enable-single],[compile lux in single precision])], ok=$enableval, ok=no)
@@ -164,22 +166,21 @@ extern void  lux_unload(void *);
 /*===========================================================================*/
 /* Convenience Message Logging Functions */
 
-extern unsigned lux_log_debug, lux_log_print, lux_log_error;
-
-#define LUX_DEF_MSGLOG(level) static inline void    \
-	lux_##level(const char *restrict fmt, ...)  \
-	{                                           \
-		va_list ap;                         \
-		va_start(ap, fmt);                  \
-		lux_vlog(lux_log_##level, fmt, ap); \
-		va_end(ap);                         \
+#define LUX_DEF_LOG(L, S) static inline void   \
+	lux_##S(const char *restrict fmt, ...) \
+	{                                      \
+		va_list ap;                    \
+		va_start(ap, fmt);             \
+		lux_vlog(L, fmt, ap);          \
+		va_end(ap);                    \
 	}
 
-LUX_DEF_MSGLOG(debug)
-LUX_DEF_MSGLOG(print)
-LUX_DEF_MSGLOG(error)
+LUX_DEF_LOG(0, fatal)
+LUX_DEF_LOG(3, error)
+LUX_DEF_LOG(6, print)
+LUX_DEF_LOG(7, debug)
 
-#undef LUX_DEF_MSGLOG
+#undef LUX_DEF_LOG
 
 /*===========================================================================*/
 

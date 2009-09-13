@@ -18,28 +18,21 @@
  * along with lux.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include <lux.h>
-#include <lux/failed.h>
-#include <stdio.h> /* for FILE and vfprintf() */
+#include <lux/log.h>
 
-unsigned lux_log_debug = 0; /* debugging message is disabled by default */
-unsigned lux_log_print = 1;
-unsigned lux_log_error = 2;
+static unsigned levels[16] = LEVELS_INIT;
 
 void
 lux_vlog(unsigned flags, const char *restrict fmt, va_list ap)
 {
-	FILE *stream = NULL;
-	switch(flags) {
-	case 1: stream = stdout; break;
-	case 2: stream = stderr; break;
-	}
+	while(flags < LUX_LOG_FLAGS)
+		flags = levels[flags]; /* FIXME: check number of levels */
 
-	if(stream) {
-		int f = failed;
-		int n = vfprintf(stream, fmt, ap);
-		if(n < 0)
-			failed = f; /* restore failure code to hide possible
-			               error emitted by vfprintf();
-			               TODO: make lux_vlog() more robust */
-	}
+	if(flags & LUX_LOG_SUSPEND)
+		return; /* suspended; do nothing */
+
+	vlog(flags & (LUX_LOG_FATAL-1), fmt, ap);
+
+	if(flags & LUX_LOG_FATAL)
+		lux_abort();
 }
