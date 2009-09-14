@@ -43,7 +43,6 @@ cleanup(void)
 #if HAVE_TIMESTAMP
 	lux_debug("lux ran for %g sec.\n", elapsed_since(t0));
 #endif
-	lux_fput(stderr);
 }
 
 void

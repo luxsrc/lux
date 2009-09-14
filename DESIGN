@@ -449,7 +449,7 @@ ERROR/FAILURE HANDLING: the terms "error" here refers to a recoverable
   variable.  Usually, a message is then logged before other action is
   taken to resolve the failure:
 
-	int fid = open(path, flag, mode);
+	int fid = open(path, flags, mode);
 	if(fid < 0) { /* handle failure */
 		int err = errno;
 		(void)fprintf(stderr,
@@ -496,15 +496,80 @@ ERROR/FAILURE HANDLING: the terms "error" here refers to a recoverable
   if any failed message is attached to a failed code.
 
 MESSAGE LOGGING: printing to stdout, stderr, files, or even memory are
-  all consider message logging in lux.  They are coordinated by the
+  all consider message logging in lux.  They are coordinated by a
   single function
 
-	lux_vlog(unsigned flag, const char *restrict format, va_list ap);
+	lux_vlog(unsigned flags, const char *restrict format, va_list ap);
 
-  There are 8 default flags that correspond to the standard syslog
-  security levels or linux kernel log levels.  These levels are
-  re-configurable in runtime and additional levels can be easily
-  added.
+  There are 8 default severity levels that correspond to the standard
+  syslog security levels or linux kernel log levels:
+
+    level  | description                          | usage examples in lux
+    -------+--------------------------------------+---------------------------
+    emerg  | may crash or return wrong results    | bug found by assertion
+    alert  | problem need to be fixed immediately | hardware failure
+    crit   | critical error/exception condition   | library (e.g. MPI) failure
+    err    | error/exception condition            | malloc failure
+    warning| error may occur if no action is taken| low disk space
+    notice | normal but significant condition     | excepted interrupt by user
+    info   | normal operational message           | a sim has started
+    debug  | print information for debugging      | name of called function
+
+  All of these levels are preconfigured by bitwise-OR-ing a
+  combination of following flags:
+
+    LUX_LOG_SUSPEND    (1U << LUX_UNSIGNED_BIT - 1)
+    LUX_LOG_FLAGS      (1U << LUX_UNSIGNED_BIT - 2)
+    LUX_LOG_FATAL      (1U << LUX_UNSIGNED_BIT - 3)
+    LUX_LOG_STREAM(ID) (1U << 5 + ID)
+    LUX_LOG_STDOUT     (1U << 4)
+    LUX_LOG_STDERR     (1U << 3)
+    LUX_LOG_AUTOFORMAT (1U << 2)
+    LUX_LOG_PID        (1U << 1)
+    LUX_LOG_TIMESTAMP  (1U << 0)
+
+  LUX_LOG_SUSPEND is the most significant bit.  This convention is
+  chosen so that a level is suspended if and only if casting the level
+  to an int results a negative number.
+
+  LUX_LOG_FLAGS is the next significant bit.  When it is not set
+  (flags & LUX_LOG_FLAGS == 0), all other bits are interpreted as an
+  integer, which is an id linked by the current level.  Theoretically,
+  we can keep track of 2^(sizeof(unsigned)*CHAR_BIT - 2) levels,
+  although the actual number of allocated levels is 16 by default.
+
+  When LUX_LOG_FLAGS is set, the following bit is LUX_LOG_FATAL, which
+  tells if the message logger should abort the program.  The next
+  LUX_UNSIGNED_BIT-6 bits are the bitwise-OR of log stream flags.
+  Among them, the more significant (sizeof(unsigned)-1)*CHAR_BIT bits
+  are for customizable output streams, while the least significant 2
+  bits are reserved for stdout and stderr.  Usually, at least one of
+  the stream flags is set.  In such a case, the least significant 3
+  bits of flags set the behavior of the logger, and are interpreted as
+  LUX_LOG_AUTOFORMAT, LUX_LOG_PID, and LUX_LOG_TIMESTAMP.  Otherwise,
+  syslog() is used instead of any of the log stream and the least
+  significant 3 bits are interpreted as a syslog severity level.
+
+  The actual 16 levels are allocated as a mutable array so they are
+  re-configurable at runtime.  In addition to the 8 default levels,
+  the remaining 8 levels can be customized for other usages.  More
+  levels can also be added by declaring unsigned variables to hold
+  their properties.
+
+  Some of the commonly used levels are mapped to the following
+  convenience message logging functions:
+
+    emerg -> lux_fatal()
+    err   -> lux_error()
+    info  -> lux_print()
+    debug -> lux_debug()
+
+  In addition to the above convenience functions, to help catching
+  programming bugs, lux also provides a macro lux_assert() to mirror
+  the function of assert() in <assert.h>.  The main difference between
+  the two is that lux_assert() uses lux_vlog() and is customizable.
+  Note that lux_assert() can be globally turned off at compile time by
+  passing the "--disable-assertion" option to `./configure`.
 
 CORE LIBRARY: the lux core library, libux, provides basic functions
   such as lux_load() and lux_unload() to access modules/plug-ins and

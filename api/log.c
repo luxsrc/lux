@@ -18,41 +18,21 @@
  * along with lux.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include <lux.h>
-#include <lux/failed.h>
-#include <lux/ringbuf.h>
-#include <lux/ringlog.h>
+#include <lux/log.h>
 
-static struct ringbuf buf = RINGBUF_INIT;
-
-int lux_log_debug = 0; /* debugging message is disabled by default */
-int lux_log_print = 1;
-int lux_log_error = 2;
+static unsigned levels[16] = LEVELS_INIT;
 
 void
-lux_vlog(int flag, const char *restrict fmt, va_list ap)
+lux_vlog(unsigned flags, const char *restrict fmt, va_list ap)
 {
-	FILE *stream = NULL;
-	switch(flag) {
-	case 1: stream = stdout; break;
-	case 2: stream = stderr; break;
-	}
+	while(flags < LUX_LOG_FLAGS)
+		flags = levels[flags]; /* FIXME: check number of levels */
 
-	if(stream) {
-		int f = failed;
-		int n = vfprintf(stream, fmt, ap);
-		if(n < 0)
-			failed = f; /* restore failure code to hide possible
-			               error emitted by vfprintf();
-			               TODO: make lux_vlog() more robust */
-	} else
-		vringlog(&buf, fmt, ap);
-}
+	if(flags & LUX_LOG_SUSPEND)
+		return; /* suspended; do nothing */
 
-void
-lux_fput(FILE *stream)
-{
-	if(stream)
-		fputring(&buf, stream);
-	else
-		ringerase(&buf);
+	vlog(flags & (LUX_LOG_FATAL-1), fmt, ap);
+
+	if(flags & LUX_LOG_FATAL)
+		lux_abort();
 }

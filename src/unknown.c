@@ -33,10 +33,9 @@ unknown(const char *restrict arg)
 {
 	const char *s = failure_msg(failed);
 	const char *k = arg[0] == '-' ? "option" : "command";
-	if(s) {
-		lux_fput(NULL); /* clean internal log */
+	if(s)
 		lux_error(fmt_with_msg, k, arg, s);
-	} else
+	else
 		lux_error(fmt_without_msg, k, arg);
 
 	return 64; /* EX_USAGE in <sysexits.h> */
