@@ -46,8 +46,10 @@
 	3             | LUX_LOG_SUSPEND,                \
 	0}
 
+static unsigned levels[16] = LEVELS_INIT;
+
 static inline void
-vlog(unsigned flags, const char *restrict fmt, va_list ap)
+_vlog(unsigned flags, const char *restrict fmt, va_list ap)
 {
 	/* TODO: implement LUX_LOG_TIMESTAMP, LUX_LOG_PID, and
 	         LUX_LOG_AUTOFORMAT */
@@ -67,6 +69,21 @@ vlog(unsigned flags, const char *restrict fmt, va_list ap)
 		failed = f; /* hide possible error emitted by v*printf();
 		               TODO: make vlog() more robust */
 	}
+}
+
+static inline void
+vlog(unsigned flags, const char *restrict fmt, va_list ap)
+{
+	while(flags < LUX_LOG_FLAGS)
+		flags = levels[flags]; /* FIXME: check number of levels */
+
+	if(flags & LUX_LOG_SUSPEND)
+		return; /* suspended; do nothing */
+
+	_vlog(flags & (LUX_LOG_FATAL-1), fmt, ap);
+
+	if(flags & LUX_LOG_FATAL)
+		lux_abort();
 }
 
 #endif /* _LUX_LOG_H_ */

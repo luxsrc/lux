@@ -20,19 +20,16 @@
 #include <lux.h>
 #include <lux/log.h>
 
-static unsigned levels[16] = LEVELS_INIT;
+#define DEF_LOG(L, S) void                     \
+	lux_##S(const char *restrict fmt, ...) \
+	{                                      \
+		va_list ap;                    \
+		va_start(ap, fmt);             \
+		vlog(levels[L], fmt, ap);      \
+		va_end(ap);                    \
+	}
 
-void
-lux_vlog(unsigned flags, const char *restrict fmt, va_list ap)
-{
-	while(flags < LUX_LOG_FLAGS)
-		flags = levels[flags]; /* FIXME: check number of levels */
-
-	if(flags & LUX_LOG_SUSPEND)
-		return; /* suspended; do nothing */
-
-	vlog(flags & (LUX_LOG_FATAL-1), fmt, ap);
-
-	if(flags & LUX_LOG_FATAL)
-		lux_abort();
-}
+DEF_LOG(0, fatal)
+DEF_LOG(3, error)
+DEF_LOG(6, print)
+DEF_LOG(7, debug)

@@ -149,13 +149,12 @@ AH_BOTTOM([/*===================================================================
 #endif
 
 /*===========================================================================*/
-/* Include standard header files to get size_t, ptrdiff_t, FILE, and va_list */
+/* Include standard header files to get size_t, ptrdiff_t, and FILE */
 
 #if HAVE_STDDEF_H
 #include <stddef.h> /* for size_t and ptrdiff_t */
 #endif
 #include <stdio.h>  /* for size_t and FILE */
-#include <stdarg.h> /* for va_list */
 
 /*---------------------------------------------------------------------------*/
 /* Typedef numerical types */
@@ -186,29 +185,13 @@ typedef struct {Lux_xreal r, i;} Lux_xcomplex;
 extern void lux_setup(void);
 extern void lux_abort(void);
 
-extern void lux_vlog(unsigned, const char *restrict, va_list);
+extern void lux_fatal(const char *restrict, ...);
+extern void lux_error(const char *restrict, ...);
+extern void lux_print(const char *restrict, ...);
+extern void lux_debug(const char *restrict, ...);
 
 extern void *lux_load(const char *restrict, ...);
 extern void  lux_unload(void *);
-
-/*===========================================================================*/
-/* Convenience Message Logging Functions */
-
-#define LUX_DEF_LOG(L, S) static inline void   \
-	lux_##S(const char *restrict fmt, ...) \
-	{                                      \
-		va_list ap;                    \
-		va_start(ap, fmt);             \
-		lux_vlog(L, fmt, ap);          \
-		va_end(ap);                    \
-	}
-
-LUX_DEF_LOG(0, fatal)
-LUX_DEF_LOG(3, error)
-LUX_DEF_LOG(6, print)
-LUX_DEF_LOG(7, debug)
-
-#undef LUX_DEF_LOG
 
 /*===========================================================================*/
 
