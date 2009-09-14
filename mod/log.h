@@ -35,18 +35,18 @@
 #define LUX_LOG_PID        (1U <<  1)
 #define LUX_LOG_TIMESTAMP  (1U <<  0)
 
-#define LEVELS_INIT {	                                \
-	LUX_LOG_FLAGS | LUX_LOG_STDERR | LUX_LOG_FATAL, \
-	0,                                              \
-	0,                                              \
-	LUX_LOG_FLAGS | LUX_LOG_STDERR,                 \
-	3,                                              \
-	6,                                              \
-	LUX_LOG_FLAGS | LUX_LOG_STDOUT,                 \
-	3             | LUX_LOG_SUSPEND,                \
-	0}
+#define EMERG_INIT (LUX_LOG_FLAGS | LUX_LOG_STDERR | LUX_LOG_FATAL)
 
-static unsigned levels[16] = LEVELS_INIT;
+#define LEVELS_INIT {	                 \
+	EMERG_INIT,                      \
+	0,                               \
+	0,                               \
+	LUX_LOG_FLAGS | LUX_LOG_STDERR,  \
+	3,                               \
+	6,                               \
+	LUX_LOG_FLAGS | LUX_LOG_STDOUT,  \
+	3             | LUX_LOG_SUSPEND, \
+	0}
 
 static inline void
 _vlog(unsigned flags, const char *restrict fmt, va_list ap)
@@ -72,10 +72,11 @@ _vlog(unsigned flags, const char *restrict fmt, va_list ap)
 }
 
 static inline void
-vlog(unsigned flags, const char *restrict fmt, va_list ap)
+vlog(size_t n_levels, const unsigned *restrict levels,
+     unsigned flags, const char *restrict fmt, va_list ap)
 {
 	while(flags < LUX_LOG_FLAGS)
-		flags = levels[flags]; /* FIXME: check number of levels */
+		flags = flags < n_levels ? levels[flags] : EMERG_INIT;
 
 	if(flags & LUX_LOG_SUSPEND)
 		return; /* suspended; do nothing */
