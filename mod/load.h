@@ -78,12 +78,12 @@ vload(const char *restrict name, va_list ap)
 	(void)strcat(strcpy(buf, "luxC"), basename(name));
 	mk = (void *(*)(va_list))dlsym(mod, buf);
 	if(mk) {
-		int f = failed;
+		int fsv = failed;
 		buf[3] = 'D';
 		rm = (void (*)(void *))dlsym(mod, buf);
 		if(!rm) {
-			failed = f;
-			(void)dlerror();
+			failed = fsv;    /* hide error emitted by dlsym() */
+			(void)dlerror(); /* clear libdl error message     */
 		}
 		ins = mk(ap);
 		if(!ins)

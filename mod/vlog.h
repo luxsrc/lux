@@ -62,7 +62,7 @@ hlog(unsigned flags, const char *restrict fmt, va_list ap)
 	if(flags < 8)
 		vsyslog(LOG_LOCAL0 | flags, fmt, ap);
 	else {
-		int f = failed;
+		int fsv = failed;
 
 		/* TODO: add a for-loop to output to STREAM(ID) */
 
@@ -72,8 +72,8 @@ hlog(unsigned flags, const char *restrict fmt, va_list ap)
 		if(flags & VLOG_STDERR)
 			(void)vfprintf(stderr, fmt, ap);
 
-		failed = f; /* hide possible error emitted by v*printf();
-		               TODO: make vlog() more robust */
+		failed = fsv; /* hide possible error emitted by v*printf();
+		                 TODO: make vlog() more robust */
 	}
 }
 
