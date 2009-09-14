@@ -21,8 +21,9 @@
 #define _LUX_LOG_H_
 
 #include <lux/failed.h>
-#include <stdio.h>
+#include <stdarg.h>
 #include <syslog.h>
+#include <stdio.h>
 
 #define LUX_LOG_SUSPEND    (1U << (LUX_UNSIGNED_BIT - 1))
 #define LUX_LOG_FLAGS      (1U << (LUX_UNSIGNED_BIT - 2))

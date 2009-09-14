@@ -20,6 +20,7 @@
 #include <lux.h>
 #include <lux/job.h>
 #include <lux/lazybuf.h>
+#include <stdarg.h> /* for va_list and va_arg() */
 #include <string.h> /* for strlen() and memcpy() */
 
 void *

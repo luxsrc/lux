@@ -20,6 +20,7 @@
 #include <lux.h>
 #include <lux/lazybuf.h>
 #include <lux/load.h>
+#include <stdarg.h> /* for va_list, va_start(), and va_end() */
 #include <unistd.h> /* for getcwd() and getenv() */
 #include <string.h> /* for strcat(), strcpy(), and strlen() */
 
