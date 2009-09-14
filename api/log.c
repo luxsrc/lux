@@ -18,19 +18,17 @@
  * along with lux.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include <lux.h>
-#include <lux/log.h>
+#include <lux/vlog.h>
 
-#define N_LEVELS 16
+static struct vlog v = VLOG_INIT;
 
-static unsigned levels[N_LEVELS] = LEVELS_INIT;
-
-#define DEF_LOG(L, S) void                                  \
-	lux_##S(const char *restrict fmt, ...)              \
-	{                                                   \
-		va_list ap;                                 \
-		va_start(ap, fmt);                          \
-		vlog(N_LEVELS, levels, levels[L], fmt, ap); \
-		va_end(ap);                                 \
+#define DEF_LOG(L, S) void                      \
+	lux_##S(const char *restrict fmt, ...)  \
+	{                                       \
+		va_list ap;                     \
+		va_start(ap, fmt);              \
+		vlog(&v, v.levels[L], fmt, ap); \
+		va_end(ap);                     \
 	}
 
 DEF_LOG(0, fatal)
