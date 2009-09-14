@@ -48,10 +48,14 @@
 static inline void
 vlog(unsigned flags, const char *restrict fmt, va_list ap)
 {
+	/* TODO: implement LUX_LOG_TIMESTAMP, LUX_LOG_PID, and
+	         LUX_LOG_AUTOFORMAT */
 	if(flags < 8)
 		vsyslog(LOG_LOCAL0 | flags, fmt, ap);
 	else {
 		int f = failed;
+
+		/* TODO: add a for-loop to output to STREAM(ID) */
 
 		if(flags & LUX_LOG_STDOUT)
 			(void)vprintf(fmt, ap);
@@ -59,7 +63,8 @@ vlog(unsigned flags, const char *restrict fmt, va_list ap)
 		if(flags & LUX_LOG_STDERR)
 			(void)vfprintf(stderr, fmt, ap);
 
-		failed = f; /* hide possible error emitted by v*printf() */
+		failed = f; /* hide possible error emitted by v*printf();
+		               TODO: make vlog() more robust */
 	}
 }
 
