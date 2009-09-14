@@ -115,6 +115,13 @@ AC_DEFINE_UNQUOTED(LUX_FAILURE_BIT,  $fbits, [Define to the required bits to hol
 AC_DEFINE_UNQUOTED(LUX_INT_BIT,      $ibits, [Define to the number of bits of int.])
 AC_DEFINE_UNQUOTED(LUX_UNSIGNED_BIT, $ubits, [Define to the number of bits of unsigned.])
 
+dnl Make assertion a configure option
+AC_ARG_ENABLE(assertion, [AC_HELP_STRING([--enable-assertion],[compile lux with assertion for debugging])], ok=$enableval, ok=no)
+if test "$ok" = "yes"; then
+	AC_DEFINE(LUX_ASSERTION, [1], [Define to 1 if to enable assertion for debugging])
+fi
+AM_CONDITIONAL(USING_ASSERTION, test "$ok" = "yes")
+
 dnl Make single-precision a configure option
 AC_ARG_ENABLE(single, [AC_HELP_STRING([--enable-single],[compile lux in single precision])], ok=$enableval, ok=no)
 AC_ARG_ENABLE(float,  [AC_HELP_STRING([--enable-float], [synonym for --enable-single])],     ok=$enableval)
