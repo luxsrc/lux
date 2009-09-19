@@ -209,3 +209,8 @@ AC_OUTPUT
 if [[ ! -e $ac_pwd/lux ]]; then
 	$LN_S $srcdir/mod $ac_pwd/lux
 fi
+
+# Create our own copy of libtool for installation
+if [[ ! -e src/lux-libtool ]]; then
+	$LN_S ../libtool src/lux-libtool
+fi
