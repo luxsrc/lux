@@ -8,7 +8,7 @@ LT_PREREQ([2.2.6b])
 LT_INIT([dlopen])
 AM_INIT_AUTOMAKE([1.11 -Wall -Werror gnu]) dnl cannot use gnits because of version number and the missing "THANKS" file
 
-dnl Checks for programs and compiler characteristics
+dnl Check for programs and compiler characteristics
 AC_PROG_CPP
 AC_PROG_CC_STDC
 AM_PROG_CC_C_O
@@ -28,7 +28,8 @@ AC_CHECK_TYPE([hrtime_t], [AC_DEFINE(HAVE_HRTIME_T, 1, [Define to 1 if hrtime_t 
 #include <sys/time.h>
 #endif])
 
-dnl Checks for functions
+dnl Check for functions
+AC_CHECK_FUNCS([vsnprintf])
 AC_CHECK_FUNCS([BSDgettimeofday gettimeofday gethrtime read_real_time time_base_to_time clock_gettime mach_absolute_time])
 
 dnl Cray UNICOS _rtc() (real-time clock) intrinsic
@@ -38,9 +39,6 @@ AC_TRY_LINK([#if HAVE_INTRINSICS_H
 #include <intrinsics.h>
 #endif], [_rtc()], [AC_DEFINE(HAVE__RTC, 1, [Define if you have the UNICOS _rtc() intrinsic.])], [rtc_ok=no])
 AC_MSG_RESULT($rtc_ok)
-
-dnl Checks for functions
-AC_CHECK_FUNCS([vsnprintf])
 
 dnl Check for types
 AC_COMPUTE_INT([ibits], [sizeof(int)      * CHAR_BIT], [#include <limits.h>], [AC_MSG_ERROR([failed to compute the size of int in bits])])
