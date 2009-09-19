@@ -1,7 +1,7 @@
 bin_PROGRAMS = lux
-bin_SCRIPTS  = lux-libtool
+bin_SCRIPTS  = lux-libtool lux-mksim
 
 lux_SOURCES = src.h main.c unknown.c usage.c version.c
 lux_LDADD   = ../api/libux.la
 
-DISTCLEANFILES = lux-libtool
+DISTCLEANFILES = lux-libtool lux-mksim

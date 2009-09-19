@@ -1,0 +1,52 @@
+#!/bin/sh
+
+# Installation paths
+prefix="@prefix@"
+exec_prefix="@exec_prefix@"
+bindir="@bindir@"
+includedir="@includedir@"
+libdir="@libdir@"
+
+# Compiler and standard flags
+CC="@CC@"
+CCLD="${CC}"
+DEFS="-DHAVE_CONFIG_H"
+DEFAULT_INCLUDES="-I. -I${includedir}"
+LIBS="@LIBS@"
+DEFAULT_RPATH="-rpath ${libdir}/lux"
+
+# Passed in by configure
+CPPFLAGS="@CPPFLAGS@"
+CFLAGS="@CFLAGS@"
+LDFLAGS="@LDFLAGS@"
+
+# Set in Makefile.am
+AM_CPPFLAGS=""
+AM_CFLAGS=""
+AM_LDFLAGS="-no-undefined -export-dynamic -module"
+
+# Helper programs
+LIBTOOL="${bindir}/lux-libtool"
+INSTALL="@INSTALL@"
+
+# Module specific part of the toolchain
+mod_SOURCE="mod.c"
+mod_CPPFLAGS="-DLUX_MOD_NAME=mod"
+mod_OBJECT="mod.lo"
+mod_LIBADD="${libdir}/libux.la"
+mod_TARGET="mod.la"
+
+${LIBTOOL} --tag=CC --mode=compile ${CC} -c \
+	${DEFS} ${DEFAULT_INCLUDES}         \
+	${AM_CPPFLAGS} ${CPPFLAGS}          \
+	${AM_CFLAGS} ${CFLAGS}              \
+	${mod_SOURCE} ${mod_CPPFLAGS} -o ${mod_OBJECT}
+
+${LIBTOOL} --tag=CC --mode=link ${CCLD} \
+	${AM_CFLAGS} ${CFLAGS}          \
+	${AM_LDFLAGS} ${LDFLAGS}        \
+	${LIBS} ${DEFAULT_RPATH}        \
+	${mod_OBJECT} ${mod_LIBADD} -o ${mod_TARGET}
+
+mkdir -p ${PWD}/sim
+${LIBTOOL} --mode=install ${INSTALL} ${mod_TARGET} ${PWD}/sim
