@@ -41,10 +41,19 @@ if test "x$out" == "x"; then
 	echo "No output module is specified; use default \"$out\""
 fi
 
+# Split path into "$dir" and "$out"
+case "$out" in
+	*/*)	dir=`dirname  "$out"`
+		out=`basename "$out"`
+		;;
+	*)	dir="sim"
+		;;
+esac
+
 # Define module name by removing the ".la" extension; abort if module
 # name is invalid
 case "$out" in
-*.la)	mod="${out%.la}";;
+*.la)	;;
 *)	echo "Invalid output module \"$out\"; ABORT"
 	exit 1
 	;;
@@ -91,7 +100,7 @@ LIBTOOL="${bindir}/lux-libtool"
 INSTALL="@INSTALL@"
 
 # Module specific part of the toolchain
-mod_CPPFLAGS="-DLUX_MOD_NAME=${mod}"
+mod_CPPFLAGS="-DLUX_MOD_NAME=${out%.la}"
 mod_LIBADD="${libdir}/libux.la"
 
 # Compile the source file(s) to object(s)
@@ -123,7 +132,7 @@ ${LIBTOOL} --tag=CC --mode=link ${CCLD} \
 	${LIBS} ${DEFAULT_RPATH}        \
 	"${obj[@]}" ${mod_LIBADD} -o "$out"
 
-# Install output module to "./sim"
-echo "Install \"$out\" to \"./sim\""
-mkdir -p ${PWD}/sim
-${LIBTOOL} --mode=install ${INSTALL} "$out" ${PWD}/sim
+# Install output module to "$dir"
+echo "Install \"$out\" to \"$dir\""
+mkdir -p "$PWD/$dir"
+${LIBTOOL} --mode=install ${INSTALL} "$out" "$PWD/$dir"
