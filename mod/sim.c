@@ -26,21 +26,25 @@
 void *
 LUXC(va_list ap)
 {
-	void *sim;
-
 	const char *arg = va_arg(ap, const char *);
-	size_t      len = strlen(arg);
 
-	char lazybuf[256] = "sim/", *buf = lazybuf;
-	buf = (char *)REALLOC(buf, sizeof("sim/") + len);
-	if(!buf)
-		return NULL;
+	if(arg[0] == '/') /* using absolute path */
+		return lux_load(arg);
+	else {
+		void *sim;
 
-	(void)memcpy(buf + sizeof("sim/") - 1, arg, len + 1);
-	sim = lux_load(buf); /* chain-loading works as expected because of the
-	                        array-of-stacks design of the hash table. */
-	FREE(buf);
-	return sim;
+		char lazybuf[256] = "sim/", *buf = lazybuf;
+		size_t len = strlen(arg);
+		buf = (char *)REALLOC(buf, sizeof("sim/") + len);
+		if(!buf)
+			return NULL; /* no need to FREE(buf);
+			                failure code was set by REALLOC() */
+		(void)memcpy(buf + sizeof("sim/") - 1, arg, len + 1);
+		sim = lux_load(buf); /* chain-loading works because of
+		                        htab's array-of-stacks design */
+		FREE(buf);
+		return sim;
+	}
 }
 
 void
