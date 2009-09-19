@@ -1,5 +1,11 @@
 #!/bin/sh
 
+if test "x$1" != "x"; then
+    mod="$1"
+else
+    mod="mod"
+fi
+
 # Installation paths
 prefix="@prefix@"
 exec_prefix="@exec_prefix@"
@@ -30,11 +36,11 @@ LIBTOOL="${bindir}/lux-libtool"
 INSTALL="@INSTALL@"
 
 # Module specific part of the toolchain
-mod_SOURCE="mod.c"
-mod_CPPFLAGS="-DLUX_MOD_NAME=mod"
-mod_OBJECT="mod.lo"
+mod_SOURCE="${mod}.c"
+mod_CPPFLAGS="-DLUX_MOD_NAME=${mod}"
+mod_OBJECT="${mod}.lo"
 mod_LIBADD="${libdir}/libux.la"
-mod_TARGET="mod.la"
+mod_TARGET="${mod}.la"
 
 ${LIBTOOL} --tag=CC --mode=compile ${CC} -c \
 	${DEFS} ${DEFAULT_INCLUDES}         \
