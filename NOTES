@@ -1,0 +1,64 @@
+# The following notes, written in Makefile.in format, summarize how
+# libtool is used in Makefile to compile and build a module.  The
+# actual process may depend on the versions of autoconf, automake, and
+# libtool.  Nevertheless, the following helps us to create scripts to
+# compile external modules.
+
+#==============================================================================
+# Global settings
+
+DEPDIR    = @DEPDIR@ # ="${am__leading_dot}deps"
+am__mv    = mv -f
+pkglibdir = $(libdir)/@PACKAGE@
+
+DEFS             = @DEFS@                          # = -DHAVE_CONFIG_H
+DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir) # @am__isrc@ = ' -I$(srcdir)' only when $(srcdir) != .
+
+#------------------------------------------------------------------------------
+# Generic part of the toolchain
+CC   = @CC@
+LIBS = @LIBS@
+
+# Passed in by configure
+LTFLAGS  =
+CPPFLAGS = @CPPFLAGS@
+CFLAGS   = @CFLAGS@
+LDFLAGS  = @LDFLAGS@
+
+# Set in Makefile.am
+AM_LTFLAGS  =
+AM_CPPFLAGS =
+AM_CFLAGS   =
+AM_LDFLAGS  = -no-undefined -export-symbols-regex '^lux[A-Z_]' -export-dynamic -module
+
+# Generic functions
+LIBTOOL   = @LIBTOOL@ # ='$(SHELL) $(top_builddir)/libtool'
+CCLD      = $(CC)
+
+LTCOMPILE = $(LIBTOOL) --tag=CC $(AM_LTFLAGS) $(LTFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
+LTLINK    = $(LIBTOOL) --tag=CC $(AM_LTFLAGS) $(LTFLAGS) --mode=link    $(CCLD)                                                                  $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS)
+
+#------------------------------------------------------------------------------
+# Module specific part of the toolchain
+mod_SOURCE   = mod.c
+mod_LIBADD   = ../api/libux.la -ldl
+mod_CPPFLAGS = -DLUX_MOD_NAME=mod
+mod_OBJECT   = mod.lo
+mod_TARGET   = mod.la
+
+$(LTCOMPILE) $(mod_SOURCE) $(mod_CPPFLAGS) -MT $(mod_OBJECT) -MD -MP -MF $(DEPDIR)/mod.Tpo -c -o $(mod_OBJECT)
+$(am__mv)    $(DEPDIR)/mod.Tpo                                                                   $(DEPDIR)/mod.Plo
+$(LTLINK)    $(mod_OBJECT) -rpath $(pkglibdir) $(mod_LIBADD) $(LIBS)                          -o $(mod_TARGET)
+
+#------------------------------------------------------------------------------
+# Install/uninstall
+INSTALL = @INSTALL@
+DESTDIR = "$$dc_destdir"
+
+$(LIBTOOL) $(AM_LTFLAGS) $(LTFLAGS) --mode=install   $(INSTALL) $(INSTALL_STRIP_FLAG) $$list2 "$(DESTDIR)$(pkglibdir)"
+$(LIBTOOL) $(AM_LTFLAGS) $(LTFLAGS) --mode=uninstall rm -f                                    "$(DESTDIR)$(pkglibdir)/$$f"
+
+#------------------------------------------------------------------------------
+# Mostly-clean/clean
+-rm -f *.lo
+-rm -rf .libs _libs
