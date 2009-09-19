@@ -205,9 +205,15 @@ dnl Output files
 AC_CONFIG_FILES(m4_esyscmd([find . -name 'Makefile.am' -type f | sed 's/\.\/\(.*\).am/\1/']))
 AC_OUTPUT
 
+dnl Hacks: in terms of source and build paths, there are only two variables
+dnl        "$srcdir" and "$ac_pwd" that are accessible within `configure`.
+dnl        All other path variables, e.g., "$top_srcdir", are empty within
+dnl        `configure`.  Since "$ac_pwd" is always ".", the only useful
+dnl        variable is "$srcdir".
+
 # Ugly hack so '#include <lux/interface.h>' works
-if [[ ! -e $ac_pwd/lux ]]; then
-	$LN_S $srcdir/mod $ac_pwd/lux
+if [[ ! -e lux ]]; then
+	$LN_S $srcdir/mod lux
 fi
 
 # Create our own copy of libtool for installation
