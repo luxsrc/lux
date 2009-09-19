@@ -20,7 +20,7 @@
 #ifndef _LUX_DOPE_H_
 #define _LUX_DOPE_H_
 
-#include <stdlib.h> /* for malloc() and free() */
+#include <lux/zalloc.h>
 
 typedef struct {
 	Lux_int r; /* rank/dimension */
@@ -31,7 +31,7 @@ typedef struct {
 static inline Lux_dope *
 mkdope(size_t sz, int rank)
 {
-	Lux_dope *head = (Lux_dope *)malloc(rank * sizeof(Lux_dope) + sz);
+	Lux_dope *head = (Lux_dope *)zalloc(rank * sizeof(Lux_dope) + sz);
 	if(head) {
 		Lux_int r;
 		for(r = 0; r < rank; ++r)
