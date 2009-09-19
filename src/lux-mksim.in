@@ -1,10 +1,65 @@
 #!/bin/sh
 
-if test "x$1" != "x"; then
-    mod="$1"
+# Seperate the argument list "$@" into input array "$ina" and output "$out"
+while test "$#" -gt 0; do
+	a="$1"
+	shift
+	if test "x$a" != "x-o"; then
+		ina+=("$a")
+	elif test "$#" -gt 0; then
+		out="$1"
+		shift
+	fi
+done
+
+# Place all "*.c" files to "$src"; abort if any file does not exist or
+# has unknown extension
+for i in "${ina[@]}"; do
+	if test -f "$i"; then case "$i" in
+	*.c)	src+=("$i");;
+	*.h)	echo "\"$i\" is a header file; SKIP";;
+	*)	echo "Invalid input module \"$i\"; ABORT"
+		exit 1
+		;;
+	esac; else
+		echo "Input file \"$i\" not found; ABORT"
+		exit 1
+	fi
+done
+
+# Obtain a sorted list of unique input file(s); exit if no input file
+if test ${#src} -eq 0; then
+	echo "No input source file is specified; EXIT"
+	exit 0
 else
-    mod="mod"
+	src=(`ls "${src[@]}" | sort | uniq`)
 fi
+
+# Use default output name if "$out" is specified
+if test "x$out" == "x"; then
+	out="mod.la"
+	echo "No output module is specified; use default \"$out\""
+fi
+
+# Define module name by removing the ".la" extension; abort if module
+# name is invalid
+case "$out" in
+*.la)	mod="${out%.la}";;
+*)	echo "Invalid output module \"$out\"; ABORT"
+	exit 1
+	;;
+esac
+
+# Finally done parsing arguments; print a summary
+printf "Input source files: "
+for i in "${!src[@]}"; do
+	if test $i -lt `expr "${#src}" - 1`; then
+		printf "\"${src[$i]}\", "
+	else
+		echo   "\"${src[$i]}\""
+	fi
+done
+echo "Output module name: \"${out}\""
 
 # Installation paths
 prefix="@prefix@"
@@ -36,23 +91,39 @@ LIBTOOL="${bindir}/lux-libtool"
 INSTALL="@INSTALL@"
 
 # Module specific part of the toolchain
-mod_SOURCE="${mod}.c"
 mod_CPPFLAGS="-DLUX_MOD_NAME=${mod}"
-mod_OBJECT="${mod}.lo"
 mod_LIBADD="${libdir}/libux.la"
-mod_TARGET="${mod}.la"
 
-${LIBTOOL} --tag=CC --mode=compile ${CC} -c \
-	${DEFS} ${DEFAULT_INCLUDES}         \
-	${AM_CPPFLAGS} ${CPPFLAGS}          \
-	${AM_CFLAGS} ${CFLAGS}              \
-	${mod_SOURCE} ${mod_CPPFLAGS} -o ${mod_OBJECT}
+# Compile the source file(s) to object(s)
+for s in "${src[@]}"; do
+	o="${s%c}lo"
+	echo "Compile source file \"$s\" to object file \"$o\""
+	${LIBTOOL} --tag=CC --mode=compile ${CC} -c \
+		${DEFS} ${DEFAULT_INCLUDES}         \
+		${AM_CPPFLAGS} ${CPPFLAGS}          \
+		${AM_CFLAGS} ${CFLAGS}              \
+		"$s" ${mod_CPPFLAGS} -o "$o"
+	obj+=("$o")
+done
+
+# Link object(s) to the output module
+printf "Link object ffile "
+for i in "${!obj[@]}"; do
+	if test $i -lt `expr "${#obj}" - 1`; then
+		printf "\"${obj[$i]}\", "
+	else
+		printf "\"${obj[$i]}\""
+	fi
+done
+echo "to output module \"$out\""
 
 ${LIBTOOL} --tag=CC --mode=link ${CCLD} \
 	${AM_CFLAGS} ${CFLAGS}          \
 	${AM_LDFLAGS} ${LDFLAGS}        \
 	${LIBS} ${DEFAULT_RPATH}        \
-	${mod_OBJECT} ${mod_LIBADD} -o ${mod_TARGET}
+	"${obj[@]}" ${mod_LIBADD} -o "$out"
 
+# Install output module to "./sim"
+echo "Install \"$out\" to \"./sim\""
 mkdir -p ${PWD}/sim
-${LIBTOOL} --mode=install ${INSTALL} ${mod_TARGET} ${PWD}/sim
+${LIBTOOL} --mode=install ${INSTALL} "$out" ${PWD}/sim
