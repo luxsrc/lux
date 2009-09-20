@@ -28,6 +28,11 @@ if [ "x$1" != "xclean" ]; then
         autoreconf --install --symlink --force --verbose
     done
     # Dirty hacks
+    sed -e's/\#define\ PACKAGE/#define LUX/g' \
+        -i~ configure
+    find . -type f -name Makefile.in -exec sed \
+	-e 's/-I\.@am__isrc@ //g' \
+	-i~ {} \;
     sed -e'/libtool stores uninstalled libraries/{N;N;N;d;}' \
         -e'/Name of package/{N;N;d;}' \
         -e'/full name and version of this package/{N;N;d;}' \
@@ -37,7 +42,5 @@ if [ "x$1" != "xclean" ]; then
         -e's/this\ package/lux/g' \
         -e's/PACKAGE_/LUX_/g' \
         -i~ lux.hin
-    sed -e's/\#define\ PACKAGE/#define LUX/g' \
-        -i~ configure
-    rm  -f lux.hin~ configure~
+    find . -type f -name '*~' -exec rm {} \;
 fi
