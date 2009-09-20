@@ -201,7 +201,7 @@ extern void  lux_unload(void *);
 
 dnl Output files
 AC_CONFIG_FILES(m4_esyscmd([find . -name 'Makefile.am' -type f | sed 's/\.\/\(.*\).am/\1/']))
-AC_CONFIG_FILES([src/lux-build], [chmod +x src/lux-build])
+AC_CONFIG_FILES([xtr/scripts/lux-build], [chmod +x xtr/scripts/lux-build])
 AC_CONFIG_FILES([xtr/pkg-config/lux.pc:xtr/pkg-config/lux.pcin])
 AC_OUTPUT
 
@@ -217,6 +217,6 @@ if [[ ! -e lux ]]; then
 fi
 
 # Create our own copy of libtool for installation
-if [[ ! -e src/lux-libtool ]]; then
-	$LN_S ../libtool src/lux-libtool
+if [[ ! -e xtr/scripts/lux-libtool ]]; then
+	$LN_S ../../libtool xtr/scripts/lux-libtool
 fi

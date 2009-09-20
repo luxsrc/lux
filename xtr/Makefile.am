@@ -1,1 +1,1 @@
-SUBDIRS = pkg-config
+SUBDIRS = pkg-config scripts
