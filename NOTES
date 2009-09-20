@@ -59,6 +59,48 @@ $(LIBTOOL) $(AM_LTFLAGS) $(LTFLAGS) --mode=install   $(INSTALL) $(INSTALL_STRIP_
 $(LIBTOOL) $(AM_LTFLAGS) $(LTFLAGS) --mode=uninstall rm -f                                    "$(DESTDIR)$(pkglibdir)/$$f"
 
 #------------------------------------------------------------------------------
-# Mostly-clean/clean
--rm -f *.lo
--rm -rf .libs _libs
+# Difference cleans
+clean: clean-am
+clean-am: clean-generic clean-libtool clean-pkglibLTLIBRARIES \
+	mostlyclean-am
+clean-generic:
+clean-libtool:
+	-rm -rf .libs _libs
+clean-pkglibLTLIBRARIES:
+	-test -z "$(pkglib_LTLIBRARIES)" || rm -f $(pkglib_LTLIBRARIES)
+	@list='$(pkglib_LTLIBRARIES)'; for p in $$list; do \
+	  dir="`echo $$p | sed -e 's|/[^/]*$$||'`"; \
+	  test "$$dir" != "$$p" || dir=.; \
+	  echo "rm -f \"$${dir}/so_locations\""; \
+	  rm -f "$${dir}/so_locations"; \
+	done
+
+distclean: distclean-am
+	-rm -rf ./$(DEPDIR)
+	-rm -f Makefile
+distclean-am: clean-am distclean-compile distclean-generic \
+	distclean-tags
+distclean-compile:
+	-rm -f *.tab.c
+distclean-generic:
+	-test -z "$(CONFIG_CLEAN_FILES)" || rm -f $(CONFIG_CLEAN_FILES)
+	-test . = "$(srcdir)" || test -z "$(CONFIG_CLEAN_VPATH_FILES)" || rm -f $(CONFIG_CLEAN_VPATH_FILES)
+distclean-tags:
+	-rm -f TAGS ID GTAGS GRTAGS GSYMS GPATH tags
+
+maintainer-clean: maintainer-clean-am
+	-rm -rf ./$(DEPDIR)
+	-rm -f Makefile
+maintainer-clean-am: distclean-am maintainer-clean-generic
+maintainer-clean-generic:
+	@echo "This command is intended for maintainers to use"
+	@echo "it deletes files that may require special tools to rebuild."
+
+mostlyclean: mostlyclean-am
+mostlyclean-am: mostlyclean-compile mostlyclean-generic \
+	mostlyclean-libtool
+mostlyclean-compile:
+	-rm -f *.$(OBJEXT)
+mostlyclean-generic:
+mostlyclean-libtool:
+	-rm -f *.lo

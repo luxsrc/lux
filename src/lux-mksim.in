@@ -84,6 +84,7 @@ DEFS="-DHAVE_CONFIG_H"
 DEFAULT_INCLUDES="-I. -I${includedir}"
 LIBS="@LIBS@"
 DEFAULT_RPATH="-rpath ${libdir}/lux"
+OBJEXT="@OBJEXT@"
 
 # Passed in by configure
 CPPFLAGS="@CPPFLAGS@"
@@ -136,3 +137,10 @@ ${LIBTOOL} --tag=CC --mode=link ${CCLD} \
 echo "Install \"$out\" to \"$dir\""
 mkdir -p "$PWD/$dir"
 ${LIBTOOL} --mode=install ${INSTALL} "$out" "$PWD/$dir"
+
+# Clean up---we do not track timestamp of the dependencies so there is
+# no reason to keep the intermediate files
+rm -rf .libs _libs
+rm -f "$out"
+rm -f *.$OBJEXT
+rm -f *.lo
