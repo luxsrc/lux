@@ -1,6 +1,6 @@
 ACLOCAL_AMFLAGS = -I .build-m4
 
-SUBDIRS = api mod src
+SUBDIRS = api mod src xtr
 
 EXTRA_DIST = .autom4te.cfg .version DESIGN NOTES STYLE bootstrap
 

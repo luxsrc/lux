@@ -1,0 +1,10 @@
+prefix=@prefix@
+exec_prefix=@exec_prefix@
+libdir=@libdir@
+includedir=@includedir@
+
+Name: lux
+Description: a scientific computation framework
+Version: @VERSION@
+Libs: -L${libdir} -lux
+Cflags: -I${includedir}
