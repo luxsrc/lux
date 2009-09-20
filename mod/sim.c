@@ -20,28 +20,25 @@
 #include <lux.h>
 #include <lux/job.h>
 #include <lux/lazybuf.h>
-#include <stdarg.h> /* for va_list and va_arg() */
 #include <string.h> /* for strlen() and memcpy() */
 
 void *
-LUXC(va_list ap)
+LUXC(const void *paras)
 {
-	const char *arg = va_arg(ap, const char *);
-
-	if(arg[0] == '/') /* using absolute path */
-		return lux_load(arg);
+	if(((const char *)paras)[0] == '/') /* using absolute path */
+		return lux_load(paras, NULL);
 	else {
 		void *sim;
 
 		char lazybuf[256] = "sim/", *buf = lazybuf;
-		size_t len = strlen(arg);
+		size_t len = strlen(paras);
 		buf = (char *)REALLOC(buf, sizeof("sim/") + len);
 		if(!buf)
 			return NULL; /* no need to FREE(buf);
 			                failure code was set by REALLOC() */
-		(void)memcpy(buf + sizeof("sim/") - 1, arg, len + 1);
-		sim = lux_load(buf); /* chain-loading works because of
-		                        htab's array-of-stacks design */
+		(void)memcpy(buf + sizeof("sim/") - 1, paras, len + 1);
+		sim = lux_load(buf, NULL); /* chain-loading works because of
+		                              htab's array-of-stacks design */
 		FREE(buf);
 		return sim;
 	}

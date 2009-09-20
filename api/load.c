@@ -20,7 +20,6 @@
 #include <lux.h>
 #include <lux/lazybuf.h>
 #include <lux/load.h>
-#include <stdarg.h> /* for va_list, va_start(), and va_end() */
 #include <unistd.h> /* for getcwd() and getenv() */
 #include <string.h> /* for strcat(), strcpy(), and strlen() */
 
@@ -35,14 +34,13 @@ max(size_t a, size_t b)
 }
 
 void *
-lux_load(const char *restrict name, ...)
+lux_load(const char *restrict name, const void *paras)
 {
 	size_t i, maxlen;
 
 	char lazybuf[256], *buf;
 
-	va_list ap;
-	void   *ins;
+	void *ins;
 
 	if(!paths[0])
 		paths[0] = getcwd(NULL, 0);
@@ -63,12 +61,10 @@ lux_load(const char *restrict name, ...)
 		return NULL; /* failure code was set by MALLOC() */
 
 	/* Try to load the module */
-	va_start(ap, name);
 	for(i = 0, ins = NULL; i < COUNT_OF(paths) && !ins; ++i) {
 		(void)strcat(strcat(strcpy(buf, paths[i]), "/"), name);
-		ins = vload(buf, ap);
+		ins = vload(buf, paras);
 	}
-	va_end(ap);
 
 	FREE(buf);
 	return ins;

@@ -51,12 +51,12 @@ static struct htab ltab = HTAB_INIT; /* the loading table */
 	} while(0)
 
 static inline void *
-vload(const char *restrict name, va_list ap)
+vload(const char *restrict name, const void *paras)
 {
 	char lazybuf[256], *buf;
 
 	void   *mod = NULL;
-	void *(*mk)(va_list);
+	void *(*mk)(const void *);
 	void  (*rm)(void *) = NULL;
 	void   *ins = NULL;
 
@@ -76,7 +76,7 @@ vload(const char *restrict name, va_list ap)
 
 	/* Try to get the instance */
 	(void)strcat(strcpy(buf, "luxC"), basename(name));
-	mk = (void *(*)(va_list))dlsym(mod, buf);
+	mk = (void *(*)(const void *))dlsym(mod, buf);
 	if(mk) {
 		int fsv = failed;
 		buf[3] = 'D';
@@ -85,7 +85,7 @@ vload(const char *restrict name, va_list ap)
 			failed = fsv;    /* hide error emitted by dlsym() */
 			(void)dlerror(); /* clear libdl error message     */
 		}
-		ins = mk(ap);
+		ins = mk(paras);
 		if(!ins)
 			FAILED_AS(F2CONS, "construct");
 	} else {
