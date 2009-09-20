@@ -2,7 +2,9 @@
 #
 # NOTE: If you just want to build lux, do not use this file.  Simply
 # run the ordinary `./configure && make` commands.  To clean up all
-# the auto-generated files, use `./bootstrap clean`.
+# the auto-generated files, use `./bootstrap clean`.  To speed up
+# bootstrapping (with the risk that autoconf doesn't get things
+# right), use `./bootstrap fast`.
 
 if [ -f Makefile ]; then
     make distclean
@@ -21,9 +23,11 @@ if [ "x$1" != "xclean" ]; then
         touch NEWS ChangeLog # TODO: generate from git commit messages
     fi
     mkdir .build-{aux,m4}
-    autoreconf --install --symlink --force --verbose
-    autoreconf --install --symlink --force --verbose
-    autoreconf --install --symlink --force --verbose
+    # Paranoia: sometimes autoconf doesn't get things right the first time
+    for i in `[ "x$1" == "xfast" ] && seq 1 || seq 3`; do
+        autoreconf --install --symlink --force --verbose
+    done
+    # Dirty hacks
     sed -e'/libtool stores uninstalled libraries/{N;N;N;d;}' \
         -e'/Name of package/{N;N;d;}' \
         -e'/full name and version of this package/{N;N;d;}' \
