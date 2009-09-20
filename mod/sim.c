@@ -23,20 +23,20 @@
 #include <string.h> /* for strlen() and memcpy() */
 
 void *
-LUXC(const void *paras)
+LUXC(const void *opts)
 {
-	if(((const char *)paras)[0] == '/') /* using absolute path */
-		return lux_load(paras, NULL);
+	if(((const char *)opts)[0] == '/') /* using absolute path */
+		return lux_load(opts, NULL);
 	else {
 		void *sim;
 
 		char lazybuf[256] = "sim/", *buf = lazybuf;
-		size_t len = strlen(paras);
+		size_t len = strlen(opts);
 		buf = (char *)REALLOC(buf, sizeof("sim/") + len);
 		if(!buf)
 			return NULL; /* no need to FREE(buf);
 			                failure code was set by REALLOC() */
-		(void)memcpy(buf + sizeof("sim/") - 1, paras, len + 1);
+		(void)memcpy(buf + sizeof("sim/") - 1, opts, len + 1);
 		sim = lux_load(buf, NULL); /* chain-loading works because of
 		                              htab's array-of-stacks design */
 		FREE(buf);

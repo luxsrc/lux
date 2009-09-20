@@ -51,7 +51,7 @@ static struct htab ltab = HTAB_INIT; /* the loading table */
 	} while(0)
 
 static inline void *
-vload(const char *restrict name, const void *paras)
+vload(const char *restrict name, const void *opts)
 {
 	char lazybuf[256], *buf;
 
@@ -85,7 +85,7 @@ vload(const char *restrict name, const void *paras)
 			failed = fsv;    /* hide error emitted by dlsym() */
 			(void)dlerror(); /* clear libdl error message     */
 		}
-		ins = mk(paras);
+		ins = mk(opts);
 		if(!ins)
 			FAILED_AS(F2CONS, "construct");
 	} else {

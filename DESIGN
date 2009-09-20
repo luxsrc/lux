@@ -57,7 +57,7 @@ DYNAMIC MODULE: a lux module MOD is a dynamically loadable library
   which expands to luxDMOD, to release the allocated resource.  Note
   that chain-loading, i.e., using
 
-	return lux_load(another_mod, other_paras);
+	return lux_load(another_mod, more_options);
 
   in a constructor, is allowed.  It works as expected because of the
   last-in-first-out nature of the stack used in the hash table.
@@ -110,7 +110,7 @@ OBJECTS, CLASSES, and METACLASSES: a lux interface together with an
   programming languages such as C++.  As described above, loading a
   lux module is like creating an object.  For example, calling
 
-	Lux_MOD *MOD = lux_load("MOD", paras);
+	Lux_MOD *MOD = lux_load("MOD", opts);
 	MOD->func(MOD, para);
 
   has more-or-less the same effect as
@@ -122,9 +122,9 @@ OBJECTS, CLASSES, and METACLASSES: a lux interface together with an
   wasteful, especially for heavy interfaces.  This is because all
   instances in
 
-	Lux_MOD *ins1 = lux_load("MOD", paras);
-	Lux_MOD *ins2 = lux_load("MOD", paras);
-	Lux_MOD *ins3 = lux_load("MOD", paras);
+	Lux_MOD *ins1 = lux_load("MOD", opts);
+	Lux_MOD *ins2 = lux_load("MOD", opts);
+	Lux_MOD *ins3 = lux_load("MOD", opts);
 	...
 
   contain the same list of function pointers.  To overcome this, we
@@ -167,7 +167,7 @@ OBJECTS, CLASSES, and METACLASSES: a lux interface together with an
 		...
 	} Lux_MOD;
 
-	Lux_MOD *cls  = lux_load("MOD", paras);
+	Lux_MOD *cls  = lux_load("MOD", opts);
 	Lux_obj *ins1 = MOD->mkobj();
 	Lux_obj *ins2 = MOD->mkobj();
 	...
