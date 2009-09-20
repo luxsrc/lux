@@ -34,7 +34,7 @@ struct load_node {
 	void  *mod;
 };
 
-static struct htab ltab = HTAB_INIT; /* the loading table */
+static struct htab ltab = HTAB_NULL; /* the loading table */
 
 #define FAILED_TO(s) do {                                          \
 		int f = failed;                                    \

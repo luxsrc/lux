@@ -20,7 +20,7 @@
 #include <lux.h>
 #include <lux/vlog.h>
 
-static struct vlog v = VLOG_INIT;
+static struct vlog v = VLOG_NULL;
 
 #define DEF_LOG(L, S) void                      \
 	lux_##S(const char *restrict fmt, ...)  \

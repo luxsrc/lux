@@ -24,7 +24,7 @@
 #include <stdlib.h> /* for malloc() */
 
 #define HTAB_COUNT 256                  /* default number of nodes */
-#define HTAB_INIT  {HTAB_COUNT, {NULL}} /* remainder is initialized to 0,
+#define HTAB_NULL  {HTAB_COUNT, {NULL}} /* remainder is initialized to 0,
                                            see c-faq 1.30. */
 struct htab_node {
 	struct htab_node *next;

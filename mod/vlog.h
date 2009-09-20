@@ -38,7 +38,7 @@
 #define VLOG_EMERG (VLOG_FLAGS | VLOG_STDERR | VLOG_FATAL)
 
 #define VLOG_COUNT 16
-#define VLOG_INIT {VLOG_COUNT, {   \
+#define VLOG_NULL {VLOG_COUNT, {   \
 	VLOG_EMERG,                \
 	0,                         \
 	0,                         \
