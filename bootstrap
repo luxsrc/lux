@@ -1,4 +1,4 @@
-#! /bin/sh
+#!/bin/sh
 #
 # NOTE: If you just want to build lux, do not use this file.  Simply
 # run the ordinary `./configure && make` commands.  To clean up all
@@ -24,15 +24,12 @@ if [ "x$1" != "xclean" ]; then
     fi
     mkdir .build-{aux,m4}
     # Paranoia: sometimes autoconf doesn't get things right the first time
-    for i in `[ "x$1" == "xfast" ] && seq 1 || seq 3`; do
+    for i in $([ "x$1" = "xfast" ] && seq 1 || seq 3); do
         autoreconf --install --symlink --force --verbose
     done
     # Dirty hacks
     sed -e's/\#define\ PACKAGE/#define LUX/g' \
         -i~ configure
-    find . -type f -name Makefile.in -exec sed \
-	-e 's/-I\.@am__isrc@ //g' \
-	-i~ {} \;
     sed -e'/libtool stores uninstalled libraries/{N;N;N;d;}' \
         -e'/Name of package/{N;N;d;}' \
         -e'/full name and version of this package/{N;N;d;}' \
