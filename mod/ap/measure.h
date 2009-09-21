@@ -20,8 +20,8 @@
 #ifndef _LUX_MEASURE_H_
 #define _LUX_MEASURE_H_
 
-#include <lux/cycle.h>
-#include <lux/task.h>
+#include <lux/ap/cycle.h>
+#include <lux/ap/task.h>
 #include <lux/timer.h>
 #include <math.h>
 
@@ -29,7 +29,7 @@
 # error high resolution tick counter is not available on this platform
 #else
 # ifdef TIME_MIN
-#  define TICK_MIN TIME_MIN /* TIME_MIN defined in <lux/cycle.h> is in ticks */
+#  define TICK_MIN TIME_MIN /* defined in <lux/ap/cycle.h> in ticks */
 # else
 #  define TICK_MIN 100.0 /* from "fftw3/kernel/timer.c" */
 # endif
