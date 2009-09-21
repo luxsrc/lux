@@ -17,13 +17,13 @@
  * You should have received a copy of the GNU General Public License
  * along with lux.  If not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef _LUX_THREAD_H_
-#define _LUX_THREAD_H_
+#ifndef _LUX_SPAWN_H_
+#define _LUX_SPAWN_H_
 
-typedef struct LuxSthread Lux_thread;
+typedef struct LuxSspawn Lux_spawn;
 
-struct LuxSthread {
-	void (*exec)(Lux_thread *, void (*)(size_t, size_t, void *), void *);
+struct LuxSspawn {
+	void (*exec)(Lux_spawn *, void (*)(size_t, size_t, void *), void *);
 };
 
-#endif /* _LUX_THREAD_H_ */
+#endif /* _LUX_SPAWN_H_ */
