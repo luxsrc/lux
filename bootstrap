@@ -10,8 +10,8 @@ if [ -f Makefile ]; then
     make distclean
 fi
 
-rm -fr .autom4te.cache .build-{aux,m4}
-rm -f  aclocal.m4 configure lux.hin INSTALL
+rm -fr .autom4te.cache .build-aux
+rm -f  aclocal.m4 configure lux.hin INSTALL .build-m4/l*.m4
 find . -name 'Makefile.in' -type f -exec rm {} \;
 [ -d .git ] && rm -f .version AUTHORS NEWS ChangeLog
 
@@ -22,7 +22,7 @@ if [ "x$1" != "xclean" ]; then
         git shortlog -nse  | cut -c7-  >> AUTHORS
         touch NEWS ChangeLog # TODO: generate from git commit messages
     fi
-    mkdir .build-{aux,m4}
+    mkdir .build-aux
     # Paranoia: sometimes autoconf doesn't get things right the first time
     for i in $([ "x$1" = "xfast" ] && seq 1 || seq 3); do
         autoreconf --install --symlink --force --verbose

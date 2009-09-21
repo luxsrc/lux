@@ -12,6 +12,8 @@ dnl Check for programs and compiler characteristics
 AC_PROG_CPP
 AC_PROG_CC_STDC
 AM_PROG_CC_C_O
+AC_PROG_CC_FRAMEWORK
+AM_CONDITIONAL([SUPPORT_FRAMEWORK], [eval test \$ac_cv_prog_cc_${ac_cc}_framework = yes])
 
 AC_C_CONST
 AC_C_INLINE
