@@ -18,9 +18,4 @@ pkginclude_HEADERS += dope.h htab.h vlog.h
 
 # Interfaces and implementations of dynamic modules
 pkginclude_HEADERS += job.h mpi.h spawn.h
-pkglib_LTLIBRARIES  = sim.la
-
-AM_LDFLAGS      = -export-dynamic -module
-sim_la_CPPFLAGS = -DLUX_MOD_NAME=sim
-sim_la_SOURCES  = job.h sim.c
-sim_la_LIBADD   = ../api/libux.la
+SUBDIRS            += job
