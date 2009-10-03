@@ -204,7 +204,7 @@ extern void  lux_unload(void *);
 dnl Output files
 AC_CONFIG_FILES(m4_esyscmd([find . -name 'Makefile.am' -type f | sed 's|\./\(.*\).am|\1|']))
 AC_CONFIG_FILES([xtr/scripts/lux-build], [chmod +x xtr/scripts/lux-build])
-AC_CONFIG_FILES([xtr/pkg-config/lux.pc:xtr/pkg-config/lux.pcin])
+AC_CONFIG_FILES([xtr/m4/lux.m4:xtr/m4/lux.m4in xtr/pkg-config/lux.pc:xtr/pkg-config/lux.pcin])
 AC_OUTPUT
 
 dnl Hacks: in terms of source and build paths, there are only two variables
