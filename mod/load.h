@@ -70,7 +70,7 @@ vload(const char *restrict name, const void *opts)
 
 	/* Try to load the module */
 	(void)strcat(strcpy(buf, name), ".so");
-	mod = dlopen(buf, RTLD_LAZY);
+	mod = dlopen(buf, RTLD_LAZY | RTLD_LOCAL);
 	if(!mod)
 		FAILED_AS(FNOMOD, "load module");
 
