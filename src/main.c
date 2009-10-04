@@ -18,6 +18,7 @@
  * along with lux.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include "src.h"
+#include <lux/basename.h>
 #include <lux/job.h>
 #include <lux/switch.h>
 #include <string.h> /* for strcmp() */
@@ -32,6 +33,13 @@ main(int argc, char *argv[])
 	Lux_job *sim    = NULL;
 
 	lux_setup();
+
+	/* If my name is not "lux", load a sim with my name */
+	{
+		const char *name = basename(argv[0]);
+		if(strcmp(name, "lux"))
+			sim = (Lux_job *)lux_load("sim", name);
+	}
 
 	/* Parse argumnet list */
 	while(++argv, --argc) {
