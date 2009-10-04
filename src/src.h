@@ -23,7 +23,7 @@
 #include <lux.h>
 
 extern int unknown(const char *restrict);
-extern int usage(int);
+extern int usage(void);
 extern int version(void);
 
 #endif /* _SRC_H_ */

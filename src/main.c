@@ -22,7 +22,7 @@
 #include <lux/job.h>
 #include <lux/switch.h>
 #include <string.h> /* for strcmp() */
-#include <stdlib.h> /* for EXIT_SUCCESS and EXIT_FAILURE */
+#include <stdlib.h> /* for EXIT_SUCCESS */
 
 #define FLAG(s) CASE(!strcmp(arg, s))
 
@@ -46,7 +46,7 @@ main(int argc, char *argv[])
 		const char *arg = *argv; /* != NULL for sure */
 		SWITCH {
 		FLAG("--help")
-			return usage(status);
+			return usage();
 		FLAG("--version")
 			return version();
 		CASE(sim ? sim->conf(sim, arg) :

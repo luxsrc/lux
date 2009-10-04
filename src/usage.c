@@ -18,9 +18,10 @@
  * along with lux.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include "src.h"
+#include <stdlib.h> /* for EXIT_SUCCESS */
 
 int
-usage(int status)
+usage(void)
 {
 	lux_print("\
 Usage: lux [OPTION ...] SIM [ARGUMENT ...]\n\
@@ -32,5 +33,5 @@ Options:\n\
 \n\
 Report lux (" LUX_NAME ") bugs to <" LUX_BUGREPORT ">.\n");
 
-	return status;
+	return EXIT_SUCCESS;
 }

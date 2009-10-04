@@ -18,6 +18,7 @@
  * along with lux.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include "src.h"
+#include <stdlib.h> /* for EXIT_SUCCESS */
 
 int
 version(void)
@@ -32,5 +33,5 @@ License GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>.\n\
 This is free software: you are free to change and redistribute it.\n\
 There is NO WARRANTY, to the extent permitted by law.\n");
 
-	return 0;
+	return EXIT_SUCCESS;
 }
