@@ -26,6 +26,13 @@
 
 #define FLAG(s) CASE(!strcmp(arg, s))
 
+static const char banner[] = "\
+  ,--.                     a flexible and extendable framework\n\
+  |  ,--.,--,--.  ,--.         for scientific computation\n\
+  |  |  ||  |\\  `'  /\n\
+  |  |  ''  ;/  /.  \\                alpha version\n\
+  `--'`----''--'  `--`             commit '" LUX_VERSION "'\n";
+
 int
 main(int argc, char *argv[])
 {
@@ -34,34 +41,33 @@ main(int argc, char *argv[])
 
 	lux_setup();
 
-	/* If my name is not "lux", load a sim with my name */
-	{
-		const char *name = basename(argv[0]);
-		if(strcmp(name, "lux"))
-			sim = (Lux_job *)lux_load("sim", name);
+	argv[0] = (char *)basename(argv[0]);
+	if(!strcmp(argv[0], "lux")) {
+		++argv;
+		--argc;
 	}
 
 	/* Parse argumnet list */
-	while(++argv, --argc) {
+	for(; argv && argc; ++argv, --argc) {
 		const char *arg = *argv; /* != NULL for sure */
 		SWITCH {
 		FLAG("--help")
 			return usage();
 		FLAG("--version")
 			return version();
-		CASE(sim ? sim->conf(sim, arg) :
-		         !(sim = (Lux_job *)lux_load("sim", arg)))
-			return unknown(arg);
+		CASE(!sim) /* try loading arg as a sim */
+			sim = (Lux_job *)lux_load("sim", arg);
+			if(sim) /* TODO: parse stdin; interactive mode? */
+				lux_print("\n%s\n",
+				          sim->banner ? sim->banner : banner);
+			else
+				return unknown(arg);
+		DEFAULT
+			status = sim->conf(sim, arg);
+			if(status)
+				return unknown(arg);
 		}
 	}
-
-	/* TODO: parse stdin; interactive mode? */
-	lux_print("\n\
-  ,--.                     a flexible and extendable framework\n\
-  |  ,--.,--,--.  ,--.         for scientific computation\n\
-  |  |  ||  |\\  `'  /\n\
-  |  |  ''  ;/  /.  \\                alpha version\n\
-  `--'`----''--'  `--`             commit '" LUX_VERSION "'\n\n");
 
 	/* Perform the simulation */
 	if(sim) {
@@ -70,7 +76,7 @@ main(int argc, char *argv[])
 		if(status == EXIT_SUCCESS)
 			status = sim->exec(sim);
 		lux_unload(sim);
-	}
-
-	return status;
+		return status;
+	} else
+		return usage();
 }

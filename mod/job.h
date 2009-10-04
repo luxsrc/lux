@@ -23,6 +23,7 @@
 typedef struct LuxSjob Lux_job;
 
 struct LuxSjob {
+	const char *banner;
 	int (*conf)(Lux_job *, const char *restrict);
 	int (*init)(Lux_job *);
 	int (*exec)(Lux_job *);
