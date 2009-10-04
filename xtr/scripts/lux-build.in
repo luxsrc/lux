@@ -15,13 +15,15 @@ done
 # Place all "*.c" files to "$src"; abort if any file does not exist or
 # has unknown extension
 for i in "${ina[@]}"; do
-	if test -f "$i"; then case "$i" in
-	*.c)	src+=("$i");;
-	*.h)	echo "\"$i\" is a header file; SKIP";;
-	*)	echo "Invalid input module \"$i\"; ABORT"
-		exit 1
-		;;
-	esac; else
+	if test -f "$i"; then
+		case "$i" in
+			*.c)	src+=("$i");;
+			*.h)	echo "\"$i\" is a header file; SKIP";;
+			*)	echo "Invalid input module \"$i\"; ABORT"
+				exit 1
+				;;
+		esac
+	else
 		echo "Input file \"$i\" not found; ABORT"
 		exit 1
 	fi
@@ -32,7 +34,7 @@ if test ${#src} -eq 0; then
 	echo "No input source file is specified; EXIT"
 	exit 0
 else
-	src=(`ls "${src[@]}" | sort | uniq`)
+	src=($(ls "${src[@]}" | sort | uniq))
 fi
 
 # Use default output name if "$out" is specified
@@ -43,8 +45,8 @@ fi
 
 # Split path into "$dir" and "$out"
 case "$out" in
-	*/*)	dir=`dirname  "$out"`
-		out=`basename "$out"`
+	*/*)	dir=$(dirname  "$out")
+		out=$(basename "$out")
 		;;
 	*)	dir="sim"
 		;;
@@ -53,16 +55,16 @@ esac
 # Define module name by removing the ".la" extension; abort if module
 # name is invalid
 case "$out" in
-*.la)	;;
-*)	echo "Invalid output module \"$out\"; ABORT"
-	exit 1
-	;;
+	*.la)	;;
+	*)	echo "Invalid output module \"$out\"; ABORT"
+		exit 1
+		;;
 esac
 
 # Finally done parsing arguments; print a summary
 printf "Input source files: "
 for i in "${!src[@]}"; do
-	if test $i -lt `expr "${#src}" - 1`; then
+	if test $i -lt $(expr "${#src}" - 1); then
 		printf "\"${src[$i]}\", "
 	else
 		echo   "\"${src[$i]}\""
@@ -135,7 +137,7 @@ done
 # Link object(s) to the output module
 printf "Link object ffile "
 for i in "${!obj[@]}"; do
-	if test $i -lt `expr "${#obj}" - 1`; then
+	if test $i -lt $(expr "${#obj}" - 1); then
 		printf "\"${obj[$i]}\", "
 	else
 		printf "\"${obj[$i]}\""
