@@ -3,4 +3,4 @@
 !*.[hc]
 !*.a[cm]
 !*.?*in
-lux.h
+lux.h*
