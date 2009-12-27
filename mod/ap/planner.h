@@ -29,12 +29,12 @@
 
 /* Forward declarations */
 typedef struct LuxSplanner Lux_planner;
-typedef struct LuxSproblem Lux_problem; /* problem specific interface */
+typedef const  void        Lux_problem; /* problem specific interface */
 typedef struct LuxStask    Lux_task;
 
 struct LuxSplanner {
         /* A Lux_planner can plan for a particular Lux_problem and
-           return an optimal plan */
+           return a single optimal plan */
 	Lux_task *(*plan)(Lux_planner *, Lux_problem *, unsigned);
 };
 

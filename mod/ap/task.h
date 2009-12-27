@@ -21,16 +21,12 @@
 #define _LUX_TASK_H_
 
 /* Forward declarations */
-typedef struct LuxSalgo    Lux_algo;    /* problem specific interface */
-typedef struct LuxSproblem Lux_problem; /* problem specific interface */
-typedef struct LuxStask    Lux_task;
+typedef struct LuxStask Lux_task;
 
 struct LuxStask {
-	Lux_algo    *algo; /* subclassing by composition */
-	Lux_problem *problem;
-	void (*exec)(Lux_task *); /* because Lux_algo and Lux_problem are
-	                             problem specific, the implementation of
-	                             exec() here is also problem specific. */
+	void (*exec)(Lux_task *); /* because problem and algo are problem
+	                             specific, the implementation of exec()
+	                             here is also problem specific. */
 };
 
 #endif /* _LUX_TASK_H_ */
