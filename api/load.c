@@ -18,6 +18,7 @@
  * along with lux.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include <lux.h>
+#include <lux/htab.h>
 #include <lux/lazybuf.h>
 #include <lux/load.h>
 #include <unistd.h> /* for getcwd() and getenv() */
@@ -25,7 +26,8 @@
 
 #define COUNT_OF(a) (sizeof(a) / sizeof(a[0]))
 
-static const char *paths[] = {NULL, NULL, LUX_MOD_PATH};
+static struct htab  ltab    = HTAB_NULL; /* the loading table */
+static const  char *paths[] = {NULL, NULL, LUX_MOD_PATH};
 
 static inline size_t
 max(size_t a, size_t b)
@@ -63,7 +65,7 @@ lux_load(const char *restrict name, const void *opts)
 	/* Try to load the module */
 	for(i = 0, ins = NULL; i < COUNT_OF(paths) && !ins; ++i) {
 		(void)strcat(strcat(strcpy(buf, paths[i]), "/"), name);
-		ins = vload(buf, opts);
+		ins = vload(&ltab, buf, opts);
 	}
 
 	FREE(buf);
@@ -73,5 +75,5 @@ lux_load(const char *restrict name, const void *opts)
 void
 lux_unload(void *ins)
 {
-	uload(ins);
+	uload(&ltab, ins);
 }

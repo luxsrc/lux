@@ -20,7 +20,6 @@
 #ifndef _LUX_LOAD_H_
 #define _LUX_LOAD_H_
 
-#include <lux.h>
 #include <lux/basename.h>
 #include <lux/failed.h>
 #include <lux/htab.h>
@@ -33,8 +32,6 @@ struct load_node {
 	void (*rm)(void *);
 	void  *mod;
 };
-
-static struct htab ltab = HTAB_NULL; /* the loading table */
 
 #define FAILED_TO(s) do {                                          \
 		int f = failed;                                    \
@@ -51,7 +48,7 @@ static struct htab ltab = HTAB_NULL; /* the loading table */
 	} while(0)
 
 static inline void *
-vload(const char *restrict name, const void *opts)
+vload(struct htab *ltab, const char *restrict name, const void *opts)
 {
 	char lazybuf[256], *buf;
 
@@ -96,7 +93,7 @@ vload(const char *restrict name, const void *opts)
 	}
 
 	/* Try to save module to a hash table */
-	node = HADD(&ltab, ins, struct load_node);
+	node = HADD(ltab, ins, struct load_node);
 	if(!node)
 		FAILED_TO("allocate loading table node");
 
@@ -116,9 +113,9 @@ vload(const char *restrict name, const void *opts)
 }
 
 static inline void
-uload(void *ins)
+uload(struct htab *ltab, void *ins)
 {
-	struct load_node *node = HPOP(&ltab, ins, struct load_node);
+	struct load_node *node = HPOP(ltab, ins, struct load_node);
 	if(node) {
 		if(node->rm)
 			node->rm(ins);
