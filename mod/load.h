@@ -42,15 +42,15 @@ struct load {
 static inline void *
 vload(struct load *load, const char *restrict name, const void *opts)
 {
-	void *hdl;
+	struct dlib l;
 	struct dmod m;
 	struct load_node *node;
 
-	hdl = mkdlib(load->paths, name);
-	if(!hdl)
+	l = mkdlib(load->paths, name);
+	if(!l.hdl)
 		goto cleanup1; /* failure code was set by mkdlib() */
 
-	m = mkdmod(hdl, basename(name), opts);
+	m = mkdmod(l, basename(name), opts);
 	if(!m.ins)
 		goto cleanup2; /* failure code was set by mkdmod() */
 
@@ -58,7 +58,7 @@ vload(struct load *load, const char *restrict name, const void *opts)
 	if(!node)
 		goto cleanup3; /* failure code was set by malloc() */
 
-	node->hdl = hdl;
+	node->hdl = l.hdl;
 	node->rm  = m.rm;
 	hadd(&load->tab, (uintptr_t)m.ins, &node->super);
 	return m.ins;
@@ -66,7 +66,7 @@ vload(struct load *load, const char *restrict name, const void *opts)
  cleanup3:
 	rmdmod(m);
  cleanup2:
-	rmdlib(hdl);
+	rmdlib(l);
  cleanup1:
 	return NULL;
 }
@@ -78,8 +78,9 @@ uload(struct load *load, void *ins)
 	                                                  (uintptr_t)ins);
 	if(node) {
 		struct dmod m = {ins, node->rm};
+		struct dlib l = {node->hdl};
 		rmdmod(m);
-		rmdlib(node->hdl);
+		rmdlib(l);
 		free(node);
 	} else
 		failed = FNOMOD;

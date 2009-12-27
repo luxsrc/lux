@@ -34,7 +34,7 @@ struct dmod {
 };
 
 static inline struct dmod
-mkdmod(void *dlib, const char *restrict name, const void *opts)
+mkdmod(struct dlib l, const char *restrict name, const void *opts)
 {
 	struct dmod m = DMOD_NULL;
 	void *(*mk)(const void *);
@@ -48,16 +48,16 @@ mkdmod(void *dlib, const char *restrict name, const void *opts)
 		             failure code was set by REALLOC() */
 	(void)memcpy(buf + sizeof("luxC") - 1, name, nlen + 1);
 
-	mk = (void *(*)(const void *))dltrysym(dlib, buf);
+	mk = (void *(*)(const void *))dltrysym(l.hdl, buf);
 	if(mk) {
 		buf[3] = 'D';
-		m.rm   = dltrysym(dlib, buf);
+		m.rm   = dltrysym(l.hdl, buf);
 		m.ins  = mk(opts);
 		if(!m.ins)
 			failed = F2CONS;
 	} else {
 		buf[3] = 'E';
-		m.ins  = dltrysym(dlib, buf);
+		m.ins  = dltrysym(l.hdl, buf);
 		if(!m.ins)
 			failed = FNOSYM;
 	}

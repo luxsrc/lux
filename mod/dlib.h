@@ -25,10 +25,16 @@
 #include <lux/lazybuf.h>
 #include <string.h> /* for memcpy(), strchr(), and strlen() */
 
-static inline void *
+#define DLIB_NULL {NULL}
+
+struct dlib {
+	void *hdl; /* handle */
+};
+
+static inline struct dlib
 mkdlib(const char *restrict paths, const char *restrict name)
 {
-	void *dlib = NULL;
+	struct dlib l = DLIB_NULL;
 
 	char lazybuf[256], *buf = lazybuf;
 	const size_t nlen = strlen(name);
@@ -36,13 +42,13 @@ mkdlib(const char *restrict paths, const char *restrict name)
 	if(name && name[0] == '/') {
 		buf = MALLOC(nlen + sizeof(".so"));
 		if(!buf)
-			return NULL; /* failure code was set by MALLOC() */
-
+			return l; /* == DLIB_NULL; no need to FREE(buf);
+			             failure code was set by MALLOC() */
 		(void)memcpy(buf, name, nlen);
 		(void)memcpy(buf + nlen, ".so", sizeof(".so"));
 
-		dlib = dltryopen(buf, RTLD_LAZY | RTLD_LOCAL);
-	} else while(paths && !dlib) {
+		l.hdl = dltryopen(buf, RTLD_LAZY | RTLD_LOCAL);
+	} else while(paths && !l.hdl) {
 		const char  *psep = strchr(paths, ':');
 		const size_t plen = psep ? (size_t)(psep-paths) : strlen(paths);
 
@@ -50,8 +56,9 @@ mkdlib(const char *restrict paths, const char *restrict name)
 		if(tmp)
 			buf = (char *)tmp;
 		else {
-			FREE(buf);   /* as REALLOC() may succeed a few times */
-			return NULL; /* failure code was set by REALLOC()    */
+			FREE(buf); /* as REALLOC() may succeed a few times */
+			return l;  /* == DLIB_NULL;
+			              failure code was set by REALLOC()    */
 		}
 		(void)memcpy(buf, paths, plen);
 		buf[plen] = '/';
@@ -59,19 +66,19 @@ mkdlib(const char *restrict paths, const char *restrict name)
 		(void)memcpy(buf + plen + 1 + nlen, ".so", sizeof(".so"));
 
 		paths = psep ? psep + 1 : NULL;
-		dlib  = dltryopen(buf, RTLD_LAZY | RTLD_LOCAL);
+		l.hdl = dltryopen(buf, RTLD_LAZY | RTLD_LOCAL);
 	}
 
 	FREE(buf);
-	if(!dlib)
+	if(!l.hdl)
 		failed = FNOLIB;
-	return dlib;
+	return l;
 }
 
 static inline void
-rmdlib(void *dlib)
+rmdlib(struct dlib l)
 {
-	if(dlclose(dlib)) {
+	if(dlclose(l.hdl)) {
 		(void)dlerror(); /* TODO: log failure message */
 		failed = FNOLIB;
 	}
