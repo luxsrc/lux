@@ -24,13 +24,14 @@
 #include <lux/failed.h>
 #include <lux/htab.h>
 #include <lux/lazybuf.h>
+#include <lux/zalloc.h>
 #include <string.h> /* for strcat(), strcpy(), and strlen() */
 #include <dlfcn.h>  /* for dlopen(), dlsym(), and dlclose() */
 
 struct load_node {
 	struct htab_node super;
-	void (*rm)(void *);
 	void  *mod;
+	void (*rm)(void *);
 };
 
 #define FAILED_TO(s) do {                                          \
@@ -52,12 +53,10 @@ vload(struct htab *ltab, const char *restrict name, const void *opts)
 {
 	char lazybuf[256], *buf;
 
-	void   *mod = NULL;
-	void *(*mk)(const void *);
-	void  (*rm)(void *) = NULL;
-	void   *ins = NULL;
+	struct load_node *node = NULL;
 
-	struct load_node *node;
+	void *(*mk)(const void *);
+	void   *ins = NULL;
 
 	/* Try to allocate more memory if name is too long: note that
 	   5 == sizeof("luxC") > sizeof(".so")*/
@@ -65,48 +64,52 @@ vload(struct htab *ltab, const char *restrict name, const void *opts)
 	if(!buf)
 		FAILED_TO("allocate string");
 
+	/* Try to allocate memory for load node */
+	node = (struct load_node *)zalloc(sizeof(struct load_node));
+	if(!node)
+		FAILED_TO("allocate loading table node");
+
 	/* Try to load the module */
 	(void)strcat(strcpy(buf, name), ".so");
-	mod = dlopen(buf, RTLD_LAZY | RTLD_LOCAL);
-	if(!mod)
+	node->mod = dlopen(buf, RTLD_LAZY | RTLD_LOCAL);
+	if(!node->mod)
 		FAILED_AS(FNOMOD, "load module");
 
 	/* Try to get the instance */
 	(void)strcat(strcpy(buf, "luxC"), basename(name));
-	mk = (void *(*)(const void *))dlsym(mod, buf);
+	mk = (void *(*)(const void *))dlsym(node->mod, buf);
 	if(mk) {
 		int fsv = failed;
 		buf[3] = 'D';
-		rm = (void (*)(void *))dlsym(mod, buf);
-		if(!rm) {
-			failed = fsv;    /* hide error emitted by dlsym() */
-			(void)dlerror(); /* clear libdl error message     */
+		node->rm = (void (*)(void *))dlsym(node->mod, buf);
+		if(!node->rm) {
+			failed = fsv;
+			(void)dlerror();
 		}
 		ins = mk(opts);
 		if(!ins)
 			FAILED_AS(F2CONS, "construct");
 	} else {
 		buf[3] = 'E';
-		ins = dlsym(mod, buf);
+		ins = dlsym(node->mod, buf);
 		if(!ins)
 			FAILED_AS(FNOSYM, "load entry point");
 	}
 
-	/* Try to save module to a hash table */
-	node = HADD(ltab, ins, struct load_node);
-	if(!node)
-		FAILED_TO("allocate loading table node");
-
-	node->rm  = rm;
-	node->mod = mod;
+	/* Save module to a hash table; would not fail */
+	hadd(ltab, (uintptr_t)ins, &node->super);
 	FREE(buf);
 	return ins;
 
  cleanup:
-	if(rm && ins)
-		rm(ins);
-	if(mod)
-		(void)dlclose(mod); /* FIXME: should not clean up dlerror() */
+	if(node) {
+		if(node->rm && ins)
+			node->rm(ins);
+		if(node->mod)
+			(void)dlclose(node->mod); /* FIXME: should not clean
+			                             up dlerror() */
+		free(node);
+	}
 	if(buf)
 		FREE(buf);
 	return NULL;
@@ -115,7 +118,7 @@ vload(struct htab *ltab, const char *restrict name, const void *opts)
 static inline void
 uload(struct htab *ltab, void *ins)
 {
-	struct load_node *node = HPOP(ltab, ins, struct load_node);
+	struct load_node *node = (struct load_node *)hpop(ltab, (uintptr_t)ins);
 	if(node) {
 		if(node->rm)
 			node->rm(ins);

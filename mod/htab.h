@@ -21,7 +21,12 @@
 #define _LUX_HTAB_H_
 
 #include <lux/hash.h>
-#include <stdlib.h> /* for malloc() */
+
+#if HAVE_STDDEF_H
+#include <stddef.h> /* for NULL and size_t */
+#else
+#include <stdlib.h> /* for NULL and size_t */
+#endif
 
 #define HTAB_COUNT 256                  /* default number of nodes */
 #define HTAB_NULL  {HTAB_COUNT, {NULL}} /* remainder is initialized to 0,
@@ -36,35 +41,28 @@ struct htab {
 	struct htab_node *node[HTAB_COUNT]; /* flexible array member */
 };
 
-static inline void *
-hadd(struct htab *h, uintptr_t key, size_t sz)
+static inline void
+hadd(struct htab *h, uintptr_t k, struct htab_node *n)
 {
-	struct htab_node *node = (struct htab_node *)malloc(sz);
-	if(node) {
-		const size_t k = WANG(key) % h->count;
-		node->next     = h->node[k];
-		node->key      = key;
-		h->node[k]     = node;
-	}
-	return node;
+	const size_t i = WANG(k) % h->count;
+	n->next    = h->node[i];
+	n->key     = k;
+	h->node[i] = n;
 }
 
-static inline void *
-hpop(struct htab *h, uintptr_t key)
+static inline struct htab_node *
+hpop(struct htab *h, uintptr_t k)
 {
-	struct htab_node **pnode = h->node + WANG(key) % h->count;
-	while(*pnode) {
-		struct htab_node *node = *pnode;
-		if(node->key == key) {
-			*pnode = node->next;
-			return node;
+	struct htab_node **p = h->node + WANG(k) % h->count;
+	while(*p) {
+		struct htab_node *n = *p;
+		if(n->key == k) {
+			*p = n->next;
+			return n;
 		}
-		pnode = &node->next;
+		p = &n->next;
 	}
 	return NULL;
 }
-
-#define HADD(h, k, t) ((t *)hadd(h, (uintptr_t)(k), sizeof(t)))
-#define HPOP(h, k, t) ((t *)hpop(h, (uintptr_t)(k)))
 
 #endif /* _LUX_HTAB_H_ */
