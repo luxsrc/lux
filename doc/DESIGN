@@ -420,7 +420,7 @@ MEMORY ORDER and DOPE VECTOR: in order to describe the memory layout
   column-major (Fortran) array, we have the relations
 
 	dope[r].r == r + rank;
- 	dope[r].s == dope[r-1].c * dope[r-1].s;
+	dope[r].s == dope[r-1].c * dope[r-1].s;
 
   Hence, it is natural to extend these to the zeroth element and make
 

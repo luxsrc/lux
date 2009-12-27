@@ -1,8 +1,8 @@
 ACLOCAL_AMFLAGS = -I .build-m4
 
-SUBDIRS = sys api mod src xtr
+SUBDIRS = sys api mod src xtr doc
 
-EXTRA_DIST = .autom4te.cfg .version DESIGN NOTES STYLE bootstrap
+EXTRA_DIST = .autom4te.cfg .version bootstrap
 
 nodist_include_HEADERS = lux.h
 DISTCLEANFILES = lux # ugly hack so '#include <lux/interface.h>' works;
