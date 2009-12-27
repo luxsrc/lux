@@ -16,11 +16,11 @@ NAMES: keep them consistent and short.  Shorter than you think.  The
 
   Common names:
 
-    LUXC: module constructor
-    LUXD: module destructor
-    LUXE: module entry point
+    LUXCMOD: module constructor
+    LUXDMOD: module destructor
+    LUXEMOD: module entry point
 
-    fsv : a saved failure code for future restoration
+    fsv: a saved failure code for future restoration
 
   If a name is used often and must have the form foo_bar to avoid
   namespace pollution, #define BAR foo_bar and use the short name.

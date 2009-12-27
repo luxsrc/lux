@@ -23,7 +23,7 @@
 #include <string.h> /* for strlen() and memcpy() */
 
 void *
-LUXC(const void *opts)
+LUXCMOD(const void *opts)
 {
 	if(((const char *)opts)[0] == '/') /* using absolute path */
 		return lux_load(opts, NULL);
@@ -45,7 +45,7 @@ LUXC(const void *opts)
 }
 
 void
-LUXD(Lux_job *sim)
+LUXDMOD(Lux_job *sim)
 {
 	lux_unload(sim);
 }

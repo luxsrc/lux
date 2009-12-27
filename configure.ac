@@ -144,9 +144,9 @@ AH_BOTTOM([/*===================================================================
 /* Name mangling by passing a cpp-flag "-DLUX_MOD_NAME=name" */
 
 #ifdef LUX_MOD_NAME
-#define LUXC LUX_CONCAT(luxC, LUX_MOD_NAME) /* constructor */
-#define LUXD LUX_CONCAT(luxD, LUX_MOD_NAME) /* destructor  */
-#define LUXE LUX_CONCAT(luxE, LUX_MOD_NAME) /* entry-point */
+#define LUXCMOD LUX_CONCAT(luxC, LUX_MOD_NAME) /* constructor */
+#define LUXDMOD LUX_CONCAT(luxD, LUX_MOD_NAME) /* destructor  */
+#define LUXEMOD LUX_CONCAT(luxE, LUX_MOD_NAME) /* entry-point */
 #endif
 
 /*===========================================================================*/

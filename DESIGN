@@ -36,23 +36,23 @@ INTERFACE: a lux interface Lux_MOD is simply a function type or a
 DYNAMIC MODULE: a standard lux module MOD is a dynamically loadable
   library that contains exactly one constructor
 
-	void *LUXC(const void *);
+	void *LUXCMOD(const void *);
 
   or, for one that does not require initialization, it needs to
   contain exactly one "entry symbol"
 
-	Lux_MOD LUXE;
+	Lux_MOD LUXEMOD;
 
   which may be an exported function (e.g., of type Lux_rand in the
   previous section) or an exported structure (e.g., of type Lux_io)
-  that provides the module interface.  The macros LUXC and LUXE expand
-  to luxCMOD and to luxEMOD, respectively, to avoid symbol conflicts.
-  When lux_load() access a module, it calls LUXC() to construct the
-  interface or returns LUXE directly.  LUXC() may take care additional
-  resource allocations.  In such a case, the lux module must implement
-  a destructor:
+  that provides the module interface.  The macros LUXCMOD and LUXEMOD
+  expand to luxCMOD and to luxEMOD, respectively, to avoid symbol
+  conflicts.  When lux_load() access a module, it calls LUXCMOD() to
+  construct the interface or returns LUXEMOD directly.  LUXCMOD() may
+  take care additional resource allocations.  In such a case, the lux
+  module must implement a destructor:
 
-	void LUXD(Lux_MOD *);
+	void LUXDMOD(Lux_MOD *);
 
   which expands to luxDMOD, to release the allocated resource.  Note
   that chain-loading, i.e., using
@@ -79,10 +79,10 @@ DYNAMIC MODULE: a standard lux module MOD is a dynamically loadable
   modules, libux requires an external dynamic linker, which may make
   symbols from loaded modules globally accessible.  Therefore, module
   developers may want to put all the source code into a single file
-  and define all private functions as static functions.  LUXC() or
-  LUXE can then interface all of these static functions.  This is an
-  ultimate way to avoid symbol conflicts because LUXC and LUXD, or
-  LUXE, are the only exported symbols.
+  and define all private functions as static functions.  LUXCMOD() or
+  LUXEMOD can then interface all of these static functions.  This is
+  an ultimate way to avoid symbol conflicts because LUXCMOD and
+  LUXDMOD, or LUXEMOD, are the only exported symbols.
 
 STATIC MODULE, RESOURCE ALLOCATOR, HYBRID MODULE, etc: it is sometimes
   overkill to pack small functions into a dynamic module.  Calling
