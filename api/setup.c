@@ -18,7 +18,6 @@
  * along with lux.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include "api.h"
-#include <lux/timer.h>
 
 struct libux *lux = NULL;
 

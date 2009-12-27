@@ -20,8 +20,8 @@
 #ifndef _LUX_LIBUX_H_
 #define _LUX_LIBUX_H_
 
+#include <lux/ap/timer.h>
 #include <lux/load.h>
-#include <lux/timer.h>
 #include <lux/vlog.h>
 
 #include <unistd.h> /* for getcwd() and getenv() */

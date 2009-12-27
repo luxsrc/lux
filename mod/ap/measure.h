@@ -22,7 +22,7 @@
 
 #include <lux/ap/cycle.h>
 #include <lux/ap/task.h>
-#include <lux/timer.h>
+#include <lux/ap/timer.h>
 #include <math.h>
 
 #if !HAVE_TICK_COUNTER
