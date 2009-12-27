@@ -37,6 +37,12 @@
 
 #define VLOG_EMERG (VLOG_FLAGS | VLOG_STDERR | VLOG_FATAL)
 
+#if LUX_ASSERTION
+#define VLOG_DEBUG (3)
+#else
+#define VLOG_DEBUG (3 | VLOG_SUSPEND)
+#endif
+
 #define VLOG_COUNT 16
 #define VLOG_NULL {VLOG_COUNT, {   \
 	VLOG_EMERG,                \
@@ -46,7 +52,7 @@
 	3,                         \
 	6,                         \
 	VLOG_FLAGS | VLOG_STDOUT,  \
-	3          | VLOG_SUSPEND, \
+	VLOG_DEBUG,                \
 	0}}
 
 struct vlog {
