@@ -20,9 +20,7 @@
 #ifndef _LUX_DLFCN_H_
 #define _LUX_DLFCN_H_
 
-#define _GNU_SOURCE
 #include <dlfcn.h>
-#undef  _GNU_SOURCE
 
 void *dlhandle(void *);
 

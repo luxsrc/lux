@@ -18,7 +18,10 @@
  * along with lux.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include <lux.h>
+
+#define  _GNU_SOURCE /* to obtain dladdr() from <lux/dlfcn.h> */
 #include <lux/dlfcn.h>
+#undef   _GNU_SOURCE
 
 #if HAVE_STDDEF_H
 #include <stddef.h> /* for NULL */
