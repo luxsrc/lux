@@ -44,7 +44,6 @@ mkdlib(const char *restrict paths, const char *restrict name)
 			FREE(buf);   /* as REALLOC() may succeed a few times */
 			return NULL; /* failure code was set by REALLOC()    */
 		}
-
 		(void)memcpy(buf, paths, plen);
 		buf[plen] = '/';
 		(void)memcpy(buf + plen + 1, name, nlen);
@@ -56,7 +55,7 @@ mkdlib(const char *restrict paths, const char *restrict name)
 
 	FREE(buf);
 	if(!dlib)
-		failed = FNOMOD;
+		failed = FNOLIB;
 	return dlib;
 }
 
@@ -65,7 +64,7 @@ rmdlib(void *dlib)
 {
 	if(dlclose(dlib)) {
 		(void)dlerror(); /* TODO: log failure message */
-		failed = FNOMOD;
+		failed = FNOLIB;
 	}
 }
 

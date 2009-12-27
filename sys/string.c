@@ -27,12 +27,14 @@ strfailure(int f)
 	f &= FAILED; /* apply failure code mask---see defintion of
 	                FAILED in <lux/failed.h> */
 	switch(f) {
-	case FNOMOD:
-		return "Invalid module";
+	case FNOLIB:
+		return "Invalid library";
 	case FNOSYM:
 		return "Invalid symbol";
 	case F2CONS:
 		return "lux module construction failed";
+	case FNOMOD:
+		return "Invalid module";
 	case FAILED:
 		return "Generic failure";
 	default:
