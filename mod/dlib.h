@@ -33,7 +33,16 @@ mkdlib(const char *restrict paths, const char *restrict name)
 	char lazybuf[256], *buf = lazybuf;
 	const size_t nlen = strlen(name);
 
-	while(paths && !dlib) {
+	if(name && name[0] == '/') {
+		buf = MALLOC(nlen + sizeof(".so"));
+		if(!buf)
+			return NULL; /* failure code was set by MALLOC() */
+
+		(void)memcpy(buf, name, nlen);
+		(void)memcpy(buf + nlen, ".so", sizeof(".so"));
+
+		dlib = dltryopen(buf, RTLD_LAZY | RTLD_LOCAL);
+	} else while(paths && !dlib) {
 		const char  *psep = strchr(paths, ':');
 		const size_t plen = psep ? (size_t)(psep-paths) : strlen(paths);
 
