@@ -20,12 +20,9 @@
 #ifndef _LUX_FAILED_H_
 #define _LUX_FAILED_H_
 
-#include <errno.h>  /* for errno */
-#include <dlfcn.h>  /* for dlerror() */
-#include <string.h> /* for strerror() */
+#include <errno.h> /* for errno */
 
 #define failed errno
-#define FAILURE_MASK (~0U >> (LUX_INT_BIT-LUX_FAILURE_BIT))
 
 enum failure_code {
 	FNOMOD = LUX_ELAST+1,
@@ -33,21 +30,6 @@ enum failure_code {
 	F2CONS
 };
 
-static inline const char *
-failure_msg(int f)
-{
-	f &= FAILURE_MASK;
-
-	if(f <= LUX_ELAST)
-		return strerror(f);
-	else if(f <= FNOSYM)
-		return dlerror(); /* FIXME: dlerror() cleans up error; how to
-		                     ensure multiple calls to strfailure()
-		                     prodcue the same result? */
-	else if(f == F2CONS)
-		return "Module construction failed";
-	else
-		return strerror(f);
-}
-
+extern const char *strfailure(int); /* pseudo "standard" function
+                                       provided by "sys/string.c" */
 #endif /* _LUX_FAILED_H_ */

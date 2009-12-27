@@ -39,14 +39,14 @@ static struct htab ltab = HTAB_NULL; /* the loading table */
 #define FAILED_TO(s) do {                                          \
 		int f = failed;                                    \
 		lux_debug("vload(\"%s\"): failed to " s " [%s]\n", \
-		          name, failure_msg(f));                   \
+		          name, strfailure(f));                    \
 		goto cleanup;                                      \
 	} while(0)
 
 #define FAILED_AS(f, s) do {                                       \
 		failed = f;                                        \
 		lux_debug("vload(\"%s\"): failed to " s " [%s]\n", \
-		          name, failure_msg(f));                   \
+		          name, strfailure(f));                    \
 		goto cleanup;                                      \
 	} while(0)
 

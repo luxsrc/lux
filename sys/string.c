@@ -17,26 +17,26 @@
  * You should have received a copy of the GNU General Public License
  * along with lux.  If not, see <http://www.gnu.org/licenses/>.
  */
-#include "src.h"
+#include <lux.h>
 #include <lux/failed.h>
+#include <dlfcn.h>  /* for dlerror() */
+#include <string.h> /* for strerror() */
 
-static const char *fmt_with_msg = "\
-Unknown %s \"%s\" [%s].\n\
-Try `lux --help` for more information.\n";
+#define FAILURE_MASK (~0U >> (LUX_INT_BIT-LUX_FAILURE_BIT))
 
-static const char *fmt_without_msg = "\
-Unknown %s \"%s\".\n\
-Try `lux --help` for more information.\n";
-
-int
-unknown(const char *restrict arg)
+const char *
+strfailure(int f)
 {
-	const char *s = strfailure(failed);
-	const char *k = arg[0] == '-' ? "option" : "command";
-	if(s)
-		lux_error(fmt_with_msg, k, arg, s);
-	else
-		lux_error(fmt_without_msg, k, arg);
+	f &= FAILURE_MASK;
 
-	return 64; /* EX_USAGE in <sysexits.h> */
+	if(f <= LUX_ELAST)
+		return strerror(f);
+	else if(f <= FNOSYM)
+		return dlerror(); /* FIXME: dlerror() cleans up error; how to
+		                     ensure multiple calls to strfailure()
+		                     prodcue the same result? */
+	else if(f == F2CONS)
+		return "Module construction failed";
+	else
+		return strerror(f);
 }
