@@ -19,24 +19,23 @@
  */
 #include <lux.h>
 #include <lux/failed.h>
-#include <dlfcn.h>  /* for dlerror() */
 #include <string.h> /* for strerror() */
-
-#define FAILURE_MASK (~0U >> (LUX_INT_BIT-LUX_FAILURE_BIT))
 
 const char *
 strfailure(int f)
 {
-	f &= FAILURE_MASK;
-
-	if(f <= LUX_ELAST)
+	f &= FAILED; /* apply failure code mask---see defintion of
+	                FAILED in <lux/failed.h> */
+	switch(f) {
+	case FNOMOD:
+		return "Invalid module";
+	case FNOSYM:
+		return "Invalid symbol";
+	case F2CONS:
+		return "lux module construction failed";
+	case FAILED:
+		return "Generic failure";
+	default:
 		return strerror(f);
-	else if(f <= FNOSYM)
-		return dlerror(); /* FIXME: dlerror() cleans up error; how to
-		                     ensure multiple calls to strfailure()
-		                     prodcue the same result? */
-	else if(f == F2CONS)
-		return "Module construction failed";
-	else
-		return strerror(f);
+	}
 }

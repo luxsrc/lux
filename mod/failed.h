@@ -24,11 +24,10 @@
 
 #define failed errno
 
-enum failure_code {
-	FNOMOD = LUX_ELAST+1,
-	FNOSYM,
-	F2CONS
-};
+#define FNOMOD (LUX_ELAST+1)
+#define FNOSYM (LUX_ELAST+2)
+#define F2CONS (LUX_ELAST+3)
+#define FAILED ((1U<<LUX_FAILURE_BIT) - 1)
 
 extern const char *strfailure(int); /* pseudo "standard" function
                                        provided by "sys/string.c" */

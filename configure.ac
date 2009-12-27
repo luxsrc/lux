@@ -55,18 +55,19 @@ AC_COMPUTE_INT([elast], [ERFKILL],     [#include <errno.h>], [
 	AC_MSG_ERROR([Failed to obtain the last error code; please describe your platform to <$PACKAGE_BUGREPORT>])
 ])])])])
 
-if   test $elast -lt  124; then fbits=8
-elif test $elast -lt  380; then fbits=9
-elif test $elast -lt  892; then fbits=10
-elif test $elast -lt 1916; then fbits=11
+if   test $elast -le  132; then fbits=8  # ERFKILL == 132 on generic architectures
+elif test $elast -le  388; then fbits=9  # ERFKILL == 134, 138, and 167 on SPARC, Alpha, and MIPS, respectively
+elif test $elast -le  900; then fbits=10 # _LAST_ERRNO ==  516 on PowerPC
+elif test $elast -le 1924; then fbits=11 # EDQUOT == 1133 on MIPS
 else
 	AC_MSG_ERROR([ELAST == $elast is unexpectedly large; please describe your platform to <$PACKAGE_BUGREPORT>])
 fi
 
-xbits=$(expr $ibits - $fbits)
-if test $xbits -lt 8; then
-	AC_MSG_ERROR([$xbits bits are not enough to encode lux-specific failure; please describe your platform to <$PACKAGE_BUGREPORT>])
+hbits=`expr $ubits / 2`
+if test $fbits -gt $hbits; then
+	fbits=$hbits
 fi
+mbits=`expr $ubits - $hbits - $fbits` # works properly even if $ubits is odd, although C standard ensures that $ubits is 16, 32, or 64
 
 dnl Customize "config.h" and rename it to "lux.h"
 # The `configure` script produces a customized public header "lux.h"
@@ -112,7 +113,9 @@ fi
 
 dnl Define error code related macros
 AC_DEFINE_UNQUOTED(LUX_ELAST,        $elast, [Define to the largest system error code.])
-AC_DEFINE_UNQUOTED(LUX_FAILURE_BIT,  $fbits, [Define to the required bits to hold all lux failure codes.])
+AC_DEFINE_UNQUOTED(LUX_STRINGID_BIT, $hbits, [Define to the required bits to hold a string key.])
+AC_DEFINE_UNQUOTED(LUX_FACILITY_BIT, $mbits, [Define to the required bits to hold a facility key.])
+AC_DEFINE_UNQUOTED(LUX_FAILURE_BIT,  $fbits, [Define to the required bits to hold a lux failure code.])
 AC_DEFINE_UNQUOTED(LUX_INT_BIT,      $ibits, [Define to the number of bits of int.])
 AC_DEFINE_UNQUOTED(LUX_UNSIGNED_BIT, $ubits, [Define to the number of bits of unsigned.])
 
