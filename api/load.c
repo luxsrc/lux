@@ -20,7 +20,6 @@
 #include "api.h"
 #include <lux/lazybuf.h>
 #include <lux/load.h>
-#include <unistd.h> /* for getcwd() and getenv() */
 #include <string.h> /* for strcat(), strcpy(), and strlen() */
 
 #define COUNT_OF(a) (sizeof(a) / sizeof(a[0]))
@@ -39,16 +38,6 @@ lux_load(const char *restrict name, const void *opts)
 	char lazybuf[256], *buf;
 
 	void *ins;
-
-	if(!libux.paths[0])
-		libux.paths[0] = getcwd(NULL, 0);
-	if(!libux.paths[1]) {
-		char *home = getenv("HOME");
-		char *path = (char *)malloc(strlen(home) +
-		                            sizeof("/.lux/lib/lux"));
-		libux.paths[1] = strcat(strcpy(path, home), "/.lux/lib/lux");
-	}
-	/* TODO: free paths[0] and paths[1] in lux-wise cleanup */
 
 	for(i=1, maxlen=strlen(libux.paths[0]); i < COUNT_OF(libux.paths); ++i)
 		maxlen = max(maxlen, strlen(libux.paths[i]));

@@ -25,9 +25,10 @@
 #include <lux/vlog.h>
 
 #if HAVE_TIMESTAMP
-#define LIBUX_NULL {HTAB_NULL, VLOG_NULL, TIMESTAMP_NULL, {NULL, NULL, LUX_MOD_PATH}}
+#define LIBUX_NULL {HTAB_NULL, VLOG_NULL, TIMESTAMP_NULL, {NULL}}
 #else
-#define LIBUX_NULL {HTAB_NULL, VLOG_NULL, {NULL, NULL, LUX_MOD_PATH}}
+#define LIBUX_NULL {HTAB_NULL, VLOG_NULL, {NULL}} /* remainder initialized
+                                                     to NULL, c-faq 1.30. */
 #endif
 
 struct libux {
