@@ -1,4 +1,4 @@
-AM_LDFLAGS = -no-undefined
+AM_LDFLAGS = -no-undefined -export-dynamic -export-symbols-regex '^lux[A-Z_]|^dlhandle|^strfailure'
 
 lib_LTLIBRARIES = libux.la
 

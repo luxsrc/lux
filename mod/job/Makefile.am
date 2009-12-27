@@ -1,4 +1,4 @@
-AM_LDFLAGS = -no-undefined -export-dynamic -module
+AM_LDFLAGS = -no-undefined -export-dynamic -export-symbols-regex '^lux[A-Z_]' -module
 
 pkglib_LTLIBRARIES = sim.la
 
