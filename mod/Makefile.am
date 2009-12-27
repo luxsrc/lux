@@ -11,7 +11,7 @@ pkginclude_HEADERS += basename.h hash.h match.h modman.h
 pkginclude_HEADERS += timer.h
 
 # Resource allocator (allocate other resource that need to be freed)
-pkginclude_HEADERS += lazybuf.h load.h zalloc.h
+pkginclude_HEADERS += dltry.h lazybuf.h load.h zalloc.h
 
 # Hybrid modules (dynamically allocate their own resources)
 pkginclude_HEADERS += dope.h htab.h libux.h vlog.h
