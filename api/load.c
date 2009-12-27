@@ -23,11 +23,11 @@
 void *
 lux_load(const char *restrict name, const void *opts)
 {
-	return vload(&libux.load, name, opts);
+	return vload(&lux->load, name, opts);
 }
 
 void
 lux_unload(void *ins)
 {
-	uload(&libux.load, ins);
+	uload(&lux->load, ins);
 }

@@ -18,37 +18,14 @@
  * along with lux.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include "api.h"
-#include <unistd.h> /* for getcwd() and getenv() */
-#include <string.h> /* for strlen() */
-#include <stdio.h>  /* for sprintf() */
-#include <stdlib.h> /* for atexit() */
+#include <lux/timer.h>
 
-struct libux libux = LIBUX_NULL;
-
-static inline const char *
-getpaths(void)
-{
-	const char fmt[] = "%s:%s/.lux/lib/lux:" LUX_MOD_PATH;
-
-	char *cwd   = getcwd(NULL, 0);
-	char *home  = getenv("HOME");
-	char *paths = (char *)malloc(strlen(cwd)  +
-	                             strlen(home) +
-	                             sizeof(fmt)  - 4);
-	(void)sprintf(paths, fmt, cwd, home);
-
-	free(cwd);
-	/* no need to free home */
-	return paths;
-}
+struct libux *lux = NULL;
 
 static void
 setup(void)
 {
-#if HAVE_TIMESTAMP
-	libux.t0 = gettimestamp();
-#endif
-	libux.load.paths = getpaths();
+	lux = mklibux();
 
 	/* Setup the lux environment */
 }
@@ -58,11 +35,7 @@ cleanup(void)
 {
 	/* Clean up the lux environment */
 
-	free((void *)libux.load.paths);
-	libux.load.paths = NULL;
-#if HAVE_TIMESTAMP
-	lux_debug("lux ran for %g sec.\n", elapsed_since(libux.t0));
-#endif
+	rmlibux(lux);
 }
 
 void
