@@ -14,7 +14,7 @@ pkginclude_HEADERS += timer.h
 pkginclude_HEADERS += lazybuf.h load.h zalloc.h
 
 # Hybrid modules (dynamically allocate their own resources)
-pkginclude_HEADERS += dope.h htab.h vlog.h
+pkginclude_HEADERS += dope.h htab.h libux.h vlog.h
 
 # Interfaces and implementations of dynamic modules
 pkginclude_HEADERS += job.h

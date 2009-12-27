@@ -21,9 +21,19 @@
 #define _LUX_TIMER_H_
 
 #if HAVE_SYS_TIME_H && (HAVE_GETTIMEOFDAY || HAVE_BSDGETTIMEOFDAY)
+
 #include <sys/time.h>
 
+#if HAVE_STDDEF_H
+#include <stddef.h> /* for NULL */
+#else
+#include <stdlib.h> /* for NULL */
+#endif
+
+#define HAVE_TIMESTAMP 1
+
 typedef struct timeval timestamp;
+#define TIMESTAMP_NULL {0, 0}
 
 static inline timestamp
 gettimestamp(void)
@@ -51,7 +61,6 @@ elapsed_since(timestamp t0)
 	return elapsed_time(t1, t0);
 }
 
-#define HAVE_TIMESTAMP 1
 #endif
 
 #endif /* _LUX_TIMER_H_ */
