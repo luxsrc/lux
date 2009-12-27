@@ -5,7 +5,7 @@ SUBDIRS             = ap
 pkginclude_HEADERS += shorthand.h switch.h
 
 # Pure static modules (include only static inline functions and macros)
-pkginclude_HEADERS += basename.h hash.h match.h
+pkginclude_HEADERS += basename.h hash.h match.h modman.h
 
 # Static modules (like pure static modules but also declare trivial types)
 pkginclude_HEADERS += timer.h

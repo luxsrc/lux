@@ -29,7 +29,8 @@
 #include <dlfcn.h>  /* for dlopen(), dlsym(), and dlclose() */
 
 struct load_node {
-	struct htab_node super;
+	struct htab_node *next;
+	void  *ins;
 	void  *mod;
 	void (*rm)(void *);
 };
@@ -48,15 +49,12 @@ struct load_node {
 		goto cleanup;                                      \
 	} while(0)
 
-static inline void *
-vload(struct htab *ltab, const char *restrict name, const void *opts)
+static inline struct load_node *
+vload(const char *restrict name, const void *opts)
 {
 	char lazybuf[256], *buf;
-
 	struct load_node *node = NULL;
-
 	void *(*mk)(const void *);
-	void   *ins = NULL;
 
 	/* Try to allocate more memory if name is too long: note that
 	   5 == sizeof("luxC") > sizeof(".so")*/
@@ -86,25 +84,23 @@ vload(struct htab *ltab, const char *restrict name, const void *opts)
 			failed = fsv;
 			(void)dlerror();
 		}
-		ins = mk(opts);
-		if(!ins)
+		node->ins = mk(opts);
+		if(!node->ins)
 			FAILED_AS(F2CONS, "construct");
 	} else {
 		buf[3] = 'E';
-		ins = dlsym(node->mod, buf);
-		if(!ins)
+		node->ins = dlsym(node->mod, buf);
+		if(!node->ins)
 			FAILED_AS(FNOSYM, "load entry point");
 	}
 
-	/* Save module to a hash table; would not fail */
-	hadd(ltab, (uintptr_t)ins, &node->super);
 	FREE(buf);
-	return ins;
+	return node;
 
  cleanup:
 	if(node) {
-		if(node->rm && ins)
-			node->rm(ins);
+		if(node->rm && node->ins)
+			node->rm(node->ins);
 		if(node->mod)
 			(void)dlclose(node->mod); /* FIXME: should not clean
 			                             up dlerror() */
@@ -116,16 +112,12 @@ vload(struct htab *ltab, const char *restrict name, const void *opts)
 }
 
 static inline void
-uload(struct htab *ltab, void *ins)
+uload(struct load_node *node)
 {
-	struct load_node *node = (struct load_node *)hpop(ltab, (uintptr_t)ins);
-	if(node) {
-		if(node->rm)
-			node->rm(ins);
-		(void)dlclose(node->mod);
-		free(node);
-	} else
-		failed = FNOMOD;
+	if(node->rm)
+		node->rm(node->ins);
+	(void)dlclose(node->mod);
+	free(node);
 }
 
 #endif /* _LUX_LOAD_H_ */

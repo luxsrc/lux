@@ -19,7 +19,7 @@
  */
 #include "api.h"
 #include <lux/lazybuf.h>
-#include <lux/load.h>
+#include <lux/modman.h>
 #include <string.h> /* for strcat(), strcpy(), and strlen() */
 
 #define COUNT_OF(a) (sizeof(a) / sizeof(a[0]))
@@ -50,7 +50,7 @@ lux_load(const char *restrict name, const void *opts)
 	/* Try to load the module */
 	for(i = 0, ins = NULL; i < COUNT_OF(libux.paths) && !ins; ++i) {
 		(void)strcat(strcat(strcpy(buf, libux.paths[i]), "/"), name);
-		ins = vload(&libux.ltab, buf, opts);
+		ins = vmkmod(&libux.ltab, buf, opts);
 	}
 
 	FREE(buf);
@@ -60,5 +60,5 @@ lux_load(const char *restrict name, const void *opts)
 void
 lux_unload(void *ins)
 {
-	uload(&libux.ltab, ins);
+	rmmod(&libux.ltab, ins);
 }
