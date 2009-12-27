@@ -48,7 +48,7 @@ setup(void)
 #if HAVE_TIMESTAMP
 	libux.t0 = gettimestamp();
 #endif
-	libux.paths = getpaths();
+	libux.load.paths = getpaths();
 
 	/* Setup the lux environment */
 }
@@ -58,8 +58,8 @@ cleanup(void)
 {
 	/* Clean up the lux environment */
 
-	free((void *)libux.paths);
-	libux.paths = NULL;
+	free((void *)libux.load.paths);
+	libux.load.paths = NULL;
 #if HAVE_TIMESTAMP
 	lux_debug("lux ran for %g sec.\n", elapsed_since(libux.t0));
 #endif

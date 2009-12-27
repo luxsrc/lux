@@ -20,23 +20,22 @@
 #ifndef _LUX_LIBUX_H_
 #define _LUX_LIBUX_H_
 
-#include <lux/htab.h>
+#include <lux/load.h>
 #include <lux/timer.h>
 #include <lux/vlog.h>
 
 #if HAVE_TIMESTAMP
-#define LIBUX_NULL {HTAB_NULL, VLOG_NULL, TIMESTAMP_NULL, NULL}
+#define LIBUX_NULL {TIMESTAMP_NULL, VLOG_NULL, LOAD_NULL}
 #else
-#define LIBUX_NULL {HTAB_NULL, VLOG_NULL, NULL}
+#define LIBUX_NULL {VLOG_NULL, LOAD_NULL}
 #endif
 
 struct libux {
-	struct htab ltab;
-	struct vlog vlog;
 #if HAVE_TIMESTAMP
-	timestamp   t0;
+	timestamp t0;
 #endif
-	const char *paths;
+	struct vlog vlog;
+	struct load load;
 }; /* TODO: implement mklibux() and rmlibux() */
 
 #endif /* _LUX_LIBUX_H_ */
