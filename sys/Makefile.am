@@ -1,3 +1,5 @@
+AM_LDFLAGS = -no-undefined
+
 noinst_LTLIBRARIES = libsys.la
 libsys_la_SOURCES  = ../mod/dlfcn.h  dlhandle.c
 libsys_la_SOURCES += ../mod/failed.h strfailure.c

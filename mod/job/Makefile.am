@@ -1,4 +1,4 @@
-AM_LDFLAGS = -export-dynamic -module
+AM_LDFLAGS = -no-undefined -export-dynamic -module
 
 pkglib_LTLIBRARIES = sim.la
 
