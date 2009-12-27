@@ -17,7 +17,7 @@
  * You should have received a copy of the GNU General Public License
  * along with lux.  If not, see <http://www.gnu.org/licenses/>.
  */
-#include <lux.h>
+#include "api.h"
 #include <stdlib.h> /* for exit() and EXIT_FAILURE */
 
 void

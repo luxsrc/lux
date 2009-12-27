@@ -17,20 +17,12 @@
  * You should have received a copy of the GNU General Public License
  * along with lux.  If not, see <http://www.gnu.org/licenses/>.
  */
-#include "api.h"
-#include <lux/vlog.h>
-#include <stdarg.h> /* for va_list, va_start(), and va_end() */
+#ifndef _API_H_
+#define _API_H_
 
-#define DEF_LOG(L, S) void                                        \
-	lux_##S(const char *restrict fmt, ...)                    \
-	{                                                         \
-		va_list ap;                                       \
-		va_start(ap, fmt);                                \
-		vlog(&libux.vlog, libux.vlog.levels[L], fmt, ap); \
-		va_end(ap);                                       \
-	}
+#include <lux.h>
+#include <lux/libux.h>
 
-DEF_LOG(0, fatal)
-DEF_LOG(3, error)
-DEF_LOG(6, print)
-DEF_LOG(7, debug)
+extern struct libux libux;
+
+#endif /* _API_H_ */

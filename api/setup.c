@@ -17,19 +17,16 @@
  * You should have received a copy of the GNU General Public License
  * along with lux.  If not, see <http://www.gnu.org/licenses/>.
  */
-#include <lux.h>
-#include <lux/timer.h>
+#include "api.h"
 #include <stdlib.h> /* for atexit() */
 
-#if HAVE_TIMESTAMP
-static timestamp t0;
-#endif
+struct libux libux = LIBUX_NULL;
 
 static void
 setup(void)
 {
 #if HAVE_TIMESTAMP
-	t0 = gettimestamp();
+	libux.t0 = gettimestamp();
 #endif
 
 	/* Setup the lux environment */
@@ -41,7 +38,7 @@ cleanup(void)
 	/* Cleanup the lux environment */
 
 #if HAVE_TIMESTAMP
-	lux_debug("lux ran for %g sec.\n", elapsed_since(t0));
+	lux_debug("lux ran for %g sec.\n", elapsed_since(libux.t0));
 #endif
 }
 

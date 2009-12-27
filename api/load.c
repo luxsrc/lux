@@ -17,17 +17,13 @@
  * You should have received a copy of the GNU General Public License
  * along with lux.  If not, see <http://www.gnu.org/licenses/>.
  */
-#include <lux.h>
-#include <lux/htab.h>
+#include "api.h"
 #include <lux/lazybuf.h>
 #include <lux/load.h>
 #include <unistd.h> /* for getcwd() and getenv() */
 #include <string.h> /* for strcat(), strcpy(), and strlen() */
 
 #define COUNT_OF(a) (sizeof(a) / sizeof(a[0]))
-
-static struct htab  ltab    = HTAB_NULL; /* the loading table */
-static const  char *paths[] = {NULL, NULL, LUX_MOD_PATH};
 
 static inline size_t
 max(size_t a, size_t b)
@@ -44,18 +40,18 @@ lux_load(const char *restrict name, const void *opts)
 
 	void *ins;
 
-	if(!paths[0])
-		paths[0] = getcwd(NULL, 0);
-	if(!paths[1]) {
+	if(!libux.paths[0])
+		libux.paths[0] = getcwd(NULL, 0);
+	if(!libux.paths[1]) {
 		char *home = getenv("HOME");
 		char *path = (char *)malloc(strlen(home) +
-		                          sizeof("/.lux/lib/lux"));
-		paths[1] = strcat(strcpy(path, home), "/.lux/lib/lux");
+		                            sizeof("/.lux/lib/lux"));
+		libux.paths[1] = strcat(strcpy(path, home), "/.lux/lib/lux");
 	}
 	/* TODO: free paths[0] and paths[1] in lux-wise cleanup */
 
-	for(i = 1, maxlen = strlen(paths[0]); i < COUNT_OF(paths); ++i)
-		maxlen = max(maxlen, strlen(paths[i]));
+	for(i=1, maxlen=strlen(libux.paths[0]); i < COUNT_OF(libux.paths); ++i)
+		maxlen = max(maxlen, strlen(libux.paths[i]));
 
 	/* Try to allocate more memory if name is too long */
 	buf = (char *)MALLOC(maxlen + sizeof("/") + strlen(name));
@@ -63,9 +59,9 @@ lux_load(const char *restrict name, const void *opts)
 		return NULL; /* failure code was set by MALLOC() */
 
 	/* Try to load the module */
-	for(i = 0, ins = NULL; i < COUNT_OF(paths) && !ins; ++i) {
-		(void)strcat(strcat(strcpy(buf, paths[i]), "/"), name);
-		ins = vload(&ltab, buf, opts);
+	for(i = 0, ins = NULL; i < COUNT_OF(libux.paths) && !ins; ++i) {
+		(void)strcat(strcat(strcpy(buf, libux.paths[i]), "/"), name);
+		ins = vload(&libux.ltab, buf, opts);
 	}
 
 	FREE(buf);
@@ -75,5 +71,5 @@ lux_load(const char *restrict name, const void *opts)
 void
 lux_unload(void *ins)
 {
-	uload(&ltab, ins);
+	uload(&libux.ltab, ins);
 }
