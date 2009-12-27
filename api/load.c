@@ -20,37 +20,38 @@
 #include "api.h"
 #include <lux/lazybuf.h>
 #include <lux/modman.h>
-#include <string.h> /* for strcat(), strcpy(), and strlen() */
-
-#define COUNT_OF(a) (sizeof(a) / sizeof(a[0]))
-
-static inline size_t
-max(size_t a, size_t b)
-{
-	return a > b ? a : b;
-}
+#include <string.h> /* for memcpy() */
 
 void *
 lux_load(const char *restrict name, const void *opts)
 {
-	size_t i, maxlen;
+	void *ins = NULL;
 
-	char lazybuf[256], *buf;
+	char lazybuf[256], *buf = lazybuf;
+	const size_t nlen  = strlen(name);
+	const char  *paths = libux.paths;
 
-	void *ins;
+	while(paths && !ins) {
+		const char  *psep = strchr(paths, ':');
+		const size_t plen = psep ? (size_t)(psep-paths) : strlen(paths);
 
-	for(i=1, maxlen=strlen(libux.paths[0]); i < COUNT_OF(libux.paths); ++i)
-		maxlen = max(maxlen, strlen(libux.paths[i]));
+		void *tmp = REALLOC(buf, plen + sizeof("/") + nlen);
+		if(tmp)
+			buf = (char *)tmp;
+		else {
+			FREE(buf);   /* as REALLOC() may succeed a few times */
+			return NULL; /* failure code was set by REALLOC()    */
+		}
 
-	/* Try to allocate more memory if name is too long */
-	buf = (char *)MALLOC(maxlen + sizeof("/") + strlen(name));
-	if(!buf)
-		return NULL; /* failure code was set by MALLOC() */
+		(void)memcpy(buf, paths, plen);
+		buf[plen] = '/';
+		(void)memcpy(buf + plen + 1, name, nlen);
+		buf[plen + 1 + nlen] = '\0';
 
-	/* Try to load the module */
-	for(i = 0, ins = NULL; i < COUNT_OF(libux.paths) && !ins; ++i) {
-		(void)strcat(strcat(strcpy(buf, libux.paths[i]), "/"), name);
+		/* Try to load the module */
 		ins = vmkmod(&libux.ltab, buf, opts);
+
+		paths = psep ? psep + 1 : NULL;
 	}
 
 	FREE(buf);
