@@ -30,5 +30,5 @@
 #define FAILED ((1U<<LUX_FAILURE_BIT) - 1)
 
 extern const char *strfailure(int); /* pseudo "standard" function
-                                       provided by "sys/string.c" */
+                                       provided by "sys/strfailure.c" */
 #endif /* _LUX_FAILED_H_ */
