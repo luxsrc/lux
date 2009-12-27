@@ -21,6 +21,7 @@
 #define _LUX_LOAD_H_
 
 #include <lux/basename.h>
+#include <lux/dltry.h>
 #include <lux/failed.h>
 #include <lux/htab.h>
 #include <lux/lazybuf.h>
@@ -75,18 +76,13 @@ vload(const char *restrict name, const void *opts)
 
 	/* Try to get the instance */
 	(void)strcat(strcpy(buf, "luxC"), basename(name));
-	mk = (void *(*)(const void *))dlsym(node->mod, buf);
+	mk = (void *(*)(const void *))dltrysym(node->mod, buf);
 	if(mk) {
-		int fsv = failed;
-		buf[3] = 'D';
-		node->rm = (void (*)(void *))dlsym(node->mod, buf);
-		if(!node->rm) {
-			failed = fsv;
-			(void)dlerror();
-		}
 		node->ins = mk(opts);
 		if(!node->ins)
 			FAILED_AS(F2CONS, "construct");
+		buf[3] = 'D';
+		node->rm = (void (*)(void *))dltrysym(node->mod, buf);
 	} else {
 		buf[3] = 'E';
 		node->ins = dlsym(node->mod, buf);
