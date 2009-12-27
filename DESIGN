@@ -33,8 +33,8 @@ INTERFACE: a lux interface Lux_MOD is simply a function type or a
   is placed in mod/ in the lux source tree, and is installed to
   $prefix/include/lux.
 
-DYNAMIC MODULE: a lux module MOD is a dynamically loadable library
-  that contains exactly one constructor
+DYNAMIC MODULE: a standard lux module MOD is a dynamically loadable
+  library that contains exactly one constructor
 
 	void *LUXC(const void *);
 
@@ -84,11 +84,41 @@ DYNAMIC MODULE: a lux module MOD is a dynamically loadable library
   ultimate way to avoid symbol conflicts because LUXC and LUXD, or
   LUXE, are the only exported symbols.
 
-STATIC MODULE: sometimes it is overkill to pack some small functions
-  into a dynamic lux module.  Calling functions via pointers can also
-  reduce the performance.  Hence, we introduce the concept of "static
-  modules", which are just header files that contain static inline
-  functions and/or macros.
+STATIC MODULE, RESOURCE ALLOCATOR, HYBRID MODULE, etc: it is sometimes
+  overkill to pack small functions into a dynamic module.  Calling
+  functions via pointers can also reduce the performance.  Hence, we
+  introduce the notion of "static modules", which are just header
+  files that contain macros and/or static inline functions.  In
+  addition to being efficient, the static nature of these simple
+  modules helps resolving the bootstrap problem of implementing the
+  lux core library libux (see the last section).
+
+  In some user cases, additional manipulations are needed after
+  resources allocations.  Static modules that implement these
+  manipulations are called resource allocators.  They usually do not
+  have delocators.  Conversely, if a mkSTRUCT()/rmSTRUCT() pair is
+  implemented for a corresponding data structure STRUCT, then we refer
+  such a module as a hybrid module.  Just like static modules,
+  resource allocators and hybrid modules are lightweight and are
+  implemented entirely in single header files; unlike static modules,
+  however, hybrid modules require both constructors and destructors to
+  function.
+
+  Although static, resource allocators, hybrid modules, etc cannot
+  encode library dependencies themselves, they never cause problems in
+  practice because all their dependent libraries are linked through
+  the convenience system librarysys/libsys.la.
+
+CUSTOM MODULE and MODULE BUNDLE: as we described in the above
+  sections, lux's module architecture is very powerful.  To generalize
+  it even further, it can be viewed as an abstraction to bring in any
+  *resource* at run-time.  For example, if we can treat a restart
+  file, or a simulation output folder, as a module, then we can unify
+  simulation initialization and restoration.  To make this unification
+  possible, the libux instance (see the last section) contains a list
+  of module loaders that can be reconfigured at run-time.  It can even
+  load a loader dynamically from a folder---in such a case, we refer
+  the folder as a module bundle.
 
 OBJECT ORIENTED PROGRAMMING: lux is implemented in C for performance,
   portability, and integrability (with other programming languages).
@@ -380,14 +410,14 @@ MEMORY ORDER and DOPE VECTOR: in order to describe the memory layout
 
   Hence, it is natural to extend these to the zeroth element and make
 
-    * dope->r the total rank so the dope values of the r-th rank can
-      be accessed by dope[r-dope->r].
+  * dope->r the total rank so the dope values of the r-th rank can
+    be accessed by dope[r-dope->r].
 
-    * dope->s the number total number of elements including padding if
-      the array is not tightly packed
+  * dope->s the number total number of elements including padding if
+    the array is not tightly packed
 
-    * dope->c the size of each element in bytes so the total size can
-      be easily computed by dope->c * dope->s.
+  * dope->c the size of each element in bytes so the total size can
+    be easily computed by dope->c * dope->s.
 
   As an example, a tightly packed two-dimensional/second-rank 4 x 3
   column-major array of double has the following dope vector
@@ -409,7 +439,7 @@ MEMORY ORDER and DOPE VECTOR: in order to describe the memory layout
 
   The stars next to the 'r's above indicate that these dope vectors
   are sorted in rank, and hence are logical orders.  To access the
-  above arrays efficiently, we sort the dope vectors acoording to the
+  above arrays efficiently, we sort the dope vectors according to the
   stride,
 
                      |  1st array  |  2nd array
@@ -446,8 +476,9 @@ ERROR/FAILURE HANDLING: the terms "error" here refers to a recoverable
   indicate failures.  Once a failure is identified, the special global
   variable errno is checked to obtain the detail of the failure.  This
   overcomes the limitation that a C function can only return a single
-  variable.  Usually, a message is then logged before other action is
-  taken to resolve the failure:
+  variable, and it ensures performance because only a single integer
+  is set in order to indicating the error.  Usually, a message is then
+  logged before other action is taken to resolve the failure:
 
 	int fid = open(path, flags, mode);
 	if(fid < 0) { /* handle failure */
@@ -455,54 +486,81 @@ ERROR/FAILURE HANDLING: the terms "error" here refers to a recoverable
 		(void)fprintf(stderr,
 		              "Failed to open \"%s\" [%d: %s]\n",
 		              path, err, strerror(err));
-		...
+		switch(err) {
+		... /* other error handling actions */
+		}
 	}
 
-  To avoid infinite recursion of failure logging, lux loggers never
-  emit failure code themselves.  For other functions that can fail in
-  lux, they often return pointers.  It is natural to employ the
-  standard convention---the null pointer is an indication of failure
-  and developers are expected to check for the failure code manually.
-
-  lux enhances the standard <errno.h> mechanism by implement a static
-  module <lux/failed.h>, where we define the following:
+  The static module <lux/failed.h> enhances the standard <errno.h>
+  mechanism.  The module defines the macro
 
 	#define failed errno
 
-  The macro `failed`, expands to errno, is an lvalue and has type int,
-  which is at least 16-bit in C.  The maximum defined system failure
-  code (ELAST for BSD, ERFKILL for Linux on most architectures,
-  _LAST_ERRNO for Linux/PowerPC and EDQUOT for Linux/MIPS, which are
-  all unified as LUX_ELAST in lux) is usually only a few hundreds.
-  Hence, we can encode additional information in `failed` to help
-  handling failures.
+  which, expands to errno, is an lvalue and has type int.  The maximum
+  defined system failure code (ELAST for BSD, ERFKILL for Linux on
+  most architectures, _LAST_ERRNO for Linux/PowerPC and EDQUOT for
+  Linux/MIPS, which are all unified as LUX_ELAST in lux) is usually
+  only a few hundreds.  Hence, in addition to the system failure
+  codes, `failed` encodes additional information to help handling
+  failures.
 
   How many bits can we use to encode the additional information?  As
-  far as we can tell, BSD-based systems has ELAST up to 106 (Darwin).
-  For Linux, ERFKILL has value 132 on generic architectures.  It can
-  take larger values on SPARC (134), Alpha (138), MIPS (167), and
-  PARISC (256).  For Linux/PowerPC and Linux/MIPS, _LAST_ERRNO (516)
-  and EDQUOT (1133) are the largest failure codes, respectively.  But
-  since all these architectures are at least 32-bit, we can use 11
-  bits to store their failure codes and use the remaining 21 bits to
-  encode addition information.  Therefore, as long as we only
-  guarantee 123 == 255 - 132 customized failed codes in lux, we can
-  fit all the failure codes in 8 bits for 16-bit systems supported by
-  Linux.  And we will have at least 8 bits to encode additional
-  information.
+  far as we can tell, BSD-based systems have ELAST up to 106 (Darwin).
+  For Linux, ERFKILL == 132 on generic architectures.  It can take
+  larger values on SPARC (134), Alpha (138), MIPS (167), and PARISC
+  (256).  For Linux/PowerPC and Linux/MIPS, _LAST_ERRNO == 516 and
+  EDQUOT == 1133, respectively.  Nevertheless, all these architectures
+  (except generic) are 32-bit or 64-bit so there are at least 21
+  remaining bits.  If we want lux to support all the platforms that
+  have C compilers, our constraint really comes from the sizeof int,
+  which is only guaranteed to be 16-bit.  As long as we only guarantee
+  123 == 255 - 132 customized failed codes, we have at least 8 bits to
+  encode additional information even for the ancient 16-bit systems.
 
-  Clearly, failure handling in lux is tightly coupled to message
-  logging (see next section).  lux reserves at least 1 bit to indicate
-  if any failed message is attached to a failed code.
+  For most applications in high-performance computing, we need a
+  detailed content dependent message to help debugging the algorithm.
+  We suggest using a unique string id (e.g., message count, hash key)
+  to identify a cached message, and bitwise-OR-ing the id with an
+  optional facility key and the failure code described in this
+  section.  This string id can be platform and implementation
+  dependent.
 
-MESSAGE LOGGING: printing to stdout, stderr, files, or even memory are
-  all consider message logging in lux.  They are coordinated by a
-  single function
+MESSAGE LOGGING: non-interactive message loggings in lux are
+  coordinated by a single function
 
 	lux_vlog(unsigned flags, const char *restrict format, va_list ap);
 
-  There are 8 default severity levels that correspond to the standard
-  syslog security levels or linux kernel log levels:
+  Just like `failed` is compatible with errno (see last section), the
+  `flags` used by lux_vlog() should be compatible with standard syslog
+  security levels.  Additional flags can then be bitwise-OR-ing to
+  `flags` to fine tune lux_vlog()'s behavior.
+
+  In order to achieve the above requirements, in the logging mode, the
+  most significant byte is formed by:
+
+    LUX_LOG_LEVEL(L)
+    LUX_LOG_FLAGS
+
+  The macro LUX_LOG_LEVEL(L) turns an integer to a implementation
+  dependent 7-bit pattern.  It is used to determine if a message is
+  fatal or not, and if the message is showed or not.
+
+  When LUX_LOG_FLAGS is set, the less significant byte(s) are used to
+  control vlog().  lux requires the following flags to be implemented
+
+    LUX_LOG_STREAM(ID) /* with 0 <= ID < LUX_LOG_STREAM_COUNT */
+    LUX_LOG_STDERR     /* == LUX_LOG_STREAM(2) */
+    LUX_LOG_STDOUT     /* == LUX_LOG_STREAM(1) */
+    LUX_LOG_STDBUF     /* == LUX_LOG_STREAM(0) */
+    LUX_LOG_FLAG_AUTOFORMAT
+    LUX_LOG_FLAG_PID
+    LUX_LOG_FLAG_TIMESTAMP
+
+  When LUX_LOG_FLAGS is not set (flags & LUX_LOG_FLAGS == 0), the less
+  significant byte(s) are interpreted as an integer, which is an id
+  linked by the current level.  There are 8 default severity levels
+  that correspond to the standard syslog security levels or Linux
+  kernel log levels:
 
     level  | description                          | usage examples in lux
     -------+--------------------------------------+---------------------------
@@ -512,49 +570,8 @@ MESSAGE LOGGING: printing to stdout, stderr, files, or even memory are
     err    | error/exception condition            | malloc failure
     warning| error may occur if no action is taken| low disk space
     notice | normal but significant condition     | excepted interrupt by user
-    info   | normal operational message           | a sim has started
+    info   | normal operational message           | a job has started
     debug  | print information for debugging      | name of called function
-
-  All of these levels are preconfigured by bitwise-OR-ing a
-  combination of following flags:
-
-    LUX_LOG_SUSPEND    (1U << LUX_UNSIGNED_BIT - 1)
-    LUX_LOG_FLAGS      (1U << LUX_UNSIGNED_BIT - 2)
-    LUX_LOG_FATAL      (1U << LUX_UNSIGNED_BIT - 3)
-    LUX_LOG_STREAM(ID) (1U << 5 + ID)
-    LUX_LOG_STDOUT     (1U << 4)
-    LUX_LOG_STDERR     (1U << 3)
-    LUX_LOG_AUTOFORMAT (1U << 2)
-    LUX_LOG_PID        (1U << 1)
-    LUX_LOG_TIMESTAMP  (1U << 0)
-
-  LUX_LOG_SUSPEND is the most significant bit.  This convention is
-  chosen so that a level is suspended if and only if casting the level
-  to an int results a negative number.
-
-  LUX_LOG_FLAGS is the next significant bit.  When it is not set
-  (flags & LUX_LOG_FLAGS == 0), all other bits are interpreted as an
-  integer, which is an id linked by the current level.  Theoretically,
-  we can keep track of 2^(sizeof(unsigned)*CHAR_BIT - 2) levels,
-  although the actual number of allocated levels is 16 by default.
-
-  When LUX_LOG_FLAGS is set, the following bit is LUX_LOG_FATAL, which
-  tells if the message logger should abort the program.  The next
-  LUX_UNSIGNED_BIT-6 bits are the bitwise-OR of log stream flags.
-  Among them, the more significant (sizeof(unsigned)-1)*CHAR_BIT bits
-  are for customizable output streams, while the least significant 2
-  bits are reserved for stdout and stderr.  Usually, at least one of
-  the stream flags is set.  In such a case, the least significant 3
-  bits of flags set the behavior of the logger, and are interpreted as
-  LUX_LOG_AUTOFORMAT, LUX_LOG_PID, and LUX_LOG_TIMESTAMP.  Otherwise,
-  syslog() is used instead of any of the log stream and the least
-  significant 3 bits are interpreted as a syslog severity level.
-
-  The actual 16 levels are allocated as a mutable array so they are
-  re-configurable at runtime.  In addition to the 8 default levels,
-  the remaining 8 levels can be customized for other usages.  More
-  levels can also be added by declaring unsigned variables to hold
-  their properties.
 
   Some of the commonly used levels are mapped to the following
   convenience message logging functions:
@@ -568,12 +585,25 @@ MESSAGE LOGGING: printing to stdout, stderr, files, or even memory are
   programming bugs, lux also provides a macro lux_assert() to mirror
   the function of assert() in <assert.h>.  The main difference between
   the two is that lux_assert() uses lux_vlog() and is customizable.
-  Note that lux_assert() can be globally turned off at compile time by
-  passing the "--disable-assertion" option to `./configure`.
+  Note that lux_assert() is turned off at compile time by default, but
+  can be turned on globally by passing the "--enable-assertion" option
+  to `./configure`.
 
 CORE LIBRARY: the lux core library, libux, provides basic functions
   such as lux_load() and lux_unload() to access modules/plug-ins and
-  to construct, configure, and run scientific computation jobs.
+  to construct, configure, and run scientific computation jobs.  It
+  provide a stable and easy-to-use API for developers.
+
+  For consistency, libux itself is implemented as a module in the mod/
+  directory.  If libux were a real dynamic module, there would be a
+  bootstrap problem---the dynamic loading feature is provided by libux
+  but is not available until libux is loaded.  Also, shared library
+  and dynamically loading module can be different on some operating
+  systems (e.g., Darwin), which stops us from linking the libux module
+  directly.  To resolve these problems, the libux module is a hybrid
+  module implemeneted in a single header file <lux/libux.h>.  The
+  actual library creation is done in api/, where we also implement
+  wrappers functions for the API.
 
   The lux executable provided within this software package is a
   lightweight frontend of the lux core library for Unix-like
@@ -584,4 +614,4 @@ CORE LIBRARY: the lux core library, libux, provides basic functions
 	gcc program.c -lux -o program
 
   In fact, this is the reason we chose "libux" as the core library
-  name --- the name does not come from linux.
+  name---the name does not come from Linux.
