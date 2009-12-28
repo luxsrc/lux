@@ -29,7 +29,7 @@
 
 /* Forward declarations */
 typedef struct LuxSplanner Lux_planner;
-typedef const  void        Lux_problem; /* problem specific interface */
+typedef struct LuxSproblem Lux_problem; /* problem specific interface */
 typedef struct LuxStask    Lux_task;
 
 struct LuxSplanner {

@@ -21,7 +21,7 @@
 #define _LUX_SOLVER_H_
 
 /* Forward declarations */
-typedef const  void         Lux_problem; /* problem specific interface */
+typedef struct LuxSproblem  Lux_problem; /* problem specific interface */
 typedef struct LuxSsolution Lux_solution;
 typedef struct LuxSsolver   Lux_solver;
 
