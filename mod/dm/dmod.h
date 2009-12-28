@@ -69,10 +69,10 @@ mkdmod(struct dlib l, const char *restrict name, const void *opts)
 static inline void
 rmdmod(struct dmod m)
 {
-	if(m.ins && m.rm)
-		m.rm(m.ins);
-	else
+	if(!m.ins)
 		failed = FNOMOD;
+	else if(m.rm)
+		m.rm(m.ins);
 }
 
 #endif /* _LUX_DMOD_H_ */
