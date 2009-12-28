@@ -22,6 +22,6 @@
 
 #include <dlfcn.h>
 
-void *dlhandle(void *);
+extern void *dlhandle(void *);
 
 #endif /* _LUX_DLFCN_H_ */
