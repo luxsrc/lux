@@ -8,7 +8,7 @@ pkginclude_HEADERS += mangle.h numeric.h shorthand.h switch.h
 pkginclude_HEADERS += basename.h hash.h head.h match.h
 
 # Static modules (like pure static modules but also declare trivial types)
-pkginclude_HEADERS += counter.h refcnt.h
+pkginclude_HEADERS += atomic.h counter.h refcnt.h
 
 # Resource allocator (allocate other resource that need to be freed)
 pkginclude_HEADERS += lazybuf.h zalloc.h

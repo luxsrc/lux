@@ -17,39 +17,37 @@
  * You should have received a copy of the GNU General Public License
  * along with lux.  If not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef _LUX_COUNTER_H_
-#define _LUX_COUNTER_H_
+#ifndef _LUX_ATOMIC_H_
+#define _LUX_ATOMIC_H_
 
-#include <lux/atomic.h>
+#define ATM_NULL {0}
 
-#define CNT_NULL {ATM_NULL}
-
-struct cnt {
-	struct atm cnt;
+struct atm {
+	int atm; /* it is usually safe to assume int is atomic */
 };
 
 static inline void
-counter_set(struct cnt *cnt, int v)
+atomic_set(struct atm *atm, int v)
 {
-	atomic_set(&cnt->cnt, v);
+	atm->atm = v;
 }
 
 static inline int
-counter_get(struct cnt *cnt)
+atomic_get(struct atm *atm)
 {
-	return atomic_get(&cnt->cnt);
+	return atm->atm;
 }
 
 static inline int
-counter_inc(struct cnt *cnt)
+atomic_add(struct atm *atm, int v)
 {
-	return atomic_add(&cnt->cnt, 1);
+	return __sync_add_and_fetch(&atm->atm, v);
 }
 
 static inline int
-counter_dec(struct cnt *cnt)
+atomic_sub(struct atm *atm, int v)
 {
-	return atomic_sub(&cnt->cnt, 1);
+	return __sync_sub_and_fetch(&atm->atm, v);
 }
 
-#endif /* _LUX_COUNTER_H_ */
+#endif /* _LUX_ATOMIC_H_ */
