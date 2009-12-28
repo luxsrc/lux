@@ -136,24 +136,6 @@ fi
 AM_CONDITIONAL(USING_SINGLE, test "$ok" = "yes")
 
 AH_BOTTOM([/*===========================================================================*/
-/* Macros for token transformation */
-
-#define LUX_STR1NG(s) #s
-#define LUX_STRING(s) LUX_STR1NG(s)
-
-#define LUX_C0NCAT(s, t) s ## t
-#define LUX_CONCAT(s, t) LUX_C0NCAT(s, t)
-
-/*---------------------------------------------------------------------------*/
-/* Name mangling by passing a cpp-flag "-DLUX_MOD_NAME=name" */
-
-#ifdef LUX_MOD_NAME
-#define LUXCMOD LUX_CONCAT(luxC, LUX_MOD_NAME) /* constructor */
-#define LUXDMOD LUX_CONCAT(luxD, LUX_MOD_NAME) /* destructor  */
-#define LUXEMOD LUX_CONCAT(luxE, LUX_MOD_NAME) /* entry-point */
-#endif
-
-/*===========================================================================*/
 /* Include standard header files to get size_t, ptrdiff_t, and FILE */
 
 #if HAVE_STDDEF_H

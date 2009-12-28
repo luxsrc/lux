@@ -2,7 +2,7 @@ pkginclude_HEADERS  = assert.h dlfcn.h failed.h
 SUBDIRS             = ap dm
 
 # Convenience static modules (typically for renaming stuffs)
-pkginclude_HEADERS += shorthand.h switch.h
+pkginclude_HEADERS += mangle.h shorthand.h switch.h
 
 # Pure static modules (include only static inline functions and macros)
 pkginclude_HEADERS += basename.h hash.h head.h match.h
