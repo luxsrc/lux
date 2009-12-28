@@ -26,6 +26,7 @@
 #include <lux/dm/dmod.h>
 #include <lux/failed.h>
 #include <lux/htab.h>
+#include <stdlib.h> /* for NULL, malloc(), and free() */
 
 #define LOAD_NULL {NULL, HTAB_NULL}
 

@@ -23,7 +23,12 @@
 #include <lux/dm/dltry.h>
 #include <lux/failed.h>
 #include <lux/lazybuf.h>
-#include <string.h> /* for memcpy(), strchr(), and strlen() */
+#if HAVE_STDDEF_H
+#include <stddef.h> /* for NULL and size_t */
+#else
+#include <stdlib.h> /* for NULL and size_t */
+#endif
+#include <string.h> /* for strlen(), memcpy(), and strchr() */
 
 #define DLIB_NULL {NULL}
 
