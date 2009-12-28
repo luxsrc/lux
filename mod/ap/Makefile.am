@@ -1,3 +1,3 @@
 pkgapincludedir = $(pkgincludedir)/ap
 
-pkgapinclude_HEADERS = cycle.h measure.h planner.h solution.h solver.h task.h timer.h
+pkgapinclude_HEADERS = measure.h planner.h solution.h solver.h task.h ticks.h timer.h
