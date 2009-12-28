@@ -136,37 +136,6 @@ fi
 AM_CONDITIONAL(USING_SINGLE, test "$ok" = "yes")
 
 AH_BOTTOM([/*===========================================================================*/
-/* Include standard header files to get size_t, ptrdiff_t, and FILE */
-
-#if HAVE_STDDEF_H
-#include <stddef.h> /* for size_t and ptrdiff_t */
-#endif
-#include <stdio.h>  /* for size_t and FILE */
-
-/*---------------------------------------------------------------------------*/
-/* Typedef numerical types */
-
-#if HAVE_STDDEF_H
-typedef size_t    Lux_whole;
-typedef ptrdiff_t Lux_int;
-#else
-typedef unsigned  Lux_whole;
-typedef int       Lux_int;
-#endif
-
-#ifdef LUX_SINGLE
-typedef float  Lux_real;
-#else
-typedef double Lux_real;
-#endif
-
-typedef double Lux_xreal; /* real numbers with possibly extra precision */
-
-typedef struct {Lux_int   n, m;} Lux_rational;
-typedef struct {Lux_real  r, i;} Lux_complex;
-typedef struct {Lux_xreal r, i;} Lux_xcomplex;
-
-/*===========================================================================*/
 /* Public API */
 
 extern void lux_setup(void);
