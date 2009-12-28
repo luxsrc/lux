@@ -326,8 +326,8 @@ OPTIMIZATION: according to the README.hacks file in the fftw2 library,
   for now).  Instead, lux uses a more flexible and lightweight, but
   problem dependent, structure:
 
-	struct algo {
-		void (*exec)(struct algo *, ...);
+	struct plan {
+		void (*exec)(struct plan *, ...);
 		struct { ... } istate;
 		struct { ... } xstate;
 	};
@@ -345,14 +345,15 @@ OPTIMIZATION: according to the README.hacks file in the fftw2 library,
   This approach mirrors the "new-array execute" functions in fftw3
   such as fftw_execute_dft() and fftw_execute_split_dft().
 
-  To summarize, the problem, algo, task, and solution data structures
+  To summarize, the problem, plan, task, and solution data structures
   need to store, and the solver and planner modules need to deliver,
   at least the following information:
 
     problem:                  xstate, paras, ro, rw, wo (prob. spec. interface)
-    algo:     driver, istate, xstate                    (prob. spec. interface)
+    plan:     driver, istate, xstate                    (prob. spec. interface)
     task:     driver, istate, xstate, paras, ro, rw, wo
     solution: driver, istate, xstate, paras, ro, rw, wo, opcnt, ecost, mcost
+
     solver:   driver, istate, xstate,                    opcnt, ecost
     planner:  solver[],                                                mcost
 
@@ -362,7 +363,7 @@ OPTIMIZATION: according to the README.hacks file in the fftw2 library,
   array of solutions; while a planner returns a single optimal plan
   according to giving flags
 
-  Because problem and algo and problem-specific, they are typedefs of
+  Because problem and plan and problem-specific, they are typedefs of
   `const void` and `void` respectively; while other AP types have well
   defined interfaces.  Also, because the implementation of a task is
   not known to libux, it is embedded as the last field in solution for
@@ -394,7 +395,7 @@ MEMORY ORDER and DOPE VECTOR: in order to describe the memory layout
   Generally speaking, applying recursive loop in memory order should
   increase cache performance of modern CPUs.  Differentiating these
   two orders allows us to dynamically construct fast memory accessing
-  pattern in an algo even if the logical order of an array is fixed at
+  pattern in an plan even if the logical order of an array is fixed at
   compile-time.
 
   A dope vector holds information about memory layout of an array.
