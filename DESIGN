@@ -463,6 +463,18 @@ MEMORY ORDER and DOPE VECTOR: in order to describe the memory layout
 	Lux_dope *head = malloc(rank * sizeof(Lux_dope) + sizeof(Subclass));
 	Subclass *data = (Subclass *)(head + rank);
 
+STRUCT AS TUPLE: like in many other programming languages, a function
+  in C can return at most one variable.  Although it is possible to
+  use structures to imitate tuples, returning a structure is usually
+  consider a bad practice in C.  This is probably due to the idea that
+  copying a large structure is time consuming.  Hence, the
+  conventional wisdom is that a C function should always consume and
+  return pointers to structures, instead of structures themselves.
+  However, in lux, we encourage developers to think at a lower level
+  and not to discard the idea of returning structure.  If fact,
+  returning multiple related variables as a structure can be a good
+  pattern---dlib.h is a good example of it.
+
 ERROR/FAILURE HANDLING: the terms "error" here refers to a recoverable
   and expected runtime error.  It is the type of errors typically
   handled by exceptions in object oriented languages such as C++ and
