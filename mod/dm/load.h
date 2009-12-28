@@ -21,16 +21,17 @@
 #define _LUX_LOAD_H_
 
 #include <lux/basename.h>
-#include <lux/dlib.h>
-#include <lux/dmod.h>
+#include <lux/dlfcn.h>
+#include <lux/dm/dlib.h>
+#include <lux/dm/dmod.h>
 #include <lux/failed.h>
 #include <lux/htab.h>
+#include <stdlib.h> /* for NULL, malloc(), and free() */
 
 #define LOAD_NULL {NULL, HTAB_NULL}
 
 struct load_node {
 	struct htab_node super;
-	void  *hdl;
 	void (*rm)(void *);
 };
 
@@ -58,8 +59,7 @@ vload(struct load *load, const char *restrict name, const void *opts)
 	if(!node)
 		goto cleanup3; /* failure code was set by malloc() */
 
-	node->hdl = l.hdl;
-	node->rm  = m.rm;
+	node->rm = m.rm;
 	hadd(&load->tab, (uintptr_t)m.ins, &node->super);
 	return m.ins;
 
@@ -78,7 +78,7 @@ uload(struct load *load, void *ins)
 	                                                  (uintptr_t)ins);
 	if(node) {
 		struct dmod m = {ins, node->rm};
-		struct dlib l = {node->hdl};
+		struct dlib l = {dlhandle(m.rm ? (void *)m.rm : m.ins)};
 		rmdmod(m);
 		rmdlib(l);
 		free(node);

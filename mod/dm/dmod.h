@@ -20,11 +20,16 @@
 #ifndef _LUX_DMOD_H_
 #define _LUX_DMOD_H_
 
-#include <lux/dlib.h>
-#include <lux/dltry.h>
+#include <lux/dm/dlib.h>
+#include <lux/dm/dltry.h>
 #include <lux/failed.h>
 #include <lux/lazybuf.h>
-#include <string.h> /* for memcpy() and strlen() */
+#if HAVE_STDDEF_H
+#include <stddef.h> /* for NULL and size_t */
+#else
+#include <stdlib.h> /* for NULL and size_t */
+#endif
+#include <string.h> /* for strlen() and memcpy() */
 
 #define DMOD_NULL {NULL, NULL}
 
@@ -69,10 +74,10 @@ mkdmod(struct dlib l, const char *restrict name, const void *opts)
 static inline void
 rmdmod(struct dmod m)
 {
-	if(m.ins && m.rm)
-		m.rm(m.ins);
-	else
+	if(!m.ins)
 		failed = FNOMOD;
+	else if(m.rm)
+		m.rm(m.ins);
 }
 
 #endif /* _LUX_DMOD_H_ */

@@ -17,27 +17,9 @@
  * You should have received a copy of the GNU General Public License
  * along with lux.  If not, see <http://www.gnu.org/licenses/>.
  */
-#include <lux.h>
-#include <lux/failed.h>
-#include <string.h> /* for strerror() */
+#ifndef _LUX_HEAD_H_
+#define _LUX_HEAD_H_
 
-const char *
-strfailure(int f)
-{
-	f &= LUX_FAILURE_MASK;
+#define GET_HEAD(T, P, F) ((T *)((char *)(P) - (size_t)&((T *)0)->F))
 
-	switch(f) {
-	case FNOLIB:
-		return "Invalid library";
-	case FNOSYM:
-		return "Invalid symbol";
-	case F2CONS:
-		return "lux module construction failed";
-	case FNOMOD:
-		return "Invalid module";
-	case FAILED:
-		return "Generic failure";
-	default:
-		return strerror(f);
-	}
-}
+#endif /* _LUX_HEAD_H_ */

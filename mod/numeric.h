@@ -17,27 +17,29 @@
  * You should have received a copy of the GNU General Public License
  * along with lux.  If not, see <http://www.gnu.org/licenses/>.
  */
-#include <lux.h>
-#include <lux/failed.h>
-#include <string.h> /* for strerror() */
+#ifndef _LUX_NUMERIC_H_
+#define _LUX_NUMERIC_H_
 
-const char *
-strfailure(int f)
-{
-	f &= LUX_FAILURE_MASK;
+#if HAVE_STDDEF_H
+#include <stddef.h> /* for size_t and ptrdiff_t */
 
-	switch(f) {
-	case FNOLIB:
-		return "Invalid library";
-	case FNOSYM:
-		return "Invalid symbol";
-	case F2CONS:
-		return "lux module construction failed";
-	case FNOMOD:
-		return "Invalid module";
-	case FAILED:
-		return "Generic failure";
-	default:
-		return strerror(f);
-	}
-}
+typedef size_t    Lux_whole;
+typedef ptrdiff_t Lux_int;
+#else
+typedef unsigned  Lux_whole;
+typedef int       Lux_int;
+#endif
+
+#ifdef LUX_SINGLE
+typedef float  Lux_real;
+#else
+typedef double Lux_real;
+#endif
+
+typedef double Lux_xreal; /* real numbers with possibly extra precision */
+
+typedef struct {Lux_int   n, m;} Lux_rational;
+typedef struct {Lux_real  r, i;} Lux_complex;
+typedef struct {Lux_xreal r, i;} Lux_xcomplex;
+
+#endif /* _LUX_NUMERIC_H_ */
