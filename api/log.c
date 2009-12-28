@@ -21,13 +21,13 @@
 #include <lux/vlog.h>
 #include <stdarg.h> /* for va_list, va_start(), and va_end() */
 
-#define DEF_LOG(L, S) void                                        \
-	lux_##S(const char *restrict fmt, ...)                    \
-	{                                                         \
-		va_list ap;                                       \
-		va_start(ap, fmt);                                \
-		vlog(&libux.vlog, libux.vlog.levels[L], fmt, ap); \
-		va_end(ap);                                       \
+#define DEF_LOG(L, S) void                                      \
+	lux_##S(const char *restrict fmt, ...)                  \
+	{                                                       \
+		va_list ap;                                     \
+		va_start(ap, fmt);                              \
+		vlog(&lux->vlog, lux->vlog.levels[L], fmt, ap); \
+		va_end(ap);                                     \
 	}
 
 DEF_LOG(0, fatal)

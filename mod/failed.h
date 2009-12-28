@@ -24,9 +24,10 @@
 
 #define failed errno
 
-#define FNOMOD (LUX_ELAST+1)
+#define FNOLIB (LUX_ELAST+1)
 #define FNOSYM (LUX_ELAST+2)
 #define F2CONS (LUX_ELAST+3)
+#define FNOMOD (LUX_ELAST+4)
 #define FAILED ((1U<<LUX_FAILURE_BIT) - 1)
 
 extern const char *strfailure(int); /* pseudo "standard" function

@@ -21,103 +21,69 @@
 #define _LUX_LOAD_H_
 
 #include <lux/basename.h>
+#include <lux/dlib.h>
+#include <lux/dmod.h>
 #include <lux/failed.h>
 #include <lux/htab.h>
-#include <lux/lazybuf.h>
-#include <lux/zalloc.h>
-#include <string.h> /* for strcat(), strcpy(), and strlen() */
-#include <dlfcn.h>  /* for dlopen(), dlsym(), and dlclose() */
+
+#define LOAD_NULL {NULL, HTAB_NULL}
 
 struct load_node {
-	struct htab_node *next;
-	void  *ins;
-	void  *mod;
+	struct htab_node super;
+	void  *hdl;
 	void (*rm)(void *);
 };
 
-#define FAILED_TO(s) do {                                          \
-		int f = failed;                                    \
-		lux_debug("vload(\"%s\"): failed to " s " [%s]\n", \
-		          name, strfailure(f));                    \
-		goto cleanup;                                      \
-	} while(0)
+struct load {
+	const  char *paths;
+	struct htab  tab; /* last because of flexible array member */
+};
 
-#define FAILED_AS(f, s) do {                                       \
-		failed = f;                                        \
-		lux_debug("vload(\"%s\"): failed to " s " [%s]\n", \
-		          name, strfailure(f));                    \
-		goto cleanup;                                      \
-	} while(0)
-
-static inline struct load_node *
-vload(const char *restrict name, const void *opts)
+static inline void *
+vload(struct load *load, const char *restrict name, const void *opts)
 {
-	char lazybuf[256], *buf;
-	struct load_node *node = NULL;
-	void *(*mk)(const void *);
+	struct dlib l;
+	struct dmod m;
+	struct load_node *node;
 
-	/* Try to allocate more memory if name is too long: note that
-	   5 == sizeof("luxC") > sizeof(".so")*/
-	buf = (char *)MALLOC(5 + strlen(name));
-	if(!buf)
-		FAILED_TO("allocate string");
+	l = mkdlib(load->paths, name);
+	if(!l.hdl)
+		goto cleanup1; /* failure code was set by mkdlib() */
 
-	/* Try to allocate memory for load node */
-	node = (struct load_node *)zalloc(sizeof(struct load_node));
+	m = mkdmod(l, basename(name), opts);
+	if(!m.ins)
+		goto cleanup2; /* failure code was set by mkdmod() */
+
+	node = (struct load_node *)malloc(sizeof(struct load_node));
 	if(!node)
-		FAILED_TO("allocate loading table node");
+		goto cleanup3; /* failure code was set by malloc() */
 
-	/* Try to load the module */
-	(void)strcat(strcpy(buf, name), ".so");
-	node->mod = dlopen(buf, RTLD_LAZY | RTLD_LOCAL);
-	if(!node->mod)
-		FAILED_AS(FNOMOD, "load module");
+	node->hdl = l.hdl;
+	node->rm  = m.rm;
+	hadd(&load->tab, (uintptr_t)m.ins, &node->super);
+	return m.ins;
 
-	/* Try to get the instance */
-	(void)strcat(strcpy(buf, "luxC"), basename(name));
-	mk = (void *(*)(const void *))dlsym(node->mod, buf);
-	if(mk) {
-		int fsv = failed;
-		buf[3] = 'D';
-		node->rm = (void (*)(void *))dlsym(node->mod, buf);
-		if(!node->rm) {
-			failed = fsv;
-			(void)dlerror();
-		}
-		node->ins = mk(opts);
-		if(!node->ins)
-			FAILED_AS(F2CONS, "construct");
-	} else {
-		buf[3] = 'E';
-		node->ins = dlsym(node->mod, buf);
-		if(!node->ins)
-			FAILED_AS(FNOSYM, "load entry point");
-	}
-
-	FREE(buf);
-	return node;
-
- cleanup:
-	if(node) {
-		if(node->rm && node->ins)
-			node->rm(node->ins);
-		if(node->mod)
-			(void)dlclose(node->mod); /* FIXME: should not clean
-			                             up dlerror() */
-		free(node);
-	}
-	if(buf)
-		FREE(buf);
+ cleanup3:
+	rmdmod(m);
+ cleanup2:
+	rmdlib(l);
+ cleanup1:
 	return NULL;
 }
 
 static inline void
-uload(struct load_node *node)
+uload(struct load *load, void *ins)
 {
-	if(node->rm)
-		node->rm(node->ins);
-	(void)dlclose(node->mod);
-	free(node);
+	struct load_node *node = (struct load_node *)hpop(&load->tab,
+	                                                  (uintptr_t)ins);
+	if(node) {
+		struct dmod m = {ins, node->rm};
+		struct dlib l = {node->hdl};
+		rmdmod(m);
+		rmdlib(l);
+		free(node);
+	} else
+		failed = FNOMOD;
 }
 
 #endif /* _LUX_LOAD_H_ */

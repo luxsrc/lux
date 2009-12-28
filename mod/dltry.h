@@ -17,35 +17,34 @@
  * You should have received a copy of the GNU General Public License
  * along with lux.  If not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef _LUX_MODMAN_H_
-#define _LUX_MODMAN_H_
+#ifndef _LUX_DLTRY_H_
+#define _LUX_DLTRY_H_
 
 #include <lux/failed.h>
-#include <lux/htab.h>
-#include <lux/load.h>
+#include <dlfcn.h> /* for dlerror(), dlopen(), and dlsym() */
 
 static inline void *
-vmkmod(struct htab *ltab, const char *restrict name, const void *opts)
+dltryopen(const char *file, int mode)
 {
-	struct load_node *node = vload(name, opts);
-
-	if(node)
-		hadd(ltab, (uintptr_t)node->ins, (struct htab_node *)node);
-	else
-		failed = FNOMOD;
-
-	return node ? node->ins : node;
+	int   fsv = failed;
+	void *hdl = dlopen(file, mode);
+	if(!hdl) {
+		(void)dlerror(); /* clear error message */
+		failed = fsv;    /* restore previous failure code */
+	}
+	return hdl;
 }
 
-static inline void
-rmmod(struct htab *ltab, void *ins)
+static inline void *
+dltrysym(void *restrict hdl, const char *restrict name)
 {
-	struct load_node *node = (struct load_node *)hpop(ltab, (uintptr_t)ins);
-
-	if(node)
-		uload(node);
-	else
-		failed = FNOMOD;
+	int   fsv = failed;
+	void *sym = dlsym(hdl, name);
+	if(!sym) {
+		(void)dlerror(); /* clear error message */
+		failed = fsv;    /* restore previous failure code */
+	}
+	return sym;
 }
 
-#endif /* _LUX_MODMAN_H_ */
+#endif /* _LUX_DLTRY_H_ */

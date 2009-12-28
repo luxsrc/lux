@@ -20,24 +20,67 @@
 #ifndef _LUX_LIBUX_H_
 #define _LUX_LIBUX_H_
 
-#include <lux/htab.h>
+#include <lux/load.h>
 #include <lux/timer.h>
 #include <lux/vlog.h>
 
+#include <unistd.h> /* for getcwd() and getenv() */
+#include <string.h> /* for strlen()              */
+#include <stdio.h>  /* for sprintf()             */
+#include <stdlib.h> /* for malloc() and free()   */
+
 #if HAVE_TIMESTAMP
-#define LIBUX_NULL {HTAB_NULL, VLOG_NULL, TIMESTAMP_NULL, {NULL}}
+#define LIBUX_NULL {TIMESTAMP_NULL, VLOG_NULL, LOAD_NULL}
 #else
-#define LIBUX_NULL {HTAB_NULL, VLOG_NULL, {NULL}} /* remainder initialized
-                                                     to NULL, c-faq 1.30. */
+#define LIBUX_NULL {VLOG_NULL, LOAD_NULL}
 #endif
 
 struct libux {
-	struct htab ltab;
-	struct vlog vlog;
 #if HAVE_TIMESTAMP
-	timestamp   t0;
+	timestamp t0;
 #endif
-	const char *paths[3];
-}; /* TODO: implement mklibux() and rmlibux() */
+	struct vlog vlog;
+	struct load load;
+};
+
+static inline const char *
+getpaths(void)
+{
+	const char fmt[] = "%s:%s/.lux/lib/lux:" LUX_MOD_PATH;
+
+	char *cwd   = getcwd(NULL, 0);
+	char *home  = getenv("HOME");
+	char *paths = (char *)malloc(strlen(cwd)  +
+	                             strlen(home) +
+	                             sizeof(fmt)  - 4);
+	(void)sprintf(paths, fmt, cwd, home);
+
+	free(cwd);
+	/* no need to free home */
+	return paths;
+}
+
+static inline struct libux *
+mklibux(void)
+{
+	static struct libux libux = LIBUX_NULL;
+
+#if HAVE_TIMESTAMP
+	libux.t0 = gettimestamp();
+#endif
+	libux.load.paths = getpaths();
+
+	return &libux;
+}
+
+static inline void
+rmlibux(struct libux *lux)
+{
+	free((void *)lux->load.paths);
+
+#if HAVE_TIMESTAMP
+	lux_debug("lux ran for %g sec.\n", elapsed_since(lux->t0));
+#endif
+}
 
 #endif /* _LUX_LIBUX_H_ */

@@ -23,6 +23,6 @@
 #include <lux.h>
 #include <lux/libux.h>
 
-extern struct libux libux;
+extern struct libux *lux;
 
 #endif /* _API_H_ */

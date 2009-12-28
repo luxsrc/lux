@@ -18,47 +18,16 @@
  * along with lux.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include "api.h"
-#include <lux/lazybuf.h>
-#include <lux/modman.h>
-#include <string.h> /* for strcat(), strcpy(), and strlen() */
-
-#define COUNT_OF(a) (sizeof(a) / sizeof(a[0]))
-
-static inline size_t
-max(size_t a, size_t b)
-{
-	return a > b ? a : b;
-}
+#include <lux/load.h>
 
 void *
 lux_load(const char *restrict name, const void *opts)
 {
-	size_t i, maxlen;
-
-	char lazybuf[256], *buf;
-
-	void *ins;
-
-	for(i=1, maxlen=strlen(libux.paths[0]); i < COUNT_OF(libux.paths); ++i)
-		maxlen = max(maxlen, strlen(libux.paths[i]));
-
-	/* Try to allocate more memory if name is too long */
-	buf = (char *)MALLOC(maxlen + sizeof("/") + strlen(name));
-	if(!buf)
-		return NULL; /* failure code was set by MALLOC() */
-
-	/* Try to load the module */
-	for(i = 0, ins = NULL; i < COUNT_OF(libux.paths) && !ins; ++i) {
-		(void)strcat(strcat(strcpy(buf, libux.paths[i]), "/"), name);
-		ins = vmkmod(&libux.ltab, buf, opts);
-	}
-
-	FREE(buf);
-	return ins;
+	return vload(&lux->load, name, opts);
 }
 
 void
 lux_unload(void *ins)
 {
-	rmmod(&libux.ltab, ins);
+	uload(&lux->load, ins);
 }
