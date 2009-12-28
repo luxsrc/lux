@@ -22,10 +22,10 @@
 
 #include <lux/atomic.h>
 
-#define CNT_NULL {ATM_NULL}
+#define CNT_NULL {ATOMIC_NULL}
 
 struct cnt {
-	struct atm cnt;
+	atomic cnt;
 };
 
 static inline void

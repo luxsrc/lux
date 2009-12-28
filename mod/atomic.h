@@ -20,34 +20,34 @@
 #ifndef _LUX_ATOMIC_H_
 #define _LUX_ATOMIC_H_
 
-#define ATM_NULL {0}
+#define ATOMIC_NULL {0}
 
-struct atm {
-	int atm; /* it is usually safe to assume int is atomic */
-};
+typedef struct {
+	int v; /* it is usually safe to assume int is atomic */
+} atomic;
 
 static inline void
-atomic_set(struct atm *atm, int v)
+atomic_set(atomic *a, int v)
 {
-	atm->atm = v;
+	a->v = v;
 }
 
 static inline int
-atomic_get(struct atm *atm)
+atomic_get(atomic *a)
 {
-	return atm->atm;
+	return a->v;
 }
 
 static inline int
-atomic_add(struct atm *atm, int v)
+atomic_add(atomic *a, int v)
 {
-	return __sync_add_and_fetch(&atm->atm, v);
+	return __sync_add_and_fetch(&a->v, v);
 }
 
 static inline int
-atomic_sub(struct atm *atm, int v)
+atomic_sub(atomic *a, int v)
 {
-	return __sync_sub_and_fetch(&atm->atm, v);
+	return __sync_sub_and_fetch(&a->v, v);
 }
 
 #endif /* _LUX_ATOMIC_H_ */
