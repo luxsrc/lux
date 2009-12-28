@@ -18,10 +18,10 @@
  * along with lux.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include <lux.h>
-#include <lux/job.h>
 #include <lux/lazybuf.h>
 #include <lux/mangle.h>
 #include <string.h> /* for strlen() and memcpy() */
+#include "../job.h"
 
 void *
 LUXCMOD(const void *opts)
