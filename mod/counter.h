@@ -17,34 +17,37 @@
  * You should have received a copy of the GNU General Public License
  * along with lux.  If not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef _LUX_REFCNT_H_
-#define _LUX_REFCNT_H_
+#ifndef _LUX_COUNTER_H_
+#define _LUX_COUNTER_H_
 
-#include <lux/counter.h>
+#define CNT_NULL {0}
 
-#define REF_NULL {CNT_NULL}
-
-struct ref {
-	struct cnt cnt;
+struct cnt {
+	int cnt; /* it is usually safe to assume int is atomic */
 };
 
 static inline void
-create(struct ref *ref)
+counter_set(struct cnt *cnt, int v)
 {
-	counter_set(&ref->cnt, 1);
+	cnt->cnt = v;
 }
 
-static inline void
-retain(struct ref *ref)
+static inline int
+counter_get(struct cnt *cnt)
 {
-	counter_inc(&ref->cnt);
+	return cnt->cnt;
 }
 
-static inline void
-destroy(struct ref *ref, void (*rm)(struct ref *))
+static inline int
+counter_inc(struct cnt *cnt)
 {
-	if(counter_dec(&ref->cnt) == 0)
-		rm(ref);
+	return __sync_add_and_fetch(&cnt->cnt, 1);
 }
 
-#endif /* _LUX_REFCNT_H_ */
+static inline int
+counter_dec(struct cnt *cnt)
+{
+	return __sync_sub_and_fetch(&cnt->cnt, 1);
+}
+
+#endif /* _LUX_COUNTER_H_ */
