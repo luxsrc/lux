@@ -22,34 +22,34 @@
 
 #include <lux/atomic.h>
 
-#define CNT_NULL {ATOMIC_NULL}
+#define COUNTER_NULL {ATOMIC_NULL}
 
-struct cnt {
-	atomic cnt;
-};
+typedef struct {
+	atomic v;
+} counter;
 
 static inline void
-counter_set(struct cnt *cnt, int v)
+counter_set(counter *c, int v)
 {
-	atomic_set(&cnt->cnt, v);
+	atomic_set(&c->v, v);
 }
 
 static inline int
-counter_get(struct cnt *cnt)
+counter_get(counter *c)
 {
-	return atomic_get(&cnt->cnt);
+	return atomic_get(&c->v);
 }
 
 static inline int
-counter_inc(struct cnt *cnt)
+counter_inc(counter *c)
 {
-	return atomic_add(&cnt->cnt, 1);
+	return atomic_add(&c->v, 1);
 }
 
 static inline int
-counter_dec(struct cnt *cnt)
+counter_dec(counter *c)
 {
-	return atomic_sub(&cnt->cnt, 1);
+	return atomic_sub(&c->v, 1);
 }
 
 #endif /* _LUX_COUNTER_H_ */

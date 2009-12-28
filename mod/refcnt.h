@@ -22,10 +22,10 @@
 
 #include <lux/counter.h>
 
-#define REF_NULL {CNT_NULL}
+#define REF_NULL {COUNTER_NULL}
 
 struct ref {
-	struct cnt cnt;
+	counter cnt;
 };
 
 static inline void
