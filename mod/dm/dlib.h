@@ -20,7 +20,7 @@
 #ifndef _LUX_DLIB_H_
 #define _LUX_DLIB_H_
 
-#include <lux/dltry.h>
+#include <lux/dm/dltry.h>
 #include <lux/failed.h>
 #include <lux/lazybuf.h>
 #include <string.h> /* for memcpy(), strchr(), and strlen() */

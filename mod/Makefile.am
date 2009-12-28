@@ -1,5 +1,5 @@
 pkginclude_HEADERS  = assert.h failed.h
-SUBDIRS             = ap
+SUBDIRS             = ap dm
 
 # Convenience static modules (typically for renaming stuffs)
 pkginclude_HEADERS += shorthand.h switch.h
@@ -11,10 +11,10 @@ pkginclude_HEADERS += basename.h hash.h match.h
 pkginclude_HEADERS += timer.h
 
 # Resource allocator (allocate other resource that need to be freed)
-pkginclude_HEADERS += dltry.h lazybuf.h load.h zalloc.h
+pkginclude_HEADERS += lazybuf.h zalloc.h
 
 # Hybrid modules (dynamically allocate their own resources)
-pkginclude_HEADERS += dlib.h dmod.h dope.h htab.h libux.h vlog.h
+pkginclude_HEADERS += dope.h htab.h libux.h vlog.h
 
 # Interfaces and implementations of dynamic modules
 pkginclude_HEADERS += job.h

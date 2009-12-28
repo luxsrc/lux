@@ -20,7 +20,7 @@
 #ifndef _LUX_LIBUX_H_
 #define _LUX_LIBUX_H_
 
-#include <lux/load.h>
+#include <lux/dm/load.h>
 #include <lux/timer.h>
 #include <lux/vlog.h>
 

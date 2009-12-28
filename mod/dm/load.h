@@ -21,8 +21,8 @@
 #define _LUX_LOAD_H_
 
 #include <lux/basename.h>
-#include <lux/dlib.h>
-#include <lux/dmod.h>
+#include <lux/dm/dlib.h>
+#include <lux/dm/dmod.h>
 #include <lux/failed.h>
 #include <lux/htab.h>
 
