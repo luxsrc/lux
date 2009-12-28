@@ -1,4 +1,4 @@
-pkginclude_HEADERS  = assert.h failed.h
+pkginclude_HEADERS  = assert.h dlfcn.h failed.h
 SUBDIRS             = ap dm
 
 # Convenience static modules (typically for renaming stuffs)
