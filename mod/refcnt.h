@@ -25,7 +25,7 @@
 #define REF_NULL {COUNTER_NULL}
 
 struct ref {
-	counter cnt;
+	struct counter cnt;
 };
 
 static inline void

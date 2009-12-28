@@ -24,30 +24,30 @@
 
 #define COUNTER_NULL {ATOMIC_NULL}
 
-typedef struct {
+struct counter {
 	atomic v;
-} counter;
+};
 
 static inline void
-counter_set(counter *c, int v)
+counter_set(struct counter *c, int v)
 {
 	atomic_set(&c->v, v);
 }
 
 static inline int
-counter_get(counter *c)
+counter_get(struct counter *c)
 {
 	return atomic_get(&c->v);
 }
 
 static inline int
-counter_inc(counter *c)
+counter_inc(struct counter *c)
 {
 	return atomic_add(&c->v, 1);
 }
 
 static inline int
-counter_dec(counter *c)
+counter_dec(struct counter *c)
 {
 	return atomic_sub(&c->v, 1);
 }
