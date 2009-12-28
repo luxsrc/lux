@@ -24,8 +24,8 @@
 const char *
 strfailure(int f)
 {
-	f &= FAILED; /* apply failure code mask---see defintion of
-	                FAILED in <lux/failed.h> */
+	f &= LUX_FAILURE_MASK;
+
 	switch(f) {
 	case FNOLIB:
 		return "Invalid library";

@@ -22,13 +22,15 @@
 
 #include <errno.h> /* for errno */
 
+#define LUX_FAILURE_MASK ((1U << LUX_FAILURE_BIT) - 1)
+
 #define failed errno
 
 #define FNOLIB (LUX_ELAST+1)
 #define FNOSYM (LUX_ELAST+2)
 #define F2CONS (LUX_ELAST+3)
 #define FNOMOD (LUX_ELAST+4)
-#define FAILED ((1U<<LUX_FAILURE_BIT) - 1)
+#define FAILED LUX_FAILURE_MASK
 
 extern const char *strfailure(int); /* pseudo "standard" function
                                        provided by "sys/string.c" */
