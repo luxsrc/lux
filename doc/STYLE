@@ -22,6 +22,11 @@ NAMES: keep them consistent and short.  Shorter than you think.  The
 
     fsv: a saved failure code for future restoration
 
+  In lux, a static module usually just defines one single structure.
+  In such a case, its file and structure name should be consistent.
+  For example, the "dlib" static module defines "struct dlib".  It is
+  located at "mod/dm/dlib.h" and can be included as <lux/dm/dlib.h>.
+
   If a name is used often and must have the form foo_bar to avoid
   namespace pollution, #define BAR foo_bar and use the short name.
 
