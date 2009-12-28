@@ -23,7 +23,7 @@
 #define REF_NULL {0}
 
 struct ref {
-	int cnt; /* assume int is atomic */
+	int cnt; /* it is usually safe to assume int is atomic */
 };
 
 static inline void
@@ -41,13 +41,13 @@ refcnt_get(struct ref *ref)
 static inline int
 refcnt_inc(struct ref *ref)
 {
-	return ++ref->cnt;
+	return __sync_add_and_fetch(&ref->cnt, 1);
 }
 
 static inline int
 refcnt_dec(struct ref *ref)
 {
-	return --ref->cnt;
+	return __sync_sub_and_fetch(&ref->cnt, 1);
 }
 
 #endif /* _LUX_REFCNT_H_ */
