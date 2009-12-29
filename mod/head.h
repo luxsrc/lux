@@ -21,5 +21,6 @@
 #define _LUX_HEAD_H_
 
 #define GET_HEAD(T, P, F) ((T *)((char *)(P) - (size_t)&((T *)0)->F))
+#define GET_COUNT(T, P) (GET_HEAD(T, P, v)->n)
 
 #endif /* _LUX_HEAD_H_ */

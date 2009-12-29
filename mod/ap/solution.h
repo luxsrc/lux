@@ -22,9 +22,8 @@
 
 #include <lux/ap/task.h>
 
-/* Forward declarations */
-typedef struct LuxSsolution  Lux_solution;
-typedef struct LuxSsolutions Lux_solutions;
+/* Forward declaration */
+typedef struct LuxSsolution Lux_solution;
 
 struct LuxSsolution {
  	Lux_task *super;
@@ -38,7 +37,10 @@ struct LuxSsolution {
 	double mcost; /* measured  computation cost in ticks */
 };
 
-struct LuxSsolutions {
+/* Counted array */
+typedef Lux_solution *Lux_solutions;
+
+struct LuxHsolutions {
 	unsigned n;
 	Lux_solution v[1];
 };
