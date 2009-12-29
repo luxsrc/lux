@@ -17,8 +17,8 @@
  * You should have received a copy of the GNU General Public License
  * along with lux.  If not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef _LUX_ALNUMCAT_H_
-#define _LUX_ALNUMCAT_H_
+#ifndef _LUX_STRUTILS_H_
+#define _LUX_STRUTILS_H_
 
 #include <ctype.h>
 #include <string.h>
@@ -32,4 +32,32 @@ alnumcat(char *d, const char *s)
 	return d;
 }
 
-#endif /* _LUX_ALNUMCAT_H_ */
+static inline const char *
+basename(const char *s)
+{
+	const char *h = s;
+	while(*h)
+		if('/' == *h++)
+			s = h;
+	return s;
+}
+
+static inline const char *
+match(const char *sym, const char *arg)
+{
+	size_t i;
+
+	const size_t l = strlen(sym);
+	const size_t n = strlen(arg);
+
+	if(l + 1 > n || '=' != arg[l])
+		return NULL;
+
+	for(i = 0; i < l; ++i)
+		if(sym[i] != arg[i])
+			return NULL;
+
+	return arg + l + 1;
+}
+
+#endif /* _LUX_STRUTILS_H_ */
