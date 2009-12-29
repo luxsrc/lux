@@ -18,6 +18,7 @@
  * along with lux.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include <lux.h>
+#include <lux/cookie.h>
 
 #if HAVE_FOPENCOOKIE
 /* Use the system fopencookie(); implement nothing */

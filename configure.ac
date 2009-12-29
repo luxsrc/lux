@@ -175,47 +175,6 @@ AH_BOTTOM([/*===================================================================
 #endif
 
 /*===========================================================================*/
-/* Declare fopencookie() and related types */
-
-#include <stdio.h> /* for ssize_t, size_t, and FILE; always included */
-
-#if !HAVE_FOPENCOOKIE && HAVE_FUNOPEN
-
-# if HAVE_OFF64_T
-#  if HAVE_SYS_TYPES_H
-#   include <sys/types.h> /* for off64_t */
-#  elif HAVE_UNISTD_H
-#   include <unistd.h> /* for off64_t */
-#  else
-#   error neither <sys/types.h> nor <unistd.h> are found;
-#   error please report definition of off64_t to <ckchan@cfa.harvard.edu>
-#  endif
-# else
-#  if HAVE_STDINT_H
-#   include <stdint.h> /* for int64_t */
-    typedef int64_t off64_t;
-#  else
-    typedef long long off64_t; /* long long is at least 64 bits in size */
-#  endif
-# endif
-
-typedef ssize_t (cookie_read_function_t )(void *,       char *, size_t);
-typedef ssize_t (cookie_write_function_t)(void *, const char *, size_t);
-typedef int     (cookie_seek_function_t )(void *,    off64_t *, int);
-typedef int     (cookie_close_function_t)(void *);
-
-typedef struct {
-	cookie_read_function_t  *read;
-	cookie_write_function_t *write;
-	cookie_seek_function_t  *seek;
-	cookie_close_function_t *close;
-} cookie_io_functions_t;
-
-FILE *fopencookie(void *, const char *, cookie_io_functions_t);
-
-#endif
-
-/*===========================================================================*/
 /* Public API */
 
 extern void lux_setup(void);
