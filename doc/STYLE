@@ -16,25 +16,34 @@ NAMES: keep them consistent and short.  Shorter than you think.  The
 
   Common names:
 
-    LUXCMOD: module constructor
-    LUXDMOD: module destructor
-    LUXEMOD: module entry point
+    LUX_MK<MOD>: module constructor
+    LUX_RM<MOD>: module destructor
+    LUX_<MOD>:   module entry point
 
     fsv: a saved failure code for future restoration
 
-  In lux, a static module usually just defines one single structure.
-  In such a case, its file and structure name should be consistent.
+  In lux, a static module usually just defines one single structure or
+  type.  If a structure is very low-level and should be seen as a lux
+  built-in type, it should be typedef, e.g.,
+
+    typedef struct { int v; } atomic;
+
+  otherwise, it should explicitly remain a C struct, e.g.,
+
+    struct ref { counter cnt; };
+
+  In both cases, their file and structure names should be consistent.
   For example, the "dlib" static module defines "struct dlib".  It is
   located at "mod/dm/dlib.h" and can be included as <lux/dm/dlib.h>.
-
   For these small modules, the constructor, destructor, retainer
   (increase reference counter if refcnt is used), and deep copier
   should be named with the prefixes "mk", "rm", "ln", and "cp",
-  inspired by the standard Unix file system commands.  They can be
-  seen as the managing functions for the module and *owned* by the
-  parent scope.  For operators that are owned by the module itself,
-  they should be named as "mod_opt".  Examples include atomic_add()
-  and atomic_sub() in the <lux/atomic.h> module.
+  respectively, inspired by the standard Unix file system commands.
+  They can be seen as the "managing functions" for the module and
+  *owned* by the parent scope.  For operators that are owned by the
+  module itself, they should be named as "mod_opt", inspired by
+  methods `mod->opt()` in C++.  Examples include atomic_add() and
+  atomic_sub() in the <lux/atomic.h> module.
 
   If a name is used often and must have the form foo_bar to avoid
   namespace pollution, #define BAR foo_bar and use the short name.

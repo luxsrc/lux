@@ -20,15 +20,23 @@
 #ifndef _LUX_MANGLE_H_
 #define _LUX_MANGLE_H_
 
+#ifndef LUX_MOD_NAME
+#error LUX_MOD_NAME is not defined
+#endif
+
 /* Macros for token transformation */
 #define LUX_STR1NG(s) #s
 #define LUX_STRING(s) LUX_STR1NG(s)
 #define LUX_C0NCAT(s, t) s ## t
 #define LUX_CONCAT(s, t) LUX_C0NCAT(s, t)
 
+/* Function prototypes */
+extern void *LUX_MKMOD(const void *);
+extern void  LUX_RMMOD(void *);
+
 /* Name mangling by passing a cpp-flag "-DLUX_MOD_NAME=name" */
-#define LUXCMOD LUX_CONCAT(luxC, LUX_MOD_NAME) /* constructor */
-#define LUXDMOD LUX_CONCAT(luxD, LUX_MOD_NAME) /* destructor  */
-#define LUXEMOD LUX_CONCAT(luxE, LUX_MOD_NAME) /* entry-point */
+#define LUX_MKMOD LUX_CONCAT(luxC, LUX_MOD_NAME) /* constructor */
+#define LUX_RMMOD LUX_CONCAT(luxD, LUX_MOD_NAME) /* destructor  */
+#define LUX_MOD   LUX_CONCAT(luxE, LUX_MOD_NAME) /* entry-point */
 
 #endif /* _LUX_MANGLE_H_ */

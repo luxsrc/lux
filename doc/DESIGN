@@ -3,10 +3,11 @@ Everything in lux is implemented as a module.  The lux core library,
 libux, provides basic functions to access modules/plug-ins and to
 construct, configure, and run scientific computation jobs.
 
-INTERFACE: a lux interface Lux_MOD is simply a function type or a
-  structure of function pointers that provides a type-safe way to
-  access features in a lux module.  For example, a random number
-  generator may have the following interface:
+INTERFACE: let us use <MOD> to denote a generic module name.  A lux
+  interface Lux_<MOD> is simply a function type or a structure of
+  function pointers that provides a type-safe way to access features
+  in a lux module.  For example, a random number generator may have
+  the following interface:
 
 	typedef int (Lux_rand)(void); /* Lux_rand is not a pointer type */
 
@@ -29,29 +30,29 @@ INTERFACE: a lux interface Lux_MOD is simply a function type or a
 	int r = rg();
 	io->load(sim, name);
 
-  The lux interface Lux_MOD is defined in a header file MOD.h, which
-  is placed in mod/ in the lux source tree, and is installed to
-  $prefix/include/lux.
+  The lux interface Lux_<MOD> is defined in a header file "<MOD>.h",
+  which is placed in "mod/" in the lux source tree, and is installed
+  to "$prefix/include/lux".
 
-DYNAMIC MODULE: a standard lux module MOD is an entry constructor in a
-  dynamically loadable library
+DYNAMIC MODULE: a standard lux module <MOD> is an entry constructor in
+  a dynamically loadable library
 
-	void *luxCMOD(const void *);
+	void *LUX_MK<MOD>(const void *);
 
   or, for one that does not require initialization, it is an "entry
   symbol"
 
-	Lux_MOD luxEMOD;
+	Lux_<MOD> LUX_<MOD>;
 
   which may be an exported function (e.g., of type Lux_rand in the
   previous section) or an exported structure (e.g., of type Lux_io)
   that provides the module interface.  When lux_load() access a
-  module, it calls luxCMOD() to construct the interface or returns
-  luxEMOD directly.  luxCMOD() may take care additional resource
+  module, it calls LUX_MK<MOD>() to construct the interface or returns
+  LUX_<MOD> directly.  LUX_MK<MOD>() may take care additional resource
   allocations.  In such a case, the lux module must implement a
   destructor:
 
-	void luxDMOD(Lux_MOD *);
+	void LUX_RM<MOD>(Lux_<MOD> *);
 
   to release the allocated resource.  Note that chain-loading, i.e.,
   using
@@ -73,15 +74,15 @@ DYNAMIC MODULE: a standard lux module MOD is an entry constructor in a
   class.  We will discuss this pattern with more details in section
   "OBJECTS, CLASSES, and METACLASSES".
 
-  A lux module MOD is implemented in mod/ in the lux source tree, and
-  is installed to $prefix/lib/lux.  In order to access dynamic
+  A lux module <MOD> is implemented in mod/ in the lux source tree,
+  and is installed to $prefix/lib/lux.  In order to access dynamic
   modules, libux requires an external dynamic linker, which may make
   symbols from loaded modules globally accessible.  Therefore, module
   developers may want to put all the source code into a single file
-  and define all private functions as static functions.  luxCMOD() or
-  luxEMOD can then interface all of these static functions.  This is
-  an ultimate way to avoid symbol conflicts because luxCMOD and
-  luxDMOD, or luxEMOD, are the only exported symbols.
+  and define all private functions as static functions.  LUX_MK<MOD>()
+  or LUX_<MOD> can then interface all of these static functions.  This
+  is an ultimate way to avoid symbol conflicts because LUX_MK<MOD> and
+  LUX_RM<MOD>, or LUX_<MOD>, are the only exported symbols.
 
   For flexibility, we allow multiple entry points to a dynamically
   loadable library.  These additional entry points can be considered
@@ -105,9 +106,9 @@ STATIC MODULE, RESOURCE ALLOCATOR, HYBRID MODULE, ETC: it is sometimes
   In some user cases, additional manipulations are needed after
   resources allocations.  Static modules that implement these
   manipulations are called resource allocators.  They usually do not
-  have delocators.  Conversely, if a mkSTRUCT()/rmSTRUCT() pair is
-  implemented for a corresponding data structure STRUCT, then we refer
-  such a module as a hybrid module.  Just like static modules,
+  have delocators.  Conversely, if a mk<STRUCT>()/rm<STRUCT>() pair is
+  implemented for a corresponding data structure <STRUCT>, then we
+  refer such a module as a hybrid module.  Just like static modules,
   resource allocators and hybrid modules are lightweight and are
   implemented entirely in single header files; unlike static modules,
   however, hybrid modules require both constructors and destructors to
@@ -158,8 +159,8 @@ OBJECTS, CLASSES, and METACLASSES: a lux interface together with an
   programming languages such as C++.  As described above, loading a
   lux module is like creating an object.  For example, calling
 
-	Lux_MOD *MOD = lux_load(scope, "MOD", opts);
-	MOD->func(MOD, para);
+	Lux_<MOD> *<MOD> = lux_load(scope, "<MOD>", opts);
+	<MOD>->func(<MOD>, para);
 
   has more-or-less the same effect as
 
@@ -170,9 +171,9 @@ OBJECTS, CLASSES, and METACLASSES: a lux interface together with an
   wasteful, especially for heavy interfaces.  This is because all
   instances in
 
-	Lux_MOD *ins1 = lux_load(scope, "MOD", opts);
-	Lux_MOD *ins2 = lux_load(scope, "MOD", opts);
-	Lux_MOD *ins3 = lux_load(scope, "MOD", opts);
+	Lux_<MOD> *ins1 = lux_load(scope, "<MOD>", opts);
+	Lux_<MOD> *ins2 = lux_load(scope, "<MOD>", opts);
+	Lux_<MOD> *ins3 = lux_load(scope, "<MOD>", opts);
 	...
 
   contain the same list of function pointers.  To overcome this, we
@@ -180,22 +181,22 @@ OBJECTS, CLASSES, and METACLASSES: a lux interface together with an
   function pointers and shared information about the module into a
   "virtual function table" vtab:
 
-	typedef struct LuxSMOD Lux_MOD;
+	typedef struct LuxS<MOD> Lux_<MOD>;
 
 	struct vtab { /* allocated only once by lux_load() */
 		const char *name;
-		double (*f)(Lux_MOD *, ...);
+		double (*f)(Lux_<MOD> *, ...);
 		...
 	};
 
-	struct LuxSMOD {
+	struct LuxS<MOD> {
 		const struct vtab *vtab;
 		double x;
 		...
 	};
 
   In the above example, vtab behaves like a metaclass.  The original
-  lux interface Lux_MOD becomes a class, and its instances are
+  lux interface Lux_<MOD> becomes a class, and its instances are
   objects.  Indeed, because the programmers know the relationship
   between objects, classes, and metaclass, there is no need to store
   the metaclass with the object.  That way, we can remove one layer of
@@ -213,11 +214,11 @@ OBJECTS, CLASSES, and METACLASSES: a lux interface together with an
 		...
 		double (*f)(Lux_obj *, double);
 		...
-	} Lux_MOD;
+	} Lux_<MOD>;
 
-	Lux_MOD *cls  = lux_load(scope, "MOD", opts);
-	Lux_obj *ins1 = MOD->mkobj();
-	Lux_obj *ins2 = MOD->mkobj();
+	Lux_<MOD> *cls  = lux_load(scope, "<MOD>", opts);
+	Lux_obj   *ins1 = <MOD>->mkobj();
+	Lux_obj   *ins2 = <MOD>->mkobj();
 	...
 
 	cls->f(ins1, para);

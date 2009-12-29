@@ -24,7 +24,7 @@
 #include "../job.h"
 
 void *
-LUXCMOD(const void *opts)
+LUX_MKMOD(const void *opts)
 {
 	if(((const char *)opts)[0] == '/') /* using absolute path */
 		return lux_load(opts, NULL);
@@ -46,7 +46,7 @@ LUXCMOD(const void *opts)
 }
 
 void
-LUXDMOD(Lux_job *sim)
+LUX_RMMOD(void *ego)
 {
-	lux_unload(sim);
+	lux_unload(ego);
 }
