@@ -17,12 +17,24 @@
  * You should have received a copy of the GNU General Public License
  * along with lux.  If not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef _LUX_DLFCN_H_
-#define _LUX_DLFCN_H_
+#include <lux.h>
 
-#include <dlfcn.h>
+#define  _GNU_SOURCE /* to obtain dladdr() from <lux/dlfcn.h> */
+#include <lux/dlfcn.h>
+#undef   _GNU_SOURCE
 
-extern const char *dlfname (void *);
-extern       void *dlhandle(void *);
+#if HAVE_STDDEF_H
+#include <stddef.h> /* for NULL */
+#else
+#include <stdlib.h> /* for NULL */
+#endif
 
-#endif /* _LUX_DLFCN_H_ */
+const char *
+dlfname(void *s)
+{
+	Dl_info info;
+	if(dladdr(s, &info))
+		return info.dli_fname;
+	else
+		return NULL;
+}
