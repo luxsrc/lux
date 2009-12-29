@@ -22,7 +22,7 @@
 
 #include <lux/ap/task.h>
 
-/* Forward declarations */
+/* Forward declaration */
 typedef struct LuxSsolution Lux_solution;
 
 struct LuxSsolution {

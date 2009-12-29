@@ -17,16 +17,10 @@
  * You should have received a copy of the GNU General Public License
  * along with lux.  If not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef _LUX_TASK_H_
-#define _LUX_TASK_H_
+#ifndef _LUX_PLAN_H_
+#define _LUX_PLAN_H_
 
-/* Forward declaration */
-typedef struct LuxStask Lux_task;
+/* Forward declaration only: problem specific interface */
+typedef struct LuxSplan Lux_plan;
 
-struct LuxStask {
-	void (*exec)(Lux_task *); /* because problem and algo are problem
-	                             specific, the implementation of exec()
-	                             here is also problem specific. */
-};
-
-#endif /* _LUX_TASK_H_ */
+#endif /* _LUX_PLAN_H_ */

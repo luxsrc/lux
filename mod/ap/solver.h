@@ -20,10 +20,11 @@
 #ifndef _LUX_SOLVER_H_
 #define _LUX_SOLVER_H_
 
-/* Forward declarations */
-typedef struct LuxSproblem  Lux_problem; /* problem specific interface */
-typedef struct LuxSsolution Lux_solution;
-typedef struct LuxSsolver   Lux_solver;
+#include <lux/ap/problem.h>
+#include <lux/ap/solution.h>
+
+/* Forward declaration */
+typedef struct LuxSsolver Lux_solver;
 
 struct LuxSsolver {
 	/* A Lux_solver can solve a particular Lux_problem and return

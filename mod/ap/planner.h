@@ -20,6 +20,9 @@
 #ifndef _LUX_PLANNER_H_
 #define _LUX_PLANNER_H_
 
+#include <lux/ap/problem.h>
+#include <lux/ap/task.h>
+
 #define LUX_PLAN_DEFAULT    LUX_PLAN_MEASURE
 
 #define LUX_PLAN_ESTIMATE   0U
@@ -27,10 +30,8 @@
 #define LUX_PLAN_PATIENT    2U
 #define LUX_PLAN_EXHAUSTIVE 3U
 
-/* Forward declarations */
+/* Forward declaration */
 typedef struct LuxSplanner Lux_planner;
-typedef struct LuxSproblem Lux_problem; /* problem specific interface */
-typedef struct LuxStask    Lux_task;
 
 struct LuxSplanner {
         /* A Lux_planner can plan for a particular Lux_problem and
