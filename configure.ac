@@ -141,12 +141,12 @@ AH_BOTTOM([/*===================================================================
 extern void lux_setup(void);
 extern void lux_abort(void);
 
-extern void lux_fatal(const char *restrict, ...);
-extern void lux_error(const char *restrict, ...);
-extern void lux_print(const char *restrict, ...);
-extern void lux_debug(const char *restrict, ...);
+extern void lux_fatal(const void *, ...);
+extern void lux_error(const void *, ...);
+extern void lux_print(const void *, ...);
+extern void lux_debug(const void *, ...);
 
-extern void *lux_load(void *, const char *restrict, const void *restrict);
+extern void *lux_load(const void *, ...);
 extern void  lux_unload(void *);
 
 /*===========================================================================*/

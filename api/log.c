@@ -22,7 +22,7 @@
 #include <stdarg.h> /* for va_list, va_start(), and va_end() */
 
 #define DEF_LOG(L, S) void                                      \
-	lux_##S(const char *restrict fmt, ...)                  \
+	lux_##S(const void *fmt, ...)                           \
 	{                                                       \
 		va_list ap;                                     \
 		va_start(ap, fmt);                              \
