@@ -27,7 +27,7 @@ void *
 LUXCMOD(const void *opts)
 {
 	if(((const char *)opts)[0] == '/') /* using absolute path */
-		return lux_load(opts, NULL);
+		return lux_load(NULL, opts, NULL);
 	else {
 		void *sim;
 
@@ -38,8 +38,9 @@ LUXCMOD(const void *opts)
 			return NULL; /* no need to FREE(buf);
 			                failure code was set by REALLOC() */
 		(void)memcpy(buf + sizeof("sim/") - 1, opts, len + 1);
-		sim = lux_load(buf, NULL); /* chain-loading works because of
-		                              htab's array-of-stacks design */
+		sim = lux_load(NULL, buf, NULL); /* chain-loading works because
+		                                    of htab's array-of-stacks
+		                                    design */
 		FREE(buf);
 		return sim;
 	}

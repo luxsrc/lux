@@ -56,7 +56,7 @@ main(int argc, char *argv[])
 		FLAG("--version")
 			return version();
 		CASE(!sim) /* try loading arg as a sim */
-			sim = (Lux_job *)lux_load("sim", arg);
+			sim = (Lux_job *)lux_load(NULL, "sim", arg);
 			if(sim) /* TODO: parse stdin; interactive mode? */
 				lux_print("\n%s\n",
 				          sim->banner ? sim->banner : banner);
