@@ -23,4 +23,21 @@
 /* Forward declaration only: problem specific interface */
 typedef struct LuxSproblem Lux_problem;
 
+/* A Lux_problem should contain at least `xstate` and `params`, which
+   are external input states such as array size that affect the
+   performance and input parameters such as time step that do not
+   affect the performance.  For example, for FFT, we may define
+
+struct LuxSproblem {
+	// xstate
+	Lux_dope *in;
+	Lux_dope *out;
+	// params
+	Lux_real scale;
+	// optional memory addresses
+	const Lux_real *restrict ro; // input
+	      Lux_real *restrict rw; // buffer
+	      Lux_real *restrict wo; // output
+}; */
+
 #endif /* _LUX_PROBLEM_H_ */

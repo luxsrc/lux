@@ -28,7 +28,7 @@ typedef struct LuxSsolver Lux_solver;
 
 struct LuxSsolver {
 	/* A Lux_solver can solve a particular Lux_problem and return
-	   an array of Lux_solution's */
+	   an array of Lux_solutions */
 	Lux_solution **(*solve)(Lux_solver *, Lux_problem *);
 };
 

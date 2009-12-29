@@ -23,4 +23,21 @@
 /* Forward declaration only: problem specific interface */
 typedef struct LuxSplan Lux_plan;
 
+/* A Lux_plan should contain everything, expect the actual pointer to
+   memory, for performing an algorithm.  These include the `driver,
+   `istate`, and `xstate`, for a driver function or the actual
+   algorithm, internal derived state, and external input state,
+   respectively.  For example, for FFT, we may define
+
+struct LuxSplan {
+	// driver
+	int (*apply)(Lux_plan *,
+	             const Lux_real *ro, Lux_real *rw, Lux_real *wo);
+	// istate
+	Lux_mpi *mpi;
+	// xstate
+	Lux_dope *in;
+	Lux_dope *out;
+}; */
+
 #endif /* _LUX_PLAN_H_ */

@@ -308,18 +308,18 @@ OPTIMIZATION: according to the README.hacks file in the fftw2 library,
   At the lowest level, a runtime-optimized algorithm can be executed
   by the following function call in C:
 
-	selected_driver(istate, xstate, paras, ro, rw, wo);
+	selected_driver(istate, xstate, params, ro, rw, wo);
 
   where `selected_driver` is a pointer to a driver function or to the
   actual algorithm; `istate` and `xstate` are internal (derived) and
   external (input) states, respectively, which hold anything needed by
   the algorithm that would affect the performance (e.g., array stride,
-  twiddle factors for FFT, pointers to codelets); `paras` are input
+  twiddle factors for FFT, pointers to codelets); `params` are input
   parameters that would not affect performance (e.g., alpha in BLAS);
   and `ro`, `rw`, and `wo` are pointers to the read-only, read-write,
   and write-only storage data structures for input and/or output.
 
-  In principle, we can pack istate, xstate, paras, in, and out into a
+  In principle, we can pack istate, xstate, params, in, and out into a
   single structure.  We call this a "task" in lux,
 
 	typedef struct LuxStask Lux_task;
@@ -327,7 +327,7 @@ OPTIMIZATION: according to the README.hacks file in the fftw2 library,
 		void (*exec)(Lux_task *);
 		struct { ... } istate;
 		struct { ... } xstate;
-		struct { ... } paras;
+		struct { ... } params;
 		Lux_data *ro, *rw, *wo;
 	};
 
@@ -368,13 +368,13 @@ OPTIMIZATION: according to the README.hacks file in the fftw2 library,
   need to store, and the solver and planner modules need to deliver,
   at least the following information:
 
-    problem:                  xstate, paras, ro, rw, wo (prob. spec. interface)
-    plan:     driver, istate, xstate                    (prob. spec. interface)
-    task:     driver, istate, xstate, paras, ro, rw, wo
-    solution: driver, istate, xstate, paras, ro, rw, wo, opcnt, ecost, mcost
+    problem:                  xstate, params, ro, rw, wo (problem specific)
+    plan:     driver, istate, xstate                     (problem specific)
+    task:     driver, istate, xstate, params, ro, rw, wo
+    solution: driver, istate, xstate, params, ro, rw, wo, opcnt, ecost, mcost
 
-    solver:   driver, istate, xstate,                    opcnt, ecost
-    planner:  solver[],                                                mcost
+    solver:   driver, istate, xstate,                     opcnt, ecost
+    planner:  solver[],                                                 mcost
 
   In the above table, opcnt stands for floating-operation count, ecost
   stands for the estimated computation cost, and mcost stands for the

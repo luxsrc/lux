@@ -24,9 +24,9 @@
 typedef struct LuxStask Lux_task;
 
 struct LuxStask {
-	void (*exec)(Lux_task *); /* because problem and algo are problem
-	                             specific, the implementation of exec()
-	                             here is also problem specific. */
+	/* Because problem and algo are problem specific, the implementation
+	   of exec() below is also problem specific.  */
+	void (*exec)(Lux_task *);
 };
 
 #endif /* _LUX_TASK_H_ */
