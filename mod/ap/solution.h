@@ -23,7 +23,8 @@
 #include <lux/ap/task.h>
 
 /* Forward declaration */
-typedef struct LuxSsolution Lux_solution;
+typedef struct LuxSsolution  Lux_solution;
+typedef        Lux_solution *Lux_solutions; /* a <lux/vector.h> */
 
 struct LuxSsolution {
  	Lux_task *super;
@@ -35,14 +36,6 @@ struct LuxSsolution {
 	} opcnt;      /* floating-point operation counts     */
 	double ecost; /* estimated computation cost in ticks */
 	double mcost; /* measured  computation cost in ticks */
-};
-
-/* Counted array */
-typedef Lux_solution *Lux_solutions;
-
-struct LuxHsolutions {
-	unsigned n;
-	Lux_solution v[1];
 };
 
 #endif /* _LUX_SOLUTION_H_ */
