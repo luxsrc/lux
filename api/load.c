@@ -21,11 +21,11 @@
 #include <lux/dm/load.h>
 
 void *
-lux_load(void *repo, const char *restrict name, const void *restrict opts)
+lux_load(void *scope, const char *restrict name, const void *restrict opts)
 {
 	return vload(&lux->load, name, opts);
 
-	(void)repo; /* silence unused variable warning */
+	(void)scope; /* silence unused variable warning */
 }
 
 void

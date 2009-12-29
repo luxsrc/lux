@@ -21,8 +21,8 @@ INTERFACE: a lux interface Lux_MOD is simply a function type or a
   This approach allows more than one implementation of the same
   interface.  A user can choose any implementation at run time:
 
-	Lux_rand *rg = lux_load(repo, "rand", "nr"); /* numerical recipes */
-	Lux_io   *io = lux_load(repo, "io",   ext);  /* ext can be "hdf5" */
+	Lux_rand *rg = lux_load(scope, "rand", "nr"); /* numerical recipes */
+	Lux_io   *io = lux_load(scope, "io",   ext);  /* ext can be "hdf5" */
 
   and the following function calls should work properly:
 
@@ -56,7 +56,7 @@ DYNAMIC MODULE: a standard lux module MOD is an entry constructor in a
   to release the allocated resource.  Note that chain-loading, i.e.,
   using
 
-	return lux_load(repo, another_mod, more_options);
+	return lux_load(scope, another_mod, more_options);
 
   in a constructor is allowed.  It works as expected because of the
   last-in-first-out nature of the stack used in the hash table.
@@ -90,8 +90,8 @@ DYNAMIC MODULE: a standard lux module MOD is an entry constructor in a
   configuration options, it is possible to pack the options into a
   dynamic module so that
 
-	Lux_mod_opts *opts = lux_load(repo, "mod/opts", argv);
-	Lux_mod      *mod  = lux_load(repo, "mod",      opts);
+	Lux_mod_opts *opts = lux_load(scope, "mod/opts", argv);
+	Lux_mod      *mod  = lux_load(scope, "mod",      opts);
 
 STATIC MODULE, RESOURCE ALLOCATOR, HYBRID MODULE, ETC: it is sometimes
   overkill to pack small functions into a dynamic module.  Calling
@@ -131,12 +131,12 @@ CUSTOM MODULE and RESOURCE BUNDLE: as we described in the above
 
 MODULE PATH PRECEDENCE: with such a generic concept of modules and
   resource bundles, there can be multiple matches for a single call of
-  lux_load().  This is exactly the reason that we have a repo argument
-  for lux_load().  The repo pointer, if points to an instance of a
-  module, will be used in searching a lookup table to identify the
-  path and file to load a scoped module.  If no corresponding entry
-  exists in the lookup table, repo is assumed to be a string
-  containing paths of the module.
+  lux_load().  This is exactly the reason that we have a scope
+  argument for lux_load().  The scope pointer, if points to an
+  instance of a module, will be used in searching a lookup table to
+  identify the path and file to load a scoped module.  If no
+  corresponding entry exists in the scope lookup table, scope is
+  assumed to be a string containing paths of the module.
 
 OBJECT ORIENTED PROGRAMMING: lux is implemented in C for performance,
   portability, and integrability (with other programming languages).
@@ -158,7 +158,7 @@ OBJECTS, CLASSES, and METACLASSES: a lux interface together with an
   programming languages such as C++.  As described above, loading a
   lux module is like creating an object.  For example, calling
 
-	Lux_MOD *MOD = lux_load(repo, "MOD", opts);
+	Lux_MOD *MOD = lux_load(scope, "MOD", opts);
 	MOD->func(MOD, para);
 
   has more-or-less the same effect as
@@ -170,9 +170,9 @@ OBJECTS, CLASSES, and METACLASSES: a lux interface together with an
   wasteful, especially for heavy interfaces.  This is because all
   instances in
 
-	Lux_MOD *ins1 = lux_load(repo, "MOD", opts);
-	Lux_MOD *ins2 = lux_load(repo, "MOD", opts);
-	Lux_MOD *ins3 = lux_load(repo, "MOD", opts);
+	Lux_MOD *ins1 = lux_load(scope, "MOD", opts);
+	Lux_MOD *ins2 = lux_load(scope, "MOD", opts);
+	Lux_MOD *ins3 = lux_load(scope, "MOD", opts);
 	...
 
   contain the same list of function pointers.  To overcome this, we
@@ -215,7 +215,7 @@ OBJECTS, CLASSES, and METACLASSES: a lux interface together with an
 		...
 	} Lux_MOD;
 
-	Lux_MOD *cls  = lux_load(repo, "MOD", opts);
+	Lux_MOD *cls  = lux_load(scope, "MOD", opts);
 	Lux_obj *ins1 = MOD->mkobj();
 	Lux_obj *ins2 = MOD->mkobj();
 	...
