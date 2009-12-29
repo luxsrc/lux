@@ -46,7 +46,7 @@ LUX_MKMOD(const void *opts)
 }
 
 void
-LUX_RMMOD(Lux_job *sim)
+LUX_RMMOD(void *ego)
 {
-	lux_unload(sim);
+	lux_unload(ego);
 }

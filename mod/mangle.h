@@ -30,6 +30,10 @@
 #define LUX_C0NCAT(s, t) s ## t
 #define LUX_CONCAT(s, t) LUX_C0NCAT(s, t)
 
+/* Function prototypes */
+extern void *LUX_MKMOD(const void *);
+extern void  LUX_RMMOD(void *);
+
 /* Name mangling by passing a cpp-flag "-DLUX_MOD_NAME=name" */
 #define LUX_MKMOD LUX_CONCAT(luxC, LUX_MOD_NAME) /* constructor */
 #define LUX_RMMOD LUX_CONCAT(luxD, LUX_MOD_NAME) /* destructor  */
