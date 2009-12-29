@@ -22,6 +22,7 @@
 
 #include <dlfcn.h>
 
-extern void *dlhandle(void *);
+extern const char *dlfname (void *);
+extern       void *dlhandle(void *);
 
 #endif /* _LUX_DLFCN_H_ */

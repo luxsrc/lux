@@ -17,26 +17,24 @@
  * You should have received a copy of the GNU General Public License
  * along with lux.  If not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef _LUX_MATCH_H_
-#define _LUX_MATCH_H_
+#include <lux.h>
 
-#include <string.h>
+#define  _GNU_SOURCE /* to obtain dladdr() from <lux/dlfcn.h> */
+#include <lux/dlfcn.h>
+#undef   _GNU_SOURCE
 
-const char *match(const char *sym, const char *arg)
+#if HAVE_STDDEF_H
+#include <stddef.h> /* for NULL */
+#else
+#include <stdlib.h> /* for NULL */
+#endif
+
+const char *
+dlfname(void *s)
 {
-	size_t i;
-
-	const size_t l = strlen(sym);
-	const size_t n = strlen(arg);
-
-	if(l + 1 > n || '=' != arg[l])
+	Dl_info info;
+	if(dladdr(s, &info))
+		return info.dli_fname;
+	else
 		return NULL;
-
-	for(i = 0; i < l; ++i)
-		if(sym[i] != arg[i])
-			return NULL;
-
-	return arg + l + 1;
 }
-
-#endif /* _LUX_MATCH_H_ */

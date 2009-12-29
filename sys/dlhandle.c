@@ -18,10 +18,7 @@
  * along with lux.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include <lux.h>
-
-#define  _GNU_SOURCE /* to obtain dladdr() from <lux/dlfcn.h> */
 #include <lux/dlfcn.h>
-#undef   _GNU_SOURCE
 
 #if HAVE_STDDEF_H
 #include <stddef.h> /* for NULL */
@@ -32,9 +29,9 @@
 void *
 dlhandle(void *s)
 {
-	Dl_info info;
-	if(dladdr(s, &info)) {
-		void *h = dlopen(info.dli_fname, RTLD_LAZY);
+	const char *f = dlfname(s);
+	if(f) {
+		void *h = dlopen(f, RTLD_LAZY);
 		dlclose(h); /* decrease refcount to "cancel" dlopen() */
 		return h;
 	} else

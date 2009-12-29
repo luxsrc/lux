@@ -18,8 +18,8 @@
  * along with lux.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include "src.h"
-#include <lux/basename.h>
 #include <lux/job.h>
+#include <lux/strutils.h>
 #include <lux/switch.h>
 #include <string.h> /* for strcmp() */
 #include <stdlib.h> /* for EXIT_SUCCESS */
