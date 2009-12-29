@@ -68,8 +68,8 @@ map_seek(void *w, fpos_t offset, int whence)
 static int
 map_close(void *w)
 {
-	int err = W->close(W->cookie); /* free the actual cookie */
-	free(w);                       /* free the cookie mapper */
+	int err = W->close ? W->close(W->cookie) : 0;
+	free(w); /* always free the cookie mapper to avoid memory leakage */
 	return err;
 }
 
@@ -92,7 +92,7 @@ fopencookie(void *cookie, const char *mode, cookie_io_functions_t iof)
 	            w->read  ? map_read  : NULL,
 	            w->write ? map_write : NULL,
 	            w->seek  ? map_seek  : NULL,
-	            w->close ? map_close : NULL);
+	            map_close); /* always pass map_close() */
 	if(!f)
 		goto cleanup2;
 
