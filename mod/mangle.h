@@ -27,8 +27,8 @@
 #define LUX_CONCAT(s, t) LUX_C0NCAT(s, t)
 
 /* Name mangling by passing a cpp-flag "-DLUX_MOD_NAME=name" */
-#define LUXCMOD LUX_CONCAT(luxC, LUX_MOD_NAME) /* constructor */
-#define LUXDMOD LUX_CONCAT(luxD, LUX_MOD_NAME) /* destructor  */
-#define LUXEMOD LUX_CONCAT(luxE, LUX_MOD_NAME) /* entry-point */
+#define LUX_MKMOD LUX_CONCAT(luxC, LUX_MOD_NAME) /* constructor */
+#define LUX_RMMOD LUX_CONCAT(luxD, LUX_MOD_NAME) /* destructor  */
+#define LUX_MOD   LUX_CONCAT(luxE, LUX_MOD_NAME) /* entry-point */
 
 #endif /* _LUX_MANGLE_H_ */

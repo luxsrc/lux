@@ -37,24 +37,24 @@ INTERFACE: let us use <MOD> to denote a generic module name.  A lux
 DYNAMIC MODULE: a standard lux module <MOD> is a dynamically loadable
   library that contains exactly one constructor
 
-	void *LUXC<MOD>(const void *);
+	void *LUX_MK<MOD>(const void *);
 
   or, for one that does not require initialization, it needs to
   contain exactly one "entry symbol"
 
-	Lux_<MOD> LUXE<MOD>;
+	Lux_<MOD> LUX_<MOD>;
 
   which may be an exported function (e.g., of type Lux_rand in the
   previous section) or an exported structure (e.g., of type Lux_io)
-  that provides the module interface.  The macros LUXC<MOD> and
-  LUXE<MOD> expand to luxC<MOD> and to luxE<MOD>, respectively, to
+  that provides the module interface.  The macros LUX_MK<MOD> and
+  LUX_<MOD> expand to luxC<MOD> and to luxE<MOD>, respectively, to
   avoid symbol conflicts.  When lux_load() access a module, it calls
-  LUXC<MOD>() to construct the interface or returns LUXE<MOD>
-  directly.  LUXC<MOD>() may take care additional resource
+  LUX_MK<MOD>() to construct the interface or returns LUX_<MOD>
+  directly.  LUX_MK<MOD>() may take care additional resource
   allocations.  In such a case, the lux module must implement a
   destructor:
 
-	void LUXD<MOD>(Lux_<MOD> *);
+	void LUX_RM<MOD>(Lux_<MOD> *);
 
   which expands to luxD<MOD>, to release the allocated resource.  Note
   that chain-loading, i.e., using
@@ -81,10 +81,10 @@ DYNAMIC MODULE: a standard lux module <MOD> is a dynamically loadable
   modules, libux requires an external dynamic linker, which may make
   symbols from loaded modules globally accessible.  Therefore, module
   developers may want to put all the source code into a single file
-  and define all private functions as static functions.  LUXC<MOD>()
-  or LUXE<MOD> can then interface all of these static functions.  This
-  is an ultimate way to avoid symbol conflicts because LUXC<MOD> and
-  LUXD<MOD>, or LUXE<MOD>, are the only exported symbols.
+  and define all private functions as static functions.  LUX_MK<MOD>()
+  or LUX_<MOD> can then interface all of these static functions.  This
+  is an ultimate way to avoid symbol conflicts because LUX_MK<MOD> and
+  LUX_RM<MOD>, or LUX_<MOD>, are the only exported symbols.
 
 STATIC MODULE, RESOURCE ALLOCATOR, HYBRID MODULE, etc: it is sometimes
   overkill to pack small functions into a dynamic module.  Calling

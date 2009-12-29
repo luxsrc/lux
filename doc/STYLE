@@ -16,9 +16,9 @@ NAMES: keep them consistent and short.  Shorter than you think.  The
 
   Common names:
 
-    LUXCMOD: module constructor
-    LUXDMOD: module destructor
-    LUXEMOD: module entry point
+    LUX_MK<MOD>: module constructor
+    LUX_RM<MOD>: module destructor
+    LUX_<MOD>:   module entry point
 
     fsv: a saved failure code for future restoration
 
