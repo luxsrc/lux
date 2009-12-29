@@ -20,6 +20,10 @@
 #ifndef _LUX_MANGLE_H_
 #define _LUX_MANGLE_H_
 
+#ifndef LUX_MOD_NAME
+#error LUX_MOD_NAME is not defined
+#endif
+
 /* Macros for token transformation */
 #define LUX_STR1NG(s) #s
 #define LUX_STRING(s) LUX_STR1NG(s)
