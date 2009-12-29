@@ -28,6 +28,7 @@ AC_HEADER_TIME
 AC_CHECK_HEADERS([stddef.h sys/time.h c_asm.h intrinsics.h mach/mach_time.h])
 
 dnl Check for types
+AC_CHECK_TYPE([off64_t])
 AC_CHECK_TYPE([hrtime_t], [AC_DEFINE(HAVE_HRTIME_T, 1, [Define to 1 if hrtime_t is defined in <sys/time.h>])], , [#if HAVE_SYS_TIME_H
 #include <sys/time.h>
 #endif])
@@ -37,7 +38,7 @@ AC_FUNC_ALLOCA
 AC_SEARCH_LIBS([dlinfo],  [dl], [AC_DEFINE(HAVE_DLINFO,  1, [Define to 1 if you have the `dlinfo' function.])],  [AC_MSG_WARN([failed to find the dlinfo() function])])
 AC_SEARCH_LIBS([dladdr],  [dl], [AC_DEFINE(HAVE_DLADDR,  1, [Define to 1 if you have the `dladdr' function.])],  [AC_MSG_WARN([failed to find the dladdr() function])])
 AC_SEARCH_LIBS([dlmopen], [dl], [AC_DEFINE(HAVE_DLMOPEN, 1, [Define to 1 if you have the `dlmopen' function.])], [AC_MSG_WARN([failed to find the dlmopen() function])])
-AC_CHECK_FUNCS([vsnprintf])
+AC_CHECK_FUNCS([fopencookie funopen vsnprintf])
 AC_CHECK_FUNCS([BSDgettimeofday gettimeofday gethrtime read_real_time time_base_to_time clock_gettime mach_absolute_time])
 
 dnl Cray UNICOS _rtc() (real-time clock) intrinsic
@@ -171,6 +172,47 @@ AH_BOTTOM([/*===================================================================
 
 #ifndef headerof
 #define headerof(T, P, E) ((T *)((char *)(P) - offsetof(T, E)))
+#endif
+
+/*===========================================================================*/
+/* Declare fopencookie() and related types */
+
+#include <stdio.h> /* for ssize_t, size_t, and FILE; always included */
+
+#if !HAVE_FOPENCOOKIE && HAVE_FUNOPEN
+
+# if HAVE_OFF64_T
+#  if HAVE_SYS_TYPES_H
+#   include <sys/types.h> /* for off64_t */
+#  elif HAVE_UNISTD_H
+#   include <unistd.h> /* for off64_t */
+#  else
+#   error neither <sys/types.h> nor <unistd.h> are found;
+#   error please report definition of off64_t to <ckchan@cfa.harvard.edu>
+#  endif
+# else
+#  if HAVE_STDINT_H
+#   include <stdint.h> /* for int64_t */
+    typedef int64_t off64_t;
+#  else
+    typedef long long off64_t; /* long long is at least 64 bits in size */
+#  endif
+# endif
+
+typedef ssize_t (cookie_read_function_t )(void *,       char *, size_t);
+typedef ssize_t (cookie_write_function_t)(void *, const char *, size_t);
+typedef int     (cookie_seek_function_t )(void *,    off64_t *, int);
+typedef int     (cookie_close_function_t)(void *);
+
+typedef struct {
+	cookie_read_function_t  *read;
+	cookie_write_function_t *write;
+	cookie_seek_function_t  *seek;
+	cookie_close_function_t *close;
+} cookie_io_functions_t;
+
+FILE *fopencookie(void *, const char *, cookie_io_functions_t);
+
 #endif
 
 /*===========================================================================*/
