@@ -18,6 +18,7 @@
  * along with lux.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include "api.h"
+#include <stdlib.h> /* for exit() and EXIT_FAILURE */
 
 struct libux *LUX = NULL;
 
@@ -44,4 +45,10 @@ lux_setup(void)
 		setup();
 	else
 		lux_abort();
+}
+
+void
+lux_abort(void)
+{
+	exit(EXIT_FAILURE);
 }
