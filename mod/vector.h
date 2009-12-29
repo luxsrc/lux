@@ -17,15 +17,25 @@
  * You should have received a copy of the GNU General Public License
  * along with lux.  If not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef _LUX_XOF_H_
-#define _LUX_XOF_H_
+#ifndef _LUX_VECTOR_H_
+#define _LUX_VECTOR_H_
 
-#if HAVE_STDDEF_H
-#include <stddef.h>
-#else
-#define offsetof(T, F) ((size_t)&((T *)0)->F)
-#endif
+#include <lux/xof.h>
 
-#define headof(T, P, F) ((T *)((char *)(P) - offsetof(T, F)))
+#define _VECTOROF(T) struct { size_t d; T e[8]; } /* vector of */
+#define _PSIZEOFD(T) offsetof(_VECTOROF(T), e)    /* padded size of dimension */
+#define _HEADOF(P)   headof(_VECTOROF(typeof(*P)), P, e)
 
-#endif /* _LUX_XOF_H_ */
+static inline void *
+_valloc(size_t dsz, size_t esz, size_t d)
+{
+	char *p = malloc(dsz + esz * d);
+	*(size_t *)p = d;
+	return p + dsz;
+}
+
+#define valloc(T, D) ((T *)_valloc(_PSIZEOFD(T), sizeof(T), D))
+#define vfree(P) free(_HEADOF(P))
+#define dimof(P) (_HEADOF(P)->d)
+
+#endif /* _LUX_VECTOR_H_ */
