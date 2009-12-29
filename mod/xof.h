@@ -17,8 +17,8 @@
  * You should have received a copy of the GNU General Public License
  * along with lux.  If not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef _LUX_HEAD_H_
-#define _LUX_HEAD_H_
+#ifndef _LUX_XOF_H_
+#define _LUX_XOF_H_
 
 #if HAVE_STDDEF_H
 #include <stddef.h>
@@ -29,4 +29,4 @@
 #define headof(T, P, F) ((T *)((char *)(P) - offsetof(T, F)))
 #define lengthof(T, P) (headof(T, P, v)->n)
 
-#endif /* _LUX_HEAD_H_ */
+#endif /* _LUX_XOF_H_ */
