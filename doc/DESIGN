@@ -33,33 +33,32 @@ INTERFACE: a lux interface Lux_MOD is simply a function type or a
   is placed in mod/ in the lux source tree, and is installed to
   $prefix/include/lux.
 
-DYNAMIC MODULE: a standard lux module MOD is a dynamically loadable
-  library that contains exactly one constructor
+DYNAMIC MODULE: a standard lux module MOD is an entry constructor in a
+  dynamically loadable library
 
-	void *LUXCMOD(const void *);
+	void *luxCMOD(const void *);
 
-  or, for one that does not require initialization, it needs to
-  contain exactly one "entry symbol"
+  or, for one that does not require initialization, it is an "entry
+  symbol"
 
-	Lux_MOD LUXEMOD;
+	Lux_MOD luxEMOD;
 
   which may be an exported function (e.g., of type Lux_rand in the
   previous section) or an exported structure (e.g., of type Lux_io)
-  that provides the module interface.  The macros LUXCMOD and LUXEMOD
-  expand to luxCMOD and to luxEMOD, respectively, to avoid symbol
-  conflicts.  When lux_load() access a module, it calls LUXCMOD() to
-  construct the interface or returns LUXEMOD directly.  LUXCMOD() may
-  take care additional resource allocations.  In such a case, the lux
-  module must implement a destructor:
+  that provides the module interface.  When lux_load() access a
+  module, it calls luxCMOD() to construct the interface or returns
+  luxEMOD directly.  luxCMOD() may take care additional resource
+  allocations.  In such a case, the lux module must implement a
+  destructor:
 
-	void LUXDMOD(Lux_MOD *);
+	void luxDMOD(Lux_MOD *);
 
-  which expands to luxDMOD, to release the allocated resource.  Note
-  that chain-loading, i.e., using
+  to release the allocated resource.  Note that chain-loading, i.e.,
+  using
 
 	return lux_load(repo, another_mod, more_options);
 
-  in a constructor, is allowed.  It works as expected because of the
+  in a constructor is allowed.  It works as expected because of the
   last-in-first-out nature of the stack used in the hash table.
 
   The concepts of constructor and destructor mentioned above are
@@ -79,12 +78,22 @@ DYNAMIC MODULE: a standard lux module MOD is a dynamically loadable
   modules, libux requires an external dynamic linker, which may make
   symbols from loaded modules globally accessible.  Therefore, module
   developers may want to put all the source code into a single file
-  and define all private functions as static functions.  LUXCMOD() or
-  LUXEMOD can then interface all of these static functions.  This is
-  an ultimate way to avoid symbol conflicts because LUXCMOD and
-  LUXDMOD, or LUXEMOD, are the only exported symbols.
+  and define all private functions as static functions.  luxCMOD() or
+  luxEMOD can then interface all of these static functions.  This is
+  an ultimate way to avoid symbol conflicts because luxCMOD and
+  luxDMOD, or luxEMOD, are the only exported symbols.
 
-STATIC MODULE, RESOURCE ALLOCATOR, HYBRID MODULE, etc: it is sometimes
+  For flexibility, we allow multiple entry points to a dynamically
+  loadable library.  These additional entry points can be considered
+  as "submodules".  In practice, it is best to pack related modules
+  into a single library.  For example, if a module has complex
+  configuration options, it is possible to pack the options into a
+  dynamic module so that
+
+	Lux_mod_opts *opts = lux_load(repo, "mod/opts", argv);
+	Lux_mod      *mod  = lux_load(repo, "mod",      opts);
+
+STATIC MODULE, RESOURCE ALLOCATOR, HYBRID MODULE, ETC: it is sometimes
   overkill to pack small functions into a dynamic module.  Calling
   functions via pointers can also reduce the performance.  Hence, we
   introduce the notion of "static modules", which are just header
@@ -109,7 +118,7 @@ STATIC MODULE, RESOURCE ALLOCATOR, HYBRID MODULE, etc: it is sometimes
   practice because all their dependent libraries are linked through
   the convenience system librarysys/libsys.la.
 
-CUSTOM MODULE and MODULE BUNDLE: as we described in the above
+CUSTOM MODULE and RESOURCE BUNDLE: as we described in the above
   sections, lux's module architecture is very powerful.  To generalize
   it even further, it can be viewed as an abstraction to bring in any
   *resource* at run-time.  For example, if we can treat a restart
@@ -118,7 +127,16 @@ CUSTOM MODULE and MODULE BUNDLE: as we described in the above
   possible, the libux instance (see the last section) contains a list
   of module loaders that can be reconfigured at run-time.  It can even
   load a loader dynamically from a folder---in such a case, we refer
-  the folder as a module bundle.
+  the folder as a resource bundle.
+
+MODULE PATH PRECEDENCE: with such a generic concept of modules and
+  resource bundles, there can be multiple matches for a single call of
+  lux_load().  This is exactly the reason that we have a repo argument
+  for lux_load().  The repo pointer, if points to an instance of a
+  module, will be used in searching a lookup table to identify the
+  path and file to load a scoped module.  If no corresponding entry
+  exists in the lookup table, repo is assumed to be a string
+  containing paths of the module.
 
 OBJECT ORIENTED PROGRAMMING: lux is implemented in C for performance,
   portability, and integrability (with other programming languages).
