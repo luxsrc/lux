@@ -26,7 +26,7 @@
 	{                                                       \
 		va_list ap;                                     \
 		va_start(ap, fmt);                              \
-		vlog(&lux->vlog, lux->vlog.levels[L], fmt, ap); \
+		vlog(&LUX->vlog, LUX->vlog.levels[L], fmt, ap); \
 		va_end(ap);                                     \
 	}
 

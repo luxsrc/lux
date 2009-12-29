@@ -30,7 +30,7 @@ if [ "x$1" != "xclean" ]; then
 		autoreconf --install --symlink --force --verbose
 	done
 	# Dirty hacks
-	sed -i~	-e's/\#define\ PACKAGE/#define LUX/g' \
+	sed -i~	-e's/\#define\ PACKAGE_/#define LUX_/g' \
 		configure
 	sed -i~	-e'/libtool stores uninstalled libraries/{N;N;N;d;}' \
 		-e'/Name of package/{N;N;d;}' \

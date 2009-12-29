@@ -23,6 +23,8 @@
 #include <lux.h>
 #include <lux/libux.h>
 
-extern struct libux *lux;
+#define LUX lux_libux_internal_instance /* long name to avoid sym-conflict */
+
+extern struct libux *LUX;
 
 #endif /* _API_H_ */

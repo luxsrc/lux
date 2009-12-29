@@ -31,11 +31,11 @@ lux_load(const void *name, ...)
 	opts = va_arg(ap, const void *);
 	va_end(ap);
 
-	return vload(&lux->load, name, opts);
+	return vload(&LUX->load, name, opts);
 }
 
 void
 lux_unload(void *ins)
 {
-	uload(&lux->load, ins);
+	uload(&LUX->load, ins);
 }

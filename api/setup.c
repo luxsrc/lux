@@ -19,12 +19,12 @@
  */
 #include "api.h"
 
-struct libux *lux = NULL;
+struct libux *LUX = NULL;
 
 static void
 setup(void)
 {
-	lux = mklibux();
+	LUX = mklibux();
 
 	/* Setup the lux environment */
 }
@@ -34,7 +34,7 @@ cleanup(void)
 {
 	/* Clean up the lux environment */
 
-	rmlibux(lux);
+	rmlibux(LUX);
 }
 
 void
