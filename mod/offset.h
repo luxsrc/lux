@@ -17,15 +17,13 @@
  * You should have received a copy of the GNU General Public License
  * along with lux.  If not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef _LUX_XOF_H_
-#define _LUX_XOF_H_
+#ifndef _LUX_OFFSET_H_
+#define _LUX_OFFSET_H_
 
 #if HAVE_STDDEF_H
 #include <stddef.h>
 #else
-#define offsetof(T, F) ((size_t)&((T *)0)->F)
+#define offsetof(T, E) ((size_t)&((T *)0)->E)
 #endif
 
-#define headof(T, P, F) ((T *)((char *)(P) - offsetof(T, F)))
-
-#endif /* _LUX_XOF_H_ */
+#endif /* _LUX_OFFSET_H_ */
