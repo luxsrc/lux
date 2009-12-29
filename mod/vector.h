@@ -23,6 +23,10 @@
 #include <lux/header.h>
 #include <lux/offset.h>
 
+#if !HAVE_TYPEOF
+# error typeof() is not available; <lux/vector.h> cannot be used as is
+#endif
+
 #define _VECTOROF(T) struct { size_t d; T e[8]; } /* vector of */
 #define _PSIZEOFD(T) offsetof(_VECTOROF(T), e)    /* padded size of dimension */
 #define _HEADEROF(P) headerof(_VECTOROF(typeof(*P)), P, e)
