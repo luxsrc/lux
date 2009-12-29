@@ -20,7 +20,13 @@
 #ifndef _LUX_HEAD_H_
 #define _LUX_HEAD_H_
 
-#define GET_HEAD(T, P, F) ((T *)((char *)(P) - (size_t)&((T *)0)->F))
-#define GET_COUNT(T, P) (GET_HEAD(T, P, v)->n)
+#if HAVE_STDDEF_H
+#include <stddef.h>
+#else
+#define offsetof(T, F) ((size_t)&((T *)0)->F)
+#endif
+
+#define headof(T, P, F) ((T *)((char *)(P) - offsetof(T, F)))
+#define lengthof(T, P) (headof(T, P, v)->n)
 
 #endif /* _LUX_HEAD_H_ */
