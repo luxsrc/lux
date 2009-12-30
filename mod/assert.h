@@ -20,10 +20,15 @@
 #ifndef _LUX_ASSERT_H_
 #define _LUX_ASSERT_H_
 
+#ifndef LUX_ASSERT_FAILURE
+#define LUX_ASSERT_FAILURE 0
+#endif
+
 #if LUX_ASSERTION
-#define lux_assert(E) do { if(!(E))                                         \
-	lux_fatal("lux_assert("#E") failed on line %u in \""__FILE__"\"\n", \
-	          __LINE__);                                                \
+#define lux_assert(E) do {	                                              \
+	if((E) == LUX_ASSERT_FAILURE)                                         \
+		lux_fatal("lux_assert(" #E ") failed on line %d in \"%s\"\n", \
+		          __LINE__, __FILE__);                                \
 } while(0)
 #else
 #define lux_assert(E) /* do nothing */
