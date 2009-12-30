@@ -33,6 +33,31 @@
 #define APPEND      (1U << 2)
 #define MATCH(a, b) (!strcmp(a, b))
 
+static inline unsigned
+mode2flags(const char *mode)
+{
+	unsigned flags;
+
+	if(!mode)
+		return 0;
+
+	switch(mode[0]) {
+	case 'r': flags = READ;           break;
+	case 'w': flags = WRITE;          break;
+	case 'a': flags = WRITE | APPEND; break;
+	default : return 0;
+	}
+
+	     if(MATCH(mode+1, ""  )||
+	        MATCH(mode+1, "b" ) ) /* do nothing */;
+	else if(MATCH(mode+1, "+" )||
+	        MATCH(mode+1, "+b")||
+	        MATCH(mode+1, "b+") ) flags |= (READ | WRITE);
+	else                          return 0;
+
+	return flags;
+}
+
 /* This internal wrapper is the mapper cookie for funopen() */
 struct wrapper {
 	void                    *cookie;
@@ -78,37 +103,22 @@ closefn_safe(void *w)
 FILE *
 fopencookie(void *cookie, const char *mode, cookie_io_functions_t iof)
 {
+	unsigned flags;
 	struct wrapper *w;
 	FILE *f;
-	unsigned flags;
 
-	/* Check mode[] */
-	if(!mode)
+	/* Convert mode to flags */
+	flags = mode2flags(mode);
+	if(!flags)
 		goto cleanup1;
-
-	switch(mode[0]) {
-	case 'r': flags = READ;           break;
-	case 'w': flags = WRITE;          break;
-	case 'a': flags = WRITE | APPEND; break;
-	default : goto cleanup1;
-	}
-
-	     if(MATCH(mode+1, ""  )||
-	        MATCH(mode+1, "b" ) ) /* do nothing */;
-	else if(MATCH(mode+1, "+" )||
-	        MATCH(mode+1, "+b")||
-	        MATCH(mode+1, "b+") ) flags |= (READ | WRITE);
-	else                          goto cleanup1;
 
 	/* Make sure that the required functions are available */
-	if((flags & READ)   && !iof.read)
-		goto cleanup1;
-	if((flags & WRITE)  && !iof.write)
-		goto cleanup1;
-	if((flags & APPEND) && !iof.seek)
+	if((flags & READ   && !iof.read )||
+	   (flags & WRITE  && !iof.write)||
+	   (flags & APPEND && !iof.seek ))
 		goto cleanup1;
 
-	/* mode[] is valid; allocate and initialize a wrapper */
+	/* Allocate and initialize a wrapper */
 	w = (struct wrapper *)malloc(sizeof(struct wrapper));
 	if(!w)
 		goto cleanup1;
@@ -119,7 +129,7 @@ fopencookie(void *cookie, const char *mode, cookie_io_functions_t iof)
 	w->seek   = iof.seek;
 	w->close  = iof.close;
 
-	/* Use funopen() to create a stream */
+	/* Use funopen() to create a stream; go to the end if in append mode */
 	f = funopen(w,
 	            flags & READ  ? readfn  : NULL,
 	            flags & WRITE ? writefn : NULL,
@@ -128,12 +138,11 @@ fopencookie(void *cookie, const char *mode, cookie_io_functions_t iof)
 	if(!f)
 		goto cleanup2;
 
-	if(flags & APPEND)
-		if(fseek(f, 0L, SEEK_END) < 0) {
-			fclose(f);
-			return NULL;
-		}
-
+	if(flags & APPEND && fseek(f, 0L, SEEK_END) < 0) {
+		(void)fclose(f);
+		goto cleanup1; /* fclose() calls closefn_safe(), which frees
+		                  the cookie; no need to use free() again */
+	}
 	return f;
 
  cleanup2:
