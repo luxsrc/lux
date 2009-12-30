@@ -56,10 +56,10 @@ writefn(void *w, const char *buf, int sz)
 }
 
 static fpos_t
-seekfn_safe(void *w, fpos_t offset, int whence)
+seekfn(void *w, fpos_t offset, int whence)
 {
 	off64_t off = offset; /* assume fpos_t an int when funopen() is used */
-	int     err = W->seek ? W->seek(W->cookie, &off, whence) : -1;
+	int     err = W->seek(W->cookie, &off, whence);
 	return  err ? (fpos_t)err : (fpos_t)off;
 	/* TODO: set errno or failed; check overflow */
 }
@@ -120,8 +120,8 @@ fopencookie(void *cookie, const char *mode, cookie_io_functions_t iof)
 	f = funopen(w,
 	            flags & READ  ? readfn  : NULL,
 	            flags & WRITE ? writefn : NULL,
-	            seekfn_safe,
-	            closefn_safe); /* always pass {seek,close}fn_safe() */
+	            w->seek       ? seekfn  : NULL,
+	            closefn_safe); /* always pass closefn_safe() */
 	if(!f)
 		goto cleanup2;
 
