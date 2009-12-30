@@ -28,6 +28,7 @@
 #define LUX_CHECK_FAILURE 0
 #endif
 
+/* Fail if E returns a non-zero value; useful in checking errno or failed */
 #define lux_check_failure_code(E, L) do {                              \
 	int __f__ = (E);                                               \
 	if(__f__ != LUX_CHECK_SUCCESS) {                               \
@@ -38,6 +39,7 @@
 	}                                                              \
 } while(0)
 
+/* Fail if E returns zero; useful in checking memory allocations */
 #define lux_check_func_success(E, L) do {                              \
 	int __s__ = (E);                                               \
 	if(__s__ == LUX_CHECK_FAILURE) {                               \
