@@ -26,9 +26,9 @@
 #define LUX_AVER_FAILURE 0
 #endif
 
-#define lux_aver(E) do {                             \
-	char aver[(E) == LUX_AVER_FAILURE ? -1 : 1]; \
-	(void)aver;                                  \
+#define lux_aver(E) do {                                                       \
+	char  negative_size_if_aver_failure[(E) == LUX_AVER_FAILURE ? -1 : 1]; \
+	(void)negative_size_if_aver_failure;                                   \
 } while(0)
 
 #endif /* _LUX_AVER_H_ */
