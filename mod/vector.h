@@ -93,7 +93,15 @@
 		char   v[d];
 	} _v; // in memory
 
-	char *v = _v.v; // pointer to v[] instead of _v.  */
+	char *v = _v.v; // pointer to v[] instead of _v.
+
+   In fact, because of the "headerof" method return ordinary a
+   pointer, it can be combined with method 2 and 4, which makes it
+   very flexible.
+
+   This static module and <lux/tensor.h> provide macros that let
+   dynamically allocating vectors (and tensors) using method 7 more
+   streamlined. */
 
 #define valloc(T, D) talloc(T, D)
 #define vfree(P)     tfree(P, 1)
