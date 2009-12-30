@@ -20,6 +20,8 @@
 #ifndef _LUX_CHECK_H_
 #define _LUX_CHECK_H_
 
+#include <lux/failed.h>
+
 #ifndef LUX_CHECK_SUCCESS
 #define LUX_CHECK_SUCCESS 0
 #endif
@@ -30,7 +32,7 @@
 
 /* Fail if E returns a non-zero value; useful in checking errno or failed */
 #define lux_check_failure_code(E, L) do {                              \
-	int __f__ = (E);                                               \
+	int __f__ = (int)(E);                                          \
 	if(__f__ != LUX_CHECK_SUCCESS) {                               \
 		lux_error("lux_check_failure(" #E ", " #L ") failed "  \
 		          "with error code %d on line %d in \"%s\"\n", \
@@ -41,11 +43,12 @@
 
 /* Fail if E returns zero; useful in checking memory allocations */
 #define lux_check_func_success(E, L) do {                              \
-	int __s__ = (E);                                               \
-	if(__s__ == LUX_CHECK_FAILURE) {                               \
+	int __fsv__ = failed;                                          \
+	if((E) == LUX_CHECK_FAILURE) {                                 \
 		lux_error("lux_check_success(" #E ", " #L ") failed "  \
 		          "with error code %d on line %d in \"%s\"\n", \
-		          __s__, __LINE__, __FILE__);                  \
+		          failed, __LINE__, __FILE__);                 \
+		failed = __fsv__;                                      \
 		goto L;                                                \
 	}                                                              \
 } while(0)
