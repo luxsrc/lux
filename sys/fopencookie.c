@@ -19,13 +19,13 @@
  */
 #include <lux.h>
 #include <lux/cookie.h>
-#include <string.h> /* for strcmp() */
 
 #if HAVE_FOPENCOOKIE
 /* Use the system fopencookie(); implement nothing */
 #elif HAVE_FUNOPEN
 /* Implement fopencookie() using funopen() */
 #include <stdlib.h> /* for malloc() and free() */
+#include <string.h> /* for strcmp() */
 
 #define W           ((struct wrapper *)w)
 #define READ        (1U << 0)
@@ -33,7 +33,7 @@
 #define APPEND      (1U << 2)
 #define MATCH(a, b) (!strcmp(a, b))
 
-/* This internal wrapper is the mapped cookie for funopen() */
+/* This internal wrapper is the mapper cookie for funopen() */
 struct wrapper {
 	void                    *cookie;
 	cookie_read_function_t  *read;
@@ -42,7 +42,11 @@ struct wrapper {
 	cookie_close_function_t *close;
 };
 
-/* The map_*() functions and mapped I/O functions for funopen() */
+/* Mapper I/O functions for funopen().  No internal checking is needed
+   for {read,write,seek}fn() because they are only passed to funopen()
+   if the corresponding functions exist.  However, internal checking
+   of W->close is needed in closefn_safe() because it is always passed
+   to funopen() to free the mapper cookie. */
 static int
 readfn(void *w, char *buf, int sz)
 {
@@ -61,7 +65,6 @@ seekfn(void *w, fpos_t offset, int whence)
 	off64_t off = offset; /* assume fpos_t an int when funopen() is used */
 	int     err = W->seek(W->cookie, &off, whence);
 	return  err ? (fpos_t)err : (fpos_t)off;
-	/* TODO: set errno or failed; check overflow */
 }
 
 static int
