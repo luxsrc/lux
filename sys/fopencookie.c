@@ -30,6 +30,7 @@
 #define W           ((struct wrapper *)w)
 #define READ        (1U << 0)
 #define WRITE       (1U << 1)
+#define SEEK        (1U << 2)
 #define MATCH(a, b) (!strcmp(a, b))
 
 /* This internal wrapper is the mapped cookie for funopen() */
@@ -61,8 +62,9 @@ static fpos_t
 map_seek(void *w, fpos_t offset, int whence)
 {
 	off64_t off = offset; /* assume fpos_t an int when funopen() is used */
-	int     err = W->seek(W->cookie, &off, whence);
-	return err ? (fpos_t)err : (fpos_t)off; /* TODO: check overflow */
+	int     err = W->flags & SEEK ? W->seek(W->cookie, &off, whence) : -1;
+	return  err ? (fpos_t)err : (fpos_t)off;
+	/* TODO: set errno or failed; check overflow */
 }
 
 static int
@@ -80,7 +82,7 @@ fopencookie(void *cookie, const char *mode, cookie_io_functions_t iof)
 	FILE *f;
 	unsigned flags;
 
-	/* Check mode[] */
+	/* Check mode[]; FIXME: how to use SEEK? */
 	if(!mode)
 		goto cleanup1;
 
