@@ -100,6 +100,14 @@ fopencookie(void *cookie, const char *mode, cookie_io_functions_t iof)
 	        MATCH(mode+1, "b+") ) flags |= (READ | WRITE);
 	else                          goto cleanup1;
 
+	/* Make sure that the required functions are available */
+	if((flags & READ)   && !iof.read)
+		goto cleanup1;
+	if((flags & WRITE)  && !iof.write)
+		goto cleanup1;
+	if((flags & APPEND) && !iof.seek)
+		goto cleanup1;
+
 	/* mode[] is valid; allocate and initialize a wrapper */
 	w = (struct wrapper *)malloc(sizeof(struct wrapper));
 	if(!w)
