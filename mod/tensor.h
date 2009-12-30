@@ -20,11 +20,6 @@
 #ifndef _LUX_TENSOR_H_
 #define _LUX_TENSOR_H_
 
-#define countof(A) (sizeof(A) / sizeof(A[0]))
-#define lengthof(...) ({ size_t _arr_[] = {__VA_ARGS__}; countof(_arr_); })
-
-#include <lux/header.h>
-#include <lux/offset.h>
 #include <stdlib.h> /* for malloc() and free() */
 
 #if !HAVE_TYPEOF

@@ -137,6 +137,24 @@ fi
 AM_CONDITIONAL(USING_SINGLE, test "$ok" = "yes")
 
 AH_BOTTOM([/*===========================================================================*/
+
+#ifndef countof
+#define countof(A) (sizeof(A) / sizeof(A[0]))
+#endif
+
+#ifndef lengthof
+#define lengthof(...) ({ size_t _arr_[] = {__VA_ARGS__}; countof(_arr_); })
+#endif
+
+#ifndef offsetof
+#define offsetof(T, E) ((size_t)&((T *)0)->E)
+#endif
+
+#ifndef headerof
+#define headerof(T, P, E) ((T *)((char *)(P) - offsetof(T, E)))
+#endif
+
+/*===========================================================================*/
 /* Public API */
 
 extern void lux_setup(void);
