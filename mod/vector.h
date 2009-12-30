@@ -20,27 +20,91 @@
 #ifndef _LUX_VECTOR_H_
 #define _LUX_VECTOR_H_
 
-#include <lux/header.h>
-#include <lux/offset.h>
+#include <lux/tensor.h>
 
-#if !HAVE_TYPEOF
-# error typeof() is not available; <lux/vector.h> cannot be used as is
-#endif
+/* There are 6 ways to keep track of the shapes/lengths/counts of 1D
+   arrays that make sense in standard C.  For convenience, we call
+   these 1D arrays "vectors" so that their shapes are naturally called
+   "dimensions".  These 6 ways are:
 
-#define _VECTOROF(T) struct { size_t d; T e[8]; } /* vector of */
-#define _PSIZEOFD(T) offsetof(_VECTOROF(T), e)    /* padded size of dimension */
-#define _HEADEROF(P) headerof(_VECTOROF(typeof(*P)), P, e)
+   1. Use two variables manually: GOOD if everything is in the same
+      scope; cannot be returned; BAD to pass as argument
 
-static inline void *
-_valloc(size_t dsz, size_t esz, size_t d)
-{
-	char *p = malloc(dsz + esz * d);
-	*(size_t *)p = d;
-	return p + dsz;
-}
+	size_t d;
+	char   v[d];
 
-#define valloc(T, D) ((T *)_valloc(_PSIZEOFD(T), sizeof(T), D))
-#define vfree(P) free(_HEADEROF(P))
-#define dimof(P) (_HEADEROF(P)->d)
+   2. Use pointer for the vector: FINE if everything is in the same
+      scope; cannot be returned; OK to pass as argument
+
+	size_t d;
+	char  *v; // -> char _v[d];
+
+   3. struct with flexible array element: same as 1---large struct to
+      passed (for pointer to this struct, see method 5)
+
+	struct {
+		size_t d;
+		char   v[d];
+	} v;
+
+   4. struct with pointer: FINE to return result; GOOD to pass
+      argument
+
+	struct {
+		size_t d;
+		char  *v; // -> char _v[d];
+	} v;
+
+   5. Pointer to struct with flexible array element: GOOD to return
+      result, FINE to pass argument
+
+	struct {
+		size_t d;
+		char   v[d];
+	} *v;
+
+   6. Pointer to struct with pointer: BAD because of double
+      de-referencing---not much point to use it
+
+	struct string {
+		size_t d;
+		char  *v; // -> char _v[d];
+	} *v;
+
+   Traditionally, C APIs use methods 2, which cannot be returned.
+   Hence, C APIs "return" by using arguments:
+
+	void mkvect(size_t *d_out, char **v_out);
+
+   which is cumbersome.  In lux, we have used both methods 4 and 5,
+   depending on if passing or returning is more important.
+
+   For this static module, we introduce yet another method using a
+   "hack".  The vector is allocated in memory using method 3.  But
+   instead of referencing is using method 5, we return the reference
+   to the flexible length array.  I.e.,
+
+   7. "headerof" method: GOOD to return result and pass result; act
+       like normal pointers; slightly slower in order to look up
+       length
+
+	struct {
+		size_t d;
+		char   v[d];
+	} _v; // in memory
+
+	char *v = _v.v; // pointer to v[] instead of _v.
+
+   In fact, because of the "headerof" method return ordinary a
+   pointer, it can be combined with method 2 and 4, which makes it
+   very flexible.
+
+   This static module and <lux/tensor.h> provide macros that let
+   dynamically allocating vectors (and tensors) using method 7 more
+   streamlined. */
+
+#define valloc(T, D) talloc(T, D)
+#define vfree(P)     tfree(P, 1)
+#define dimof(P)     (*dimsof(P, 1))
 
 #endif /* _LUX_VECTOR_H_ */
