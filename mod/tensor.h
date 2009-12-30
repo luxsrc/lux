@@ -43,7 +43,7 @@
    actual data of the tensor.  */
 
 #define _TENSOROF(R, T) struct { size_t d[R]; T e[8]; }
-#define _PSIZEOFD(R, T) offsetof(_TENSOROF(R, T), e)
+#define _HEADERSZ(R, T) offsetof(_TENSOROF(R, T), e)
 #define _HEADEROF(R, P) headerof(_TENSOROF(R, typeof(*P)), P, e)
 
 #define talloc(T, ...) ({                          \
@@ -51,16 +51,16 @@
 	                                           \
 	size_t _dims_[] = {__VA_ARGS__};           \
 	size_t _rank_   = countof(_dims_);         \
-	size_t _dsz_    = _PSIZEOFD(_rank_, T);    \
+	size_t _hsz_    = _HEADERSZ(_rank_, T);    \
 	size_t _cnt_    = 1;                       \
 	size_t _i_;                                \
 	for(_i_ = 0; _i_ < _rank_; ++_i_)          \
 		_cnt_ *= _dims_[_i_];              \
 	                                           \
-	_ptr_ = malloc(_dsz_ + sizeof(T) * _cnt_); \
+	_ptr_ = malloc(_hsz_ + sizeof(T) * _cnt_); \
 	for(_i_ = 0; _i_ < _rank_; ++_i_)          \
 		_ptr_[_i_] = _dims_[_i_];          \
-	(T *)((char *)_ptr_ + _dsz_);              \
+	(T *)((char *)_ptr_ + _hsz_);              \
 })
 
 #define tfree(R, P)  free(_HEADEROF(R, P))
