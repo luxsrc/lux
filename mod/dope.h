@@ -19,7 +19,29 @@
  */
 #ifndef _LUX_DOPE_H_
 #define _LUX_DOPE_H_
-
+/*
+ * Generalized <lux/tensor.h> that determine rank at runtime
+ *
+ * FIXME: using pointer arithmetic to determine the offset of the data
+ * array from the dope vector, although is self-consistent, may cause
+ * incorrect data alignment.  For 64-bit machines, this only happens
+ * if the data type of an array starts with `long double`.  In this
+ * rare case, misalignment could significantly slow down the algorithm
+ * or even produce incorrect results on some hardwares.
+ *
+ * For now, it is possible to follow <lux/tensor.h> and then use the
+ * compile-time assertion macro lux_aver() to stop lux for compiling
+ * for situations with incorrect alignment.
+ *
+ * #define _TENSOROF(T, R) struct { Lux_dope d[R]; T e[8]; }
+ * #define _HEADERSZ(T, R) offsetof(_TENSOROF(T, R), e)
+ * ...
+ * {
+ *	...
+ * 	lux_aver(_HEADERSZ(long double, 3) == sizeof(Lux_dope[3]));
+ * }
+ */
+#include <lux/numeric.h>
 #include <lux/zalloc.h>
 
 typedef struct {
