@@ -20,13 +20,7 @@
 #ifndef _LUX_VECTOR_H_
 #define _LUX_VECTOR_H_
 
-#include <lux/header.h>
-#include <lux/offset.h>
-#include <stdlib.h> /* for malloc() and free() */
-
-#if !HAVE_TYPEOF
-# error typeof() is not available; <lux/vector.h> cannot be used as is
-#endif
+#include <lux/tensor.h>
 
 /* There are 6 ways to keep track of the shapes/lengths/counts of 1D
    arrays that make sense in standard C.  For convenience, we call
@@ -99,22 +93,10 @@
 		char   v[d];
 	} _v; // in memory
 
-	char *v = _v.v; // pointer to v[] instead of _v.
-*/
-#define _VECTOROF(T) struct { size_t d; T e[8]; } /* vector of */
-#define _PSIZEOFD(T) offsetof(_VECTOROF(T), e)    /* padded size of dimension */
-#define _HEADEROF(P) headerof(_VECTOROF(typeof(*P)), P, e)
+	char *v = _v.v; // pointer to v[] instead of _v.  */
 
-static inline void *
-_valloc(size_t dsz, size_t esz, size_t d)
-{
-	char *p = malloc(dsz + esz * d);
-	*(size_t *)p = d;
-	return p + dsz;
-}
-
-#define valloc(T, D) ((T *)_valloc(_PSIZEOFD(T), sizeof(T), D))
-#define vfree(P) free(_HEADEROF(P))
-#define dimof(P) (_HEADEROF(P)->d)
+#define valloc(T, D) talloc(T, D)
+#define vfree(P)     tfree(P, 1)
+#define dimof(P)     (*dimsof(P, 1))
 
 #endif /* _LUX_VECTOR_H_ */
