@@ -27,7 +27,6 @@ typedef struct LuxSsolution  Lux_solution;
 typedef        Lux_solution *Lux_solutions; /* a <lux/vector.h> */
 
 struct LuxSsolution {
- 	Lux_task *super;
 	struct {
 		double add;
 		double mul;
@@ -36,6 +35,8 @@ struct LuxSsolution {
 	} opcnt;      /* floating-point operation counts     */
 	double ecost; /* estimated computation cost in ticks */
 	double mcost; /* measured  computation cost in ticks */
+
+	Lux_task *task;
 };
 
 #endif /* _LUX_SOLUTION_H_ */

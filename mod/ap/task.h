@@ -28,14 +28,14 @@ struct LuxStask {
 	   of exec() below is also problem specific.  */
 	void (*exec)(Lux_task *);
 
-	/* Internally, Lux_task should embed the problem specific
+	/* Internally, a Lux_task should embed the problem specific
 	   plan, params, ro, rw, and wo.  E.g.,
+
 	Lux_plan    plan;
 	Lux_params  params;
 	const void *input;
 	void       *buffer;
-	void       *output;
-	*/
+	void       *output; */
 };
 
 #endif /* _LUX_TASK_H_ */

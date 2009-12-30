@@ -23,22 +23,25 @@
 /* Forward declaration only: problem specific interface */
 typedef struct LuxSalgo Lux_algo;
 
-/* A Lux_algo should contain everything, expect the actual pointer to
-   memory, for performing an algorithm.  These include the `driver,
-   `istate`, and `xstate`, for a driver function or the actual
-   algorithm, internal derived state, and external input state,
-   respectively.  For example, for FFT, we may define
-
 struct LuxSalgo {
+	int: 0; /* a hack for creating empty struct */
+
+	/* Internally, a Lux_algo should contain everything, expect
+	   the actual pointer to memory, for performing an algorithm.
+	   These include the `driver`, `istate`, and `xstate`, for a
+	   driver function or the actual algorithm, internal derived
+	   state, and external input state, respectively.  For
+	   example, for FFT, we may define
+
 	// driver
-	int (*apply)(Lux_algo *,
-	             const Lux_real *ro, Lux_real *rw, Lux_real *wo);
+	int (*apply)(Lux_algo *, ...);
+
 	// istate
 	Lux_mpi *mpi;
 
 	// xstate
 	Lux_dope *in;
-	Lux_dope *out;
-}; */
+	Lux_dope *out; */
+};
 
 #endif /* _LUX_ALGO_H_ */
