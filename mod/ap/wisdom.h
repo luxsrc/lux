@@ -17,15 +17,13 @@
  * You should have received a copy of the GNU General Public License
  * along with lux.  If not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef _LUX_SOLUTION_H_
-#define _LUX_SOLUTION_H_
-
-#include <lux/ap/task.h>
+#ifndef _LUX_WISDOM_H_
+#define _LUX_WISDOM_H_
 
 /* Forward declaration */
-typedef struct LuxSsolution Lux_solution;
+typedef struct LuxSwisdom Lux_wisdom;
 
-struct LuxSsolution {
+struct LuxSwisdom {
 	struct {
 		double add;
 		double mul;
@@ -35,7 +33,7 @@ struct LuxSsolution {
 	double ecost; /* estimated computation cost in ticks */
 	double mcost; /* measured  computation cost in ticks */
 
-	Lux_task *task;
+	uintptr_t task_hash;
 };
 
-#endif /* _LUX_SOLUTION_H_ */
+#endif /* _LUX_WISDOM_H_ */
