@@ -44,19 +44,19 @@ struct wrapper {
 
 /* The map_*() functions and mapped I/O functions for funopen() */
 static int
-map_read(void *w, char *buf, int sz)
+readfn(void *w, char *buf, int sz)
 {
 	return W->read(W->cookie, buf, sz);
 }
 
 static int
-map_write(void *w, const char *buf, int sz)
+writefn(void *w, const char *buf, int sz)
 {
 	return W->write(W->cookie, buf, sz);
 }
 
 static fpos_t
-map_seek(void *w, fpos_t offset, int whence)
+seekfn_safe(void *w, fpos_t offset, int whence)
 {
 	off64_t off = offset; /* assume fpos_t an int when funopen() is used */
 	int     err = W->seek ? W->seek(W->cookie, &off, whence) : -1;
@@ -65,7 +65,7 @@ map_seek(void *w, fpos_t offset, int whence)
 }
 
 static int
-map_close(void *w)
+closefn_safe(void *w)
 {
 	int err = W->close ? W->close(W->cookie) : 0;
 	free(w); /* always free the cookie mapper to avoid memory leakage */
@@ -118,9 +118,10 @@ fopencookie(void *cookie, const char *mode, cookie_io_functions_t iof)
 
 	/* Use funopen() to create a stream */
 	f = funopen(w,
-	            flags & READ  ? map_read  : NULL,
-	            flags & WRITE ? map_write : NULL,
-	            map_seek, map_close); /* always pass map_{seek,close}() */
+	            flags & READ  ? readfn  : NULL,
+	            flags & WRITE ? writefn : NULL,
+	            seekfn_safe,
+	            closefn_safe); /* always pass {seek,close}fn_safe() */
 	if(!f)
 		goto cleanup2;
 
