@@ -30,7 +30,7 @@
 #define W           ((struct wrapper *)w)
 #define READ        (1U << 0)
 #define WRITE       (1U << 1)
-#define SEEK        (1U << 2)
+#define APPEND      (1U << 2)
 #define MATCH(a, b) (!strcmp(a, b))
 
 /* This internal wrapper is the mapped cookie for funopen() */
@@ -62,7 +62,7 @@ static fpos_t
 map_seek(void *w, fpos_t offset, int whence)
 {
 	off64_t off = offset; /* assume fpos_t an int when funopen() is used */
-	int     err = W->flags & SEEK ? W->seek(W->cookie, &off, whence) : -1;
+	int     err = W->seek ? W->seek(W->cookie, &off, whence) : -1;
 	return  err ? (fpos_t)err : (fpos_t)off;
 	/* TODO: set errno or failed; check overflow */
 }
@@ -82,14 +82,14 @@ fopencookie(void *cookie, const char *mode, cookie_io_functions_t iof)
 	FILE *f;
 	unsigned flags;
 
-	/* Check mode[]; FIXME: how to use SEEK? */
+	/* Check mode[] */
 	if(!mode)
 		goto cleanup1;
 
 	switch(mode[0]) {
-	case 'r': flags = READ;  break;
-	case 'w': /* fall-thought */
-	case 'a': flags = WRITE; break;
+	case 'r': flags = READ;           break;
+	case 'w': flags = WRITE;          break;
+	case 'a': flags = WRITE | APPEND; break;
 	default : goto cleanup1;
 	}
 
@@ -120,6 +120,12 @@ fopencookie(void *cookie, const char *mode, cookie_io_functions_t iof)
 	            map_close); /* always pass map_close() */
 	if(!f)
 		goto cleanup2;
+
+	if(flags & APPEND)
+		if(fseek(f, 0L, SEEK_END) < 0) {
+			fclose(f);
+			return NULL;
+		}
 
 	return f;
 
