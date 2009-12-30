@@ -40,22 +40,19 @@ struct wrapper {
 	cookie_write_function_t *write;
 	cookie_seek_function_t  *seek;
 	cookie_close_function_t *close;
-	unsigned                 flags;
 };
 
 /* The map_*() functions and mapped I/O functions for funopen() */
 static int
 map_read(void *w, char *buf, int sz)
 {
-	return W->flags & READ ? W->read(W->cookie, buf, sz) : -1;
-	/* TODO: set errno or failed */
+	return W->read(W->cookie, buf, sz);
 }
 
 static int
 map_write(void *w, const char *buf, int sz)
 {
-	return W->flags & WRITE ? W->write(W->cookie, buf, sz) : -1;
-	/* TODO: set errno or failed */
+	return W->write(W->cookie, buf, sz);
 }
 
 static fpos_t
@@ -118,14 +115,12 @@ fopencookie(void *cookie, const char *mode, cookie_io_functions_t iof)
 	w->write  = iof.write;
 	w->seek   = iof.seek;
 	w->close  = iof.close;
-	w->flags  = flags;
 
 	/* Use funopen() to create a stream */
 	f = funopen(w,
-	            w->read  ? map_read  : NULL,
-	            w->write ? map_write : NULL,
-	            w->seek  ? map_seek  : NULL,
-	            map_close); /* always pass map_close() */
+	            flags & READ  ? map_read  : NULL,
+	            flags & WRITE ? map_write : NULL,
+	            map_seek, map_close); /* always pass map_{seek,close}() */
 	if(!f)
 		goto cleanup2;
 
