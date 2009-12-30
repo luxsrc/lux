@@ -19,43 +19,42 @@
  */
 #include <lux.h>
 #include <lux/cookie.h>
+#include <string.h> /* for strcmp() */
 
 #if HAVE_FOPENCOOKIE
 /* Use the system fopencookie(); implement nothing */
 #elif HAVE_FUNOPEN
-/* Implement fopencookie() using funopen()
- *
- * Although BSD came up with funopen() first, it erroneously assumes
- * that fpos_t is an integral type.  If we had decided to make
- * funopen() portable, lux would have needed to create a wrapper
- * function anyway.  Therefore, we use fopencookie() as lux's
- * "standard".  Also, fopencookie() takes a "mode" argument, which
- * makes it more fopen()-like.
- */
+/* Implement fopencookie() using funopen() */
 #include <stdlib.h> /* for malloc() and free() */
 
-#define W ((struct wrapper *)w)
+#define W           ((struct wrapper *)w)
+#define READ        (1U << 0)
+#define WRITE       (1U << 1)
+#define MATCH(a, b) (!strcmp(a, b))
 
-/* Wrapper is the mapped cookie for funopen() */
+/* This internal wrapper is the mapped cookie for funopen() */
 struct wrapper {
 	void                    *cookie;
 	cookie_read_function_t  *read;
 	cookie_write_function_t *write;
 	cookie_seek_function_t  *seek;
 	cookie_close_function_t *close;
+	unsigned                 flags;
 };
 
 /* The map_*() functions and mapped I/O functions for funopen() */
 static int
 map_read(void *w, char *buf, int sz)
 {
-	return W->read(W->cookie, buf, sz);
+	return W->flags & READ ? W->read(W->cookie, buf, sz) : -1;
+	/* TODO: set errno or failed */
 }
 
 static int
 map_write(void *w, const char *buf, int sz)
 {
-	return W->write(W->cookie, buf, sz);
+	return W->flags & WRITE ? W->write(W->cookie, buf, sz) : -1;
+	/* TODO: set errno or failed */
 }
 
 static fpos_t
@@ -63,7 +62,7 @@ map_seek(void *w, fpos_t offset, int whence)
 {
 	off64_t off = offset; /* assume fpos_t an int when funopen() is used */
 	int     err = W->seek(W->cookie, &off, whence);
-	return err ? (fpos_t)err : (fpos_t)off;
+	return err ? (fpos_t)err : (fpos_t)off; /* TODO: check overflow */
 }
 
 static int
@@ -77,9 +76,30 @@ map_close(void *w)
 FILE *
 fopencookie(void *cookie, const char *mode, cookie_io_functions_t iof)
 {
+	struct wrapper *w;
 	FILE *f;
+	unsigned flags;
 
-	struct wrapper *w = (struct wrapper *)malloc(sizeof(struct wrapper));
+	/* Check mode[] */
+	if(!mode)
+		goto cleanup1;
+
+	switch(mode[0]) {
+	case 'r': flags = READ;  break;
+	case 'w': /* fall-thought */
+	case 'a': flags = WRITE; break;
+	default : goto cleanup1;
+	}
+
+	     if(MATCH(mode+1, ""  )||
+	        MATCH(mode+1, "b" ) ) /* do nothing */;
+	else if(MATCH(mode+1, "+" )||
+	        MATCH(mode+1, "+b")||
+	        MATCH(mode+1, "b+") ) flags |= (READ | WRITE);
+	else                          goto cleanup1;
+
+	/* mode[] is valid; allocate and initialize a wrapper */
+	w = (struct wrapper *)malloc(sizeof(struct wrapper));
 	if(!w)
 		goto cleanup1;
 
@@ -88,7 +108,9 @@ fopencookie(void *cookie, const char *mode, cookie_io_functions_t iof)
 	w->write  = iof.write;
 	w->seek   = iof.seek;
 	w->close  = iof.close;
+	w->flags  = flags;
 
+	/* Use funopen() to create a stream */
 	f = funopen(w,
 	            w->read  ? map_read  : NULL,
 	            w->write ? map_write : NULL,
@@ -103,10 +125,8 @@ fopencookie(void *cookie, const char *mode, cookie_io_functions_t iof)
 	free(w); /* free the cookie mapper only */
  cleanup1:
 	return NULL;
-
-	(void)mode; /* silence unused variable warning; ignore mode for now */
 }
 #else
 # error neither fopencookie() nor funopen() are found;
-# error no way to provide fopencookie().
+# error no way to implement fopencookie().
 #endif
