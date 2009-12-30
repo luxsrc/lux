@@ -45,9 +45,11 @@ AC_TRY_LINK([#if HAVE_INTRINSICS_H
 #endif], [_rtc()], [AC_DEFINE(HAVE__RTC, 1, [Define if you have the UNICOS _rtc() intrinsic.])], [rtc_ok=no])
 AC_MSG_RESULT($rtc_ok)
 
-dnl Check for types
+dnl Find out the number of bits in integer types
 AC_COMPUTE_INT([ibits], [sizeof(int)      * CHAR_BIT], [#include <limits.h>], [AC_MSG_ERROR([failed to compute the size of int in bits])])
 AC_COMPUTE_INT([ubits], [sizeof(unsigned) * CHAR_BIT], [#include <limits.h>], [AC_MSG_ERROR([failed to compute the size of unsigned in bits])])
+AC_COMPUTE_INT([sbits], [sizeof(size_t)   * CHAR_BIT], [#include <limits.h>
+#include <stdlib.h>], [AC_MSG_ERROR([failed to compute the size of size_t in bits])])
 
 dnl Find out the number of bits required to hold all error codes
 AC_COMPUTE_INT([elast], [ELAST],       [#include <errno.h>], [
@@ -70,6 +72,14 @@ if test $fbits -gt $hbits; then
 	fbits=$hbits
 fi
 mbits=`expr $ubits - $hbits - $fbits` # works properly even if $ubits is odd, although C standard ensures that $ubits is 16, 32, or 64
+
+dnl Find out the number of bits required to hold tensor dimensions
+if   test $sbits -ge 64; then dbits=59 # at most rank 32
+elif test $sbits -ge 32; then dbits=28 # at most rank 16
+elif test $sbits -ge 16; then dbits=13 # at most rank 8, same as IDL ;-)
+else
+	AC_MSG_ERROR([A ${sbits}-bit size_t is unexpectedly small; please describe your platform to <$PACKAGE_BUGREPORT>])
+fi
 
 dnl Customize "config.h" and rename it to "lux.h"
 # The `configure` script produces a customized public header "lux.h"
@@ -114,12 +124,14 @@ else
 fi
 
 dnl Define error code related macros
-AC_DEFINE_UNQUOTED(LUX_ELAST,        $elast, [Define to the largest system error code.])
-AC_DEFINE_UNQUOTED(LUX_STRINGID_BIT, $hbits, [Define to the required bits to hold a string key.])
-AC_DEFINE_UNQUOTED(LUX_FACILITY_BIT, $mbits, [Define to the required bits to hold a facility key.])
-AC_DEFINE_UNQUOTED(LUX_FAILURE_BIT,  $fbits, [Define to the required bits to hold a lux failure code.])
-AC_DEFINE_UNQUOTED(LUX_INT_BIT,      $ibits, [Define to the number of bits of int.])
-AC_DEFINE_UNQUOTED(LUX_UNSIGNED_BIT, $ubits, [Define to the number of bits of unsigned.])
+AC_DEFINE_UNQUOTED(LUX_ELAST,         $elast, [Define to the largest system error code.])
+AC_DEFINE_UNQUOTED(LUX_STRINGID_BIT,  $hbits, [Define to the required bits to hold a string key.])
+AC_DEFINE_UNQUOTED(LUX_FACILITY_BIT,  $mbits, [Define to the required bits to hold a facility key.])
+AC_DEFINE_UNQUOTED(LUX_FAILURE_BIT,   $fbits, [Define to the required bits to hold a lux failure code.])
+AC_DEFINE_UNQUOTED(LUX_INT_BIT,       $ibits, [Define to the number of bits of int.])
+AC_DEFINE_UNQUOTED(LUX_UNSIGNED_BIT,  $ubits, [Define to the number of bits of unsigned.])
+AC_DEFINE_UNQUOTED(LUX_SIZE_T_BIT,    $sbits, [Define to the number of bits of int.])
+AC_DEFINE_UNQUOTED(LUX_TENSORDIM_BIT, $dbits, [Define to the number of bits of dimensions used in <lux/tensor.h>.])
 
 dnl Make assertion a configure option (default disabled)
 AC_ARG_ENABLE(assertion, [AC_HELP_STRING([--enable-assertion],[compile lux with assertion for debugging])], ok=$enableval, ok=no)
