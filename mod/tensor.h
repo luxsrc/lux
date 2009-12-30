@@ -36,7 +36,17 @@
    We do not list all the possible ways here.  The basic principle is
    the same as <lux/vector.h>, that we need to keep track both a
    header that contains the rank and dimension information, and the
-   actual data of the tensor.  */
+   actual data of the tensor.
+
+   In principle, we can let tfree() and getdim() determine the rank in
+   runtime.  Nevertheless, we intend to use <lux/tensor.h> even in
+   performance critical inner loops.  Hence, we keep <lux/tensor.h>
+   static to ensure it can be optimized at compile time.  The
+   programmer must keep track of the tensor rank at compile time.
+
+   For dynamic rank tensors, the programmer can use <lux/dope.h>.  For
+   static dimension tensors, the programmer should simply use fixed
+   dimension arryas, e.g., `arr[16][16][16]`.  */
 
 #define _TENSOROF(T, R) struct { size_t d[R]; T e[8]; }
 #define _HEADERSZ(T, R) offsetof(_TENSOROF(T, R), e)
@@ -44,34 +54,34 @@
 
 #if LUX_ASSERTION
 
-#define LUX_TENSORDIM_MASK (((size_t)1 << LUX_TENSORDIM_BIT) - 1)
-#define LUX_TENSORRANK_MAX ((size_t)1 << (LUX_SIZE_T_BIT - LUX_TENSORDIM_BIT))
+#define LUX_TENSORDIM_MAX (((size_t)1 << LUX_TENSORDIM_BIT) - 1)
+#define LUX_TENSORRNK_MAX ((size_t)1 << (LUX_SIZE_T_BIT - LUX_TENSORDIM_BIT))
 
-#define talloc(T, ...) ({                                        \
-	size_t *_ptr_;                                           \
-	                                                         \
-	size_t _dims_[] = {__VA_ARGS__};                         \
-	size_t _rank_   = countof(_dims_);                       \
-	size_t _hsz_    = _HEADERSZ(T, countof(_dims_));         \
-	size_t _cnt_, _i_;                                       \
-	lux_assert(_rank_ <= LUX_TENSORRANK_MAX);                \
-	for(_i_ = 0, _cnt_ = 1; _i_ < _rank_; ++_i_) {           \
-		lux_assert(_dims_[_i_] <= LUX_TENSORDIM_MASK);   \
-		_cnt_ *= _dims_[_i_];                            \
-	}                                                        \
-	                                                         \
-	_ptr_ = malloc(_hsz_ + sizeof(T) * _cnt_);               \
-	if(_ptr_)                                                \
-		for(_i_ = 0; _i_ < _rank_; ++_i_)                \
-			_ptr_[_i_] = _i_ << LUX_TENSORDIM_BIT |  \
-			     (_dims_[_i_] & LUX_TENSORDIM_MASK); \
-	(T *)((char *)_ptr_ + (_ptr_ ? _hsz_ : 0));              \
+#define talloc(T, ...) ({                                       \
+	size_t *_ptr_;                                          \
+	                                                        \
+	size_t _dims_[] = {__VA_ARGS__};                        \
+	size_t _rnk_    = countof(_dims_);                      \
+	size_t _hsz_    = _HEADERSZ(T, countof(_dims_));        \
+	size_t _cnt_, _i_;                                      \
+	lux_assert(_rnk_ <= LUX_TENSORRNK_MAX);                 \
+	for(_i_ = 0, _cnt_ = 1; _i_ < _rnk_; ++_i_) {           \
+		lux_assert(_dims_[_i_] <= LUX_TENSORDIM_MAX);   \
+		_cnt_ *= _dims_[_i_];                           \
+	}                                                       \
+	                                                        \
+	_ptr_ = malloc(_hsz_ + sizeof(T) * _cnt_);              \
+	if(_ptr_)                                               \
+		for(_i_ = 0; _i_ < _rnk_; ++_i_)                \
+			_ptr_[_i_] = _i_ << LUX_TENSORDIM_BIT | \
+			     (_dims_[_i_] & LUX_TENSORDIM_MAX); \
+	(T *)((char *)_ptr_ + (_ptr_ ? _hsz_ : 0));             \
 })
 #define tfree(P, R)     free(_HEADEROF(P, R))
-#define getdim(P, R, J) ({	                                            \
-	size_t _rank_ = (_HEADEROF(P, R)->d[R-1] >> LUX_TENSORDIM_BIT) + 1; \
-	lux_assert(_rank_ == R);                                            \
-	_HEADEROF(P, R)->d[J] & LUX_TENSORDIM_MASK;                         \
+#define getdim(P, R, J) ({	                                           \
+	size_t _rnk_ = (_HEADEROF(P, R)->d[R-1] >> LUX_TENSORDIM_BIT) + 1; \
+	lux_assert(_rnk_ == R);                                            \
+	_HEADEROF(P, R)->d[J] & LUX_TENSORDIM_MAX;                         \
 })
 
 #else
@@ -80,15 +90,15 @@
 	size_t *_ptr_;                                   \
 	                                                 \
 	size_t _dims_[] = {__VA_ARGS__};                 \
-	size_t _rank_   = countof(_dims_);               \
+	size_t _rnk_    = countof(_dims_);               \
 	size_t _hsz_    = _HEADERSZ(T, countof(_dims_)); \
 	size_t _cnt_, _i_;                               \
-	for(_i_ = 0, _cnt_ = 1; _i_ < _rank_; ++_i_)     \
+	for(_i_ = 0, _cnt_ = 1; _i_ < _rnk_; ++_i_)      \
 		_cnt_ *= _dims_[_i_];                    \
 	                                                 \
 	_ptr_ = malloc(_hsz_ + sizeof(T) * _cnt_);       \
 	if(_ptr_)                                        \
-		for(_i_ = 0; _i_ < _rank_; ++_i_)        \
+		for(_i_ = 0; _i_ < _rnk_; ++_i_)         \
 			_ptr_[_i_] = _dims_[_i_];        \
 	(T *)((char *)_ptr_ + (_ptr_ ? _hsz_ : 0));      \
 })
