@@ -21,7 +21,7 @@
 #define _LUX_TENSOR_H_
 
 #define countof(A) (sizeof(A) / sizeof(A[0]))
-#define lengthof(...) ({ size_t arr[] = {__VA_ARGS__}; countof(arr); })
+#define lengthof(...) ({ size_t _arr_[] = {__VA_ARGS__}; countof(_arr_); })
 
 #include <lux/header.h>
 #include <lux/offset.h>
@@ -46,20 +46,20 @@
 #define _PSIZEOFD(R, T) offsetof(_TENSOROF(R, T), e)
 #define _HEADEROF(R, P) headerof(_TENSOROF(R, typeof(*P)), P, e)
 
-#define _talloc(dsz, esz, ...) ({      \
-	size_t *p;                     \
-	                               \
-	size_t ds[] = {__VA_ARGS__};   \
-	size_t r    = countof(ds);     \
-	size_t c    = 1;               \
-	size_t i;                      \
-	for(i = 0; i < r; ++i)         \
-		c *= ds[i];            \
-	                               \
-	p = malloc((dsz) + (esz) * c); \
-	for(i = 0; i < r; ++i)         \
-		p[i] = ds[i];          \
-	(char *)p + (dsz);             \
+#define _talloc(dsz, esz, ...) ({              \
+	size_t *_ptr_;                         \
+	                                       \
+	size_t _dims_[] = {__VA_ARGS__};       \
+	size_t _rank_   = countof(_dims_);     \
+	size_t _cnt_    = 1;                   \
+	size_t _i_;                            \
+	for(_i_ = 0; _i_ < _rank_; ++_i_)      \
+		_cnt_ *= _dims_[_i_];          \
+	                                       \
+	_ptr_ = malloc((dsz) + (esz) * _cnt_); \
+	for(_i_ = 0; _i_ < _rank_; ++_i_)      \
+		_ptr_[_i_] = _dims_[_i_];      \
+	(char *)_ptr_ + (dsz);                 \
 })
 
 #define talloc(T, ...) ((T *)_talloc(_PSIZEOFD(lengthof(__VA_ARGS__), T), sizeof(T), __VA_ARGS__))
