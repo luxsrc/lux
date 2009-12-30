@@ -105,6 +105,6 @@
 
 #define valloc(T, D) talloc(T, D)
 #define vfree(P)     tfree(P, 1)
-#define dimof(P)     (*dimsof(P, 1))
+#define dimof(P)     getdim(P, 1, 0)
 
 #endif /* _LUX_VECTOR_H_ */

@@ -37,6 +37,8 @@
    header that contains the rank and dimension information, and the
    actual data of the tensor.  */
 
+#define LUX_TENSORDIM_MASK (((size_t)1 << LUX_TENSORDIM_BIT) - 1)
+
 #define _TENSOROF(T, R) struct { size_t d[R]; T e[8]; }
 #define _HEADERSZ(T, R) offsetof(_TENSOROF(T, R), e)
 #define _HEADEROF(P, R) headerof(_TENSOROF(typeof(*P), R), P, e)
@@ -53,11 +55,13 @@
 	                                                 \
 	_ptr_ = malloc(_hsz_ + sizeof(T) * _cnt_);       \
 	for(_i_ = 0; _i_ < _rank_; ++_i_)                \
-		_ptr_[_i_] = _dims_[_i_];                \
+		_ptr_[_i_] = _i_ << LUX_TENSORDIM_BIT |  \
+		     (_dims_[_i_] & LUX_TENSORDIM_MASK); \
 	(T *)((char *)_ptr_ + _hsz_);                    \
 })
 
-#define tfree(P, R)  free(_HEADEROF(P, R))
-#define dimsof(P, R) (_HEADEROF(P, R)->d)
+#define tfree(P, R)      free(_HEADEROF(P, R))
+#define getdim(P, R, J)  (_HEADEROF(P, R)->d[J] & LUX_TENSORDIM_MASK)
+#define getrank(P, R, J) (_HEADEROF(P, R)->d[J] >> LUX_TENSORDIM_BIT)
 
 #endif /* _LUX_TENSOR_H_ */
