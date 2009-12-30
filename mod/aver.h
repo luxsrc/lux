@@ -17,23 +17,18 @@
  * You should have received a copy of the GNU General Public License
  * along with lux.  If not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef _LUX_ASSERT_H_
-#define _LUX_ASSERT_H_
+#ifndef _LUX_AVER_H_
+#define _LUX_AVER_H_
 
-/* Run-time assertion similar to C's standard assert() macro */
+/* Compile-time assertion; hence the more formal term "aver" */
 
-#ifndef LUX_ASSERT_FAILURE
-#define LUX_ASSERT_FAILURE 0
+#ifndef LUX_AVER_FAILURE
+#define LUX_AVER_FAILURE 0
 #endif
 
-#if LUX_ASSERTION
-#define lux_assert(E) do {	                                              \
-	if((E) == LUX_ASSERT_FAILURE)                                         \
-		lux_fatal("lux_assert(" #E ") failed on line %d in \"%s\"\n", \
-		          __LINE__, __FILE__);                                \
+#define lux_aver(E) do {                             \
+	char aver[(E) == LUX_AVER_FAILURE ? -1 : 1]; \
+	(void)aver;                                  \
 } while(0)
-#else
-#define lux_assert(E) /* do nothing */
-#endif
 
-#endif /* _LUX_ASSERT_H_ */
+#endif /* _LUX_AVER_H_ */
