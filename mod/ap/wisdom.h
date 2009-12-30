@@ -24,16 +24,23 @@
 typedef struct LuxSwisdom Lux_wisdom;
 
 struct LuxSwisdom {
+	uintptr_t hask; /* hash of task */
+
 	struct {
 		double add;
 		double mul;
 		double fma;
 		double other;
-	} opcnt;      /* floating-point operation counts     */
-	double ecost; /* estimated computation cost in ticks */
-	double mcost; /* measured  computation cost in ticks */
+	} opcnt; /* floating-point operation counts */
 
-	uintptr_t task_hash;
+	double ecost; /* estimated computation cost in ticks */
+
+	struct {
+		size_t n;
+		double tot;
+		double min;
+		double max;
+	} mcost; /* measured computation cost in ticks */
 };
 
 #endif /* _LUX_WISDOM_H_ */
