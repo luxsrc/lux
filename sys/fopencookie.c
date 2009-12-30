@@ -25,35 +25,35 @@
 #elif HAVE_FUNOPEN
 /* Implement fopencookie() using funopen() */
 #include <stdlib.h> /* for malloc() and free() */
-#include <string.h> /* for strcmp() */
 
-#define W           ((struct wrapper *)w)
-#define READ        (1U << 0)
-#define WRITE       (1U << 1)
-#define APPEND      (1U << 2)
-#define MATCH(a, b) (!strcmp(a, b))
+#define W ((struct wrapper *)w)
 
+#define READ   (1U << 0)
+#define WRITE  (1U << 1)
+#define APPEND (1U << 2)
+#define BINARY (1U << 3) /* not used in Unux/Linux */
+#define RDWR   (READ|WRITE)
+
+#define SET(f, F) (((f) & (F)) == (F)) /* check if F is set or not; work even
+                                          when F is not a single bit */
 static inline unsigned
 mode2flags(const char *mode)
 {
-	unsigned flags;
+	unsigned flags = 0;
 
-	if(!mode)
-		return 0;
+	if(mode)
+		switch(mode[0]) {
+		case 'r': flags = READ;         break;
+		case 'w': flags = WRITE;        break;
+		case 'a': flags = WRITE|APPEND; break;
+		}
 
-	switch(mode[0]) {
-	case 'r': flags = READ;           break;
-	case 'w': flags = WRITE;          break;
-	case 'a': flags = WRITE | APPEND; break;
-	default : return 0;
-	}
-
-	     if(MATCH(mode+1, ""  )||
-	        MATCH(mode+1, "b" ) ) /* do nothing */;
-	else if(MATCH(mode+1, "+" )||
-	        MATCH(mode+1, "+b")||
-	        MATCH(mode+1, "b+") ) flags |= (READ | WRITE);
-	else                          return 0;
+	while(flags && *++mode)
+		switch(mode[0]) {
+		case '+': flags = SET(flags, RDWR)   ? 0 : flags|RDWR;   break;
+		case 'b': flags = SET(flags, BINARY) ? 0 : flags|BINARY; break;
+		default : flags = 0;                                     break;
+		}
 
 	return flags;
 }
