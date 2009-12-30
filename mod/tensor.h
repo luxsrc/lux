@@ -20,6 +20,9 @@
 #ifndef _LUX_TENSOR_H_
 #define _LUX_TENSOR_H_
 
+#define countof(A) (sizeof(A) / sizeof(A[0]))
+#define lengthof(...) ({ size_t arr[] = {__VA_ARGS__}; countof(arr); })
+
 #include <lux/header.h>
 #include <lux/offset.h>
 #include <stdlib.h> /* for malloc() and free() */
@@ -39,28 +42,27 @@
    header that contains the rank and dimension information, and the
    actual data of the tensor.  */
 
-#define _COUNTOF(...) ({ size_t arr[] = {__VA_ARGS__}; sizeof(arr) / sizeof(size_t); })
 #define _TENSOROF(R, T) struct { size_t d[R]; T e[8]; }
 #define _PSIZEOFD(R, T) offsetof(_TENSOROF(R, T), e)
 #define _HEADEROF(R, P) headerof(_TENSOROF(R, typeof(*P)), P, e)
 
-#define _talloc(dsz, esz, ...) ({                 \
-	size_t *p;                                \
-	                                          \
-	size_t ds[] = {__VA_ARGS__};              \
-	size_t r   = sizeof(ds) / sizeof(size_t); \
-	size_t c    = 1;                          \
-	size_t i;                                 \
-	for(i = 0; i < r; ++i)                    \
-		c *= ds[i];                       \
-	                                          \
-	p = malloc((dsz) + (esz) * c);            \
-	for(i = 0; i < r; ++i)                    \
-		p[i] = ds[i];                     \
-	(char *)p + (dsz);                        \
+#define _talloc(dsz, esz, ...) ({      \
+	size_t *p;                     \
+	                               \
+	size_t ds[] = {__VA_ARGS__};   \
+	size_t r    = countof(ds);     \
+	size_t c    = 1;               \
+	size_t i;                      \
+	for(i = 0; i < r; ++i)         \
+		c *= ds[i];            \
+	                               \
+	p = malloc((dsz) + (esz) * c); \
+	for(i = 0; i < r; ++i)         \
+		p[i] = ds[i];          \
+	(char *)p + (dsz);             \
 })
 
-#define talloc(T, ...) ((T *)_talloc(_PSIZEOFD(_COUNTOF(__VA_ARGS__), T), sizeof(T), __VA_ARGS__))
+#define talloc(T, ...) ((T *)_talloc(_PSIZEOFD(lengthof(__VA_ARGS__), T), sizeof(T), __VA_ARGS__))
 #define tfree(R, P)  free(_HEADEROF(R, P))
 #define dimsof(R, P) (_HEADEROF(R, P)->d)
 
