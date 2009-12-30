@@ -46,21 +46,20 @@
 #define _HEADERSZ(T, R) offsetof(_TENSOROF(T, R), e)
 #define _HEADEROF(P, R) headerof(_TENSOROF(typeof(*P), R), P, e)
 
-#define talloc(T, ...) ({                          \
-	size_t *_ptr_;                             \
-	                                           \
-	size_t _dims_[] = {__VA_ARGS__};           \
-	size_t _rank_   = countof(_dims_);         \
-	size_t _hsz_    = _HEADERSZ(T, _rank_);    \
-	size_t _cnt_    = 1;                       \
-	size_t _i_;                                \
-	for(_i_ = 0; _i_ < _rank_; ++_i_)          \
-		_cnt_ *= _dims_[_i_];              \
-	                                           \
-	_ptr_ = malloc(_hsz_ + sizeof(T) * _cnt_); \
-	for(_i_ = 0; _i_ < _rank_; ++_i_)          \
-		_ptr_[_i_] = _dims_[_i_];          \
-	(T *)((char *)_ptr_ + _hsz_);              \
+#define talloc(T, ...) ({                                \
+	size_t *_ptr_;                                   \
+	                                                 \
+	size_t _dims_[] = {__VA_ARGS__};                 \
+	size_t _rank_   = countof(_dims_);               \
+	size_t _hsz_    = _HEADERSZ(T, countof(_dims_)); \
+	size_t _cnt_, _i_;                               \
+	for(_i_ = 0, _cnt_ = 1; _i_ < _rank_; ++_i_)     \
+		_cnt_ *= _dims_[_i_];                    \
+	                                                 \
+	_ptr_ = malloc(_hsz_ + sizeof(T) * _cnt_);       \
+	for(_i_ = 0; _i_ < _rank_; ++_i_)                \
+		_ptr_[_i_] = _dims_[_i_];                \
+	(T *)((char *)_ptr_ + _hsz_);                    \
 })
 
 #define tfree(P, R)  free(_HEADEROF(P, R))
