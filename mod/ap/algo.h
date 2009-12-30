@@ -17,27 +17,28 @@
  * You should have received a copy of the GNU General Public License
  * along with lux.  If not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef _LUX_PLAN_H_
-#define _LUX_PLAN_H_
+#ifndef _LUX_ALGO_H_
+#define _LUX_ALGO_H_
 
 /* Forward declaration only: problem specific interface */
-typedef struct LuxSplan Lux_plan;
+typedef struct LuxSalgo Lux_algo;
 
-/* A Lux_plan should contain everything, expect the actual pointer to
+/* A Lux_algo should contain everything, expect the actual pointer to
    memory, for performing an algorithm.  These include the `driver,
    `istate`, and `xstate`, for a driver function or the actual
    algorithm, internal derived state, and external input state,
    respectively.  For example, for FFT, we may define
 
-struct LuxSplan {
+struct LuxSalgo {
 	// driver
-	int (*apply)(Lux_plan *,
+	int (*apply)(Lux_algo *,
 	             const Lux_real *ro, Lux_real *rw, Lux_real *wo);
 	// istate
 	Lux_mpi *mpi;
+
 	// xstate
 	Lux_dope *in;
 	Lux_dope *out;
 }; */
 
-#endif /* _LUX_PLAN_H_ */
+#endif /* _LUX_ALGO_H_ */

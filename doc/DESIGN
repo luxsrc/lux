@@ -345,31 +345,31 @@ OPTIMIZATION: according to the README.hacks file in the fftw2 library,
   for now).  Instead, lux uses a more flexible and lightweight, but
   problem dependent, structure:
 
-	struct plan {
-		void (*exec)(struct plan *, ...);
+	struct algo {
+		void (*apply)(struct algo *, ...);
 		struct { ... } istate;
 		struct { ... } xstate;
 	};
 
-  where exec() takes different arguments according to the algorithm.
+  where apply() takes different arguments according to the algorithm.
   For example, for an in-place FFT, it is
 
-	fft_inplace->exec(fft_inplace, array);
+	fft_inplace->apply(fft_inplace, array);
 
   and for a semi-implicit Runge-Kutta stepping for the Navier-Stokes
   equations, it is
 
-	rk4->exec(rk4, dt, nu, curr, next);
+	rk4->apply(rk4, dt, nu, curr, next);
 
   This approach mirrors the "new-array execute" functions in fftw3
   such as fftw_execute_dft() and fftw_execute_split_dft().
 
-  To summarize, the problem, plan, task, and solution data structures
+  To summarize, the problem, algo, task, and solution data structures
   need to store, and the solver and planner modules need to deliver,
   at least the following information:
 
     problem:                  xstate, params, ro, rw, wo (problem specific)
-    plan:     driver, istate, xstate                     (problem specific)
+    algo:     driver, istate, xstate                     (problem specific)
     task:     driver, istate, xstate, params, ro, rw, wo
     solution: driver, istate, xstate, params, ro, rw, wo, opcnt, ecost, mcost
 
@@ -379,7 +379,7 @@ OPTIMIZATION: according to the README.hacks file in the fftw2 library,
   In the above table, opcnt stands for floating-operation count, ecost
   stands for the estimated computation cost, and mcost stands for the
   measured computation cost.  Simply put, a lux AP solver returns an
-  array of solutions; while a planner returns a single optimal plan
+  array of solutions; while a planner returns a single optimal algo
   according to giving flags
 
   Because problems and plans are problem-specific, they are typedefs
@@ -448,7 +448,7 @@ MEMORY ORDER and DOPE VECTOR: in order to describe the memory layout
   Generally speaking, applying recursive loop in memory order should
   increase cache performance of modern CPUs.  Differentiating these
   two orders allows us to dynamically construct fast memory accessing
-  pattern in an plan even if the logical order of an array is fixed at
+  pattern in an algo even if the logical order of an array is fixed at
   compile-time.
 
   A dope vector holds information about memory layout of an array.
