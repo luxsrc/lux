@@ -28,8 +28,8 @@ typedef struct LuxSsolver Lux_solver;
 
 struct LuxSsolver {
 	/* A Lux_solver can solve a particular Lux_problem and return
-	   an array of Lux_solutions */
-	Lux_solutions (*solve)(Lux_solver *, Lux_problem *);
+	   a <lux/vector.h> of pointers to Lux_solution */
+	Lux_solution **(*solve)(Lux_solver *, Lux_problem *);
 };
 
 #endif /* _LUX_SOLVER_H_ */

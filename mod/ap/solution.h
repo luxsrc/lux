@@ -23,8 +23,7 @@
 #include <lux/ap/task.h>
 
 /* Forward declaration */
-typedef struct LuxSsolution  Lux_solution;
-typedef        Lux_solution *Lux_solutions; /* a <lux/vector.h> */
+typedef struct LuxSsolution Lux_solution;
 
 struct LuxSsolution {
 	struct {
