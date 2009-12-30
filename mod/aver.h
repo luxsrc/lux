@@ -19,9 +19,14 @@
  */
 #ifndef _LUX_AVER_H_
 #define _LUX_AVER_H_
-
-/* Compile-time assertion; hence the more formal term "aver" */
-
+/*
+ * Compile-time assertion; hence the more formal term "aver"
+ *
+ * The expression inside lux_aver() must be evaluated at compile time,
+ * otherwise lux_aver() will simply fail.  Because there is no runtime
+ * overhead, it does not make sense to disable lux_aver().  It is
+ * always on if used.
+ */
 #ifndef LUX_AVER_FAILURE
 #define LUX_AVER_FAILURE 0
 #endif

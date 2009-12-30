@@ -19,34 +19,34 @@
  */
 #ifndef _LUX_TENSOR_H_
 #define _LUX_TENSOR_H_
-
+/*
+ * Similar to <lux/vector.h>, there are different ways to keep track
+ * of the shapes of multi-dimensional arrays that makes sense in
+ * standard C.  For convenience, we call these arrays "tensors" so
+ * that their dimensions are naturally called "rank", and their shapes
+ * are naturally called "dimensions".
+ *
+ * We do not list all the possible ways here.  The basic principle is
+ * the same as <lux/vector.h>, that we need to keep track both a
+ * header that contains the rank and dimension information, and the
+ * actual data of the tensor.
+ *
+ * In principle, we can let tfree() and getdim() determine the rank in
+ * runtime.  Nevertheless, we intend to use <lux/tensor.h> even in
+ * performance critical inner loops.  Hence, we keep <lux/tensor.h>
+ * static to ensure it can be optimized at compile time.  The
+ * programmer must keep track of the tensor rank at compile time.
+ *
+ * For dynamic rank tensors, the programmer can use <lux/dope.h>.  For
+ * static dimension tensors, the programmer should simply use fixed
+ * dimension arryas, e.g., `arr[16][16][16]`.
+ */
 #include <lux/assert.h>
 #include <stdlib.h> /* for malloc() and free() */
 
 #if !HAVE_TYPEOF
 # error typeof() is not available; <lux/tensor.h> cannot be used as is
 #endif
-
-/* Similar to <lux/vector.h>, there are different ways to keep track
-   of the shapes of multi-dimensional arrays that makes sense in
-   standard C.  For convenience, we call these arrays "tensors" so
-   that their dimensions are naturally called "rank", and their shapes
-   are naturally called "dimensions".
-
-   We do not list all the possible ways here.  The basic principle is
-   the same as <lux/vector.h>, that we need to keep track both a
-   header that contains the rank and dimension information, and the
-   actual data of the tensor.
-
-   In principle, we can let tfree() and getdim() determine the rank in
-   runtime.  Nevertheless, we intend to use <lux/tensor.h> even in
-   performance critical inner loops.  Hence, we keep <lux/tensor.h>
-   static to ensure it can be optimized at compile time.  The
-   programmer must keep track of the tensor rank at compile time.
-
-   For dynamic rank tensors, the programmer can use <lux/dope.h>.  For
-   static dimension tensors, the programmer should simply use fixed
-   dimension arryas, e.g., `arr[16][16][16]`.  */
 
 #define _TENSOROF(T, R) struct { size_t d[R]; T e[8]; }
 #define _HEADERSZ(T, R) offsetof(_TENSOROF(T, R), e)

@@ -19,9 +19,14 @@
  */
 #ifndef _LUX_ASSERT_H_
 #define _LUX_ASSERT_H_
-
-/* Run-time assertion similar to C's standard assert() macro */
-
+/*
+ * Run-time assertion similar to C's standard assert() macro
+ *
+ * lux_assert() is only enabled if LUX_ASSERTION is defined, which is
+ * only defined if "--enable-assertion" is passed at configure time.
+ * When assertion is disabled, the expreission inside lux_assert() is
+ * not seen by compiler and hence has no runtime overhead.
+ */
 #ifndef LUX_ASSERT_FAILURE
 #define LUX_ASSERT_FAILURE 0
 #endif
