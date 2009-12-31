@@ -23,16 +23,9 @@
  * Generalized <lux/tensor.h> that determines rank at runtime
  */
 #include <lux/assert.h>
+#include <lux/dope.h>
 #include <stddef.h> /* for ptrdiff_t */
 #include <stdlib.h> /* for malloc() and free() */
-
-struct dope {
-	size_t    d; /* bitwise-OR of rank and dimension */
-	ptrdiff_t s; /* stride is in unit of bytes */
-};
-
-#define LUX_ARRDIM_MAX (((size_t)1 << LUX_ARRDIM_BIT) - 1)
-#define LUX_ARRRNK_MAX ((size_t)1 << (LUX_SIZE_T_BIT - LUX_ARRDIM_BIT))
 
 #define _ARRAYOF(T, R) struct { struct dope dd; struct dope d[R]; T e[8]; }
 #define _HEADEROF(P, R) headerof(_ARRAYOF(typeof(*P), R), P, e)
@@ -50,22 +43,17 @@ struct dope {
 	                                                         \
 	_ptr_ = malloc(_hsz_ + sizeof(T) * _cnt_);               \
 	if(_ptr_) {                                              \
-		_ptr_[0].d = R;                                  \
-		_ptr_[0].s = sizeof(struct dope);                \
+		_ptr_[0] = pkdope(0, R, sizeof(struct dope));    \
 		for(_i_ = 0; _i_ < R; ++_i_) {                   \
-			_ptr_[_i_+1].d = _i_ << LUX_ARRDIM_BIT | \
-			   (Ds[_i_] & LUX_ARRDIM_MAX);           \
-			_ptr_[_i_+1].s = sizeof(T) * _cnt_;      \
+			_ptr_[_i_+1] = pkdope(_i_, Ds[_i_],      \
+			                      sizeof(T) * _cnt_);\
 			_cnt_ /= Ds[_i_];                        \
 		}                                                \
 	}                                                        \
 	(T *)((char *)_ptr_ + (_ptr_ ? _hsz_ : 0));              \
 })
 
-#define afree(P) free(_HEADEROF(P, 1 + (_HEADEROF(P, 1)->d[0].d >> \
-                                        LUX_ARRDIM_BIT)))
-#define getdim(P, J) (_HEADEROF(P, 1 + (_HEADEROF(P, 1)->d[0].d >> \
-                                        LUX_ARRDIM_BIT))->d[J].d & \
-                      LUX_ARRDIM_MAX)
+#define afree(P)          free(_HEADEROF(P, dope_getr(_HEADEROF(P, 1)->d)+1))
+#define getdim(P, J) dope_getd(_HEADEROF(P, dope_getr(_HEADEROF(P, 1)->d)+1)->d + J)
 
 #endif /* _LUX_ARRAY_H_ */
