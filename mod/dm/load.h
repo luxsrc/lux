@@ -79,7 +79,8 @@ uload(struct libux *lux, void *ins)
 	                                                  (uintptr_t)ins);
 	if(node) {
 		struct dmod m = {ins, node->rm};
-		struct dlib l = {dlhandle(m.rm ? (void *)m.rm : m.ins)};
+		struct dlib l = {dlhandle(lux->namespace,
+		                          m.rm ? (void *)m.rm : m.ins)};
 		rmdmod(m);
 		rmdlib(l);
 		free(node);
