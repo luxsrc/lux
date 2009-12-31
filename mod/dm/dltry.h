@@ -20,14 +20,15 @@
 #ifndef _LUX_DLTRY_H_
 #define _LUX_DLTRY_H_
 
+#include <lux/libux.h>
+#include <lux/dlfcn.h> /* for dlerror(), dlmopen(), and dlsym() */
 #include <lux/failed.h>
-#include <dlfcn.h> /* for dlerror(), dlopen(), and dlsym() */
 
 static inline void *
-dltryopen(const char *file, int mode)
+dltryopen(struct libux *lux, const char *file, int mode)
 {
 	int   fsv = failed;
-	void *hdl = dlopen(file, mode);
+	void *hdl = dlmopen(lux->namespace, file, mode);
 	if(!hdl) {
 		(void)dlerror(); /* clear error message */
 		failed = fsv;    /* restore previous failure code */
