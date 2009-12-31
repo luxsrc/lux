@@ -159,6 +159,10 @@ AH_BOTTOM([/*===================================================================
 #define lengthof(...) ({ size_t _arr_[] = {__VA_ARGS__}; countof(_arr_); })
 #endif
 
+#ifndef alignof
+#define alignof(T) ((size_t)&((struct { char _chr_; T _elm_; } *)0)->_elm_)
+#endif
+
 #ifndef offsetof
 #define offsetof(T, E) ((size_t)&((T *)0)->E)
 #endif
