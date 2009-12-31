@@ -21,14 +21,16 @@
 #define _LUX_MESSAGE_H_
 
 #include <lux/atomic.h>
+#include <lux/ap/task.h>
 
 typedef struct LuxSmessage Lux_message;
 
 struct LuxSmessage {
 	atomic status;
+	void (*pass)(Lux_message *, Lux_task *);
 };
 
-#define LUX_MESSAGE_INIT {ATOMIC_NULL}
+#define LUX_MESSAGE_INIT {ATOMIC_NULL, NULL}
 
 #define LUX_MESSAGE_RUNNING (1 << 0)
 #define LUX_MESSAGE_DONE    (1 << 1)
