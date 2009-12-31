@@ -20,13 +20,15 @@
 #ifndef _LUX_TASK_H_
 #define _LUX_TASK_H_
 
+#include <lux/message.h>
+
 /* Forward declaration */
 typedef struct LuxStask Lux_task;
 
 struct LuxStask {
 	/* Because problem and algo are problem specific, the implementation
 	   of exec() below is also problem specific.  */
-	Lux_message *(*exec)(Lux_task *);
+	Lux_message *(*exec)(Lux_task *, Lux_message **);
 
 	/* Internally, a Lux_task should embed the problem specific
 	   plan, params, ro, rw, and wo.  E.g.,

@@ -549,16 +549,18 @@ MESSAGE PASSING: to support adaptive performance of tasks and make
   simple algorithms that asynchronous communication is not necessary,
   one may simply call:
 
-	Lux_message *message = my_task->exec(my_task);
+	Lux_message *message = my_task->exec(my_task, NULL);
 
   because my_task->exec() blocks the main thread, message would
   contain a status LUX_MESSAGE_DONE when my_task->exec() returns.
   Otherwise, one may submit the task to lux:
 
-	Lux_message *message = lux_exec_async(my_task);
+	Lux_message *message = lux_exec_async(my_task, other_messages);
 
-  In such a case, message would contain a LUX_MESSAGE_RUNNING status.
-  One may use
+  where other_messages is a NULL-terminated array of Lux_message *
+  that my_task needs to wait before it starts.  The call would return
+  immediate with the returned message containing a LUX_MESSAGE_RUNNING
+  status.  One may use
 
 	lux_wait(message);
 
