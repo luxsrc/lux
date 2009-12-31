@@ -50,7 +50,7 @@ measure_ave(Lux_task *task, unsigned n)
 
 	t0 = getticks();
 	for(i = 0; i < n; ++i)
-		(void)task->exec(task);
+		task->exec(task);
 	t1 = getticks();
 
 	return elapsed(t1, t0) / n;
