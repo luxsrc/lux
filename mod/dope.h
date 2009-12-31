@@ -27,8 +27,8 @@
 typedef long long ptrdiff_t;
 #endif
 
-#define DOPE_DIM_MAX (((size_t)1<<LUX_DIMENSION_BIT) - 1)
-#define DOPE_RNK_MAX ((size_t)1 << (LUX_SIZE_T_BIT-LUX_DIMENSION_BIT))
+#define DOPE_DIM_MAX (((size_t)1 << LUX_DIMENSION_BIT) - 1)
+#define DOPE_RNK_MAX ((size_t)1 << (LUX_SIZE_T_BIT - LUX_DIMENSION_BIT))
 
 struct dope {
 	ptrdiff_t s;  /* stride is in unit of bytes */

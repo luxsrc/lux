@@ -37,9 +37,9 @@
  * static to ensure it can be optimized at compile time.  The
  * programmer must keep track of the tensor rank at compile time.
  *
- * For dynamic rank tensors, the programmer can use <lux/dope.h>.  For
- * static dimension tensors, the programmer should simply use fixed
- * dimension arryas, e.g., `arr[16][16][16]`.
+ * For dynamic rank tensors, the programmer can use <lux/dope.h> and
+ * <lux/array.h>.  For static dimension tensors, the programmer should
+ * simply use fixed dimension arryas, e.g., `arr[16][16][16]`.
  */
 #include <lux/assert.h>
 #include <stdlib.h> /* for malloc() and free() */
@@ -102,8 +102,8 @@
 			_ptr_[_i_] = _dims_[_i_];        \
 	(T *)((char *)_ptr_ + (_ptr_ ? _hsz_ : 0));      \
 })
-#define tfree(P, R)     free(_HEADEROF(P, R))
-#define getdim(P, R, J) (_HEADEROF(P, R)->d[J])
+#define tfree(P, R)      free(_HEADEROF(P, R))
+#define tgetdim(P, R, J) (_HEADEROF(P, R)->d[J])
 
 #endif
 
