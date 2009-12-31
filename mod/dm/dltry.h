@@ -25,10 +25,10 @@
 #include <lux/failed.h>
 
 static inline void *
-dltryopen(struct libux *lux, const char *file, int mode)
+dltryopen(struct libux *lux, const char *file)
 {
 	int   fsv = failed;
-	void *hdl = dlmopen(lux->namespace, file, mode);
+	void *hdl = dlmopen(lux->namespace, file, lux->dlmode);
 	if(!hdl) {
 		(void)dlerror(); /* clear error message */
 		failed = fsv;    /* restore previous failure code */
