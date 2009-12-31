@@ -24,10 +24,10 @@ if [ "x$1" != "xclean" ]; then
 	fi
 	mkdir .build-{aux,m4}
 	# Use "xtr/m4/framework.m4"
-	ln -s "../xtr/m4/framework.m4" .build-m4
+	cp "xtr/m4/framework.m4" .build-m4
 	# Paranoia: sometimes autoconf doesn't get things right the first time
 	for i in $([ "x$1" = "xfast" ] && seq 1 || seq 3); do
-		autoreconf --install --symlink --force --verbose
+		autoreconf --install --force --verbose
 	done
 	# Dirty hacks
 	sed -i~	-e's/\#define\ PACKAGE_/#define LUX_/g' \
