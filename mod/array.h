@@ -27,13 +27,21 @@
 #include <stddef.h> /* for ptrdiff_t */
 #include <stdlib.h> /* for malloc() and free() */
 
-#define _ARRAYOF(T, R) struct { struct dope dd; struct dope d[R]; T e[8]; }
-#define _HEADEROF(P, R) headerof(_ARRAYOF(typeof(*P), R), P, e)
+static inline size_t
+roundup(size_t n, size_t m)
+{
+	return ((n + m - 1) / m) * m;
+}
+
+#define DOPESZOF(R) ((1+(R))*sizeof(struct dope))
+#define HEADERSZOF(R, T) roundup(DOPESZOF(R), alignof(T))
+#define HEADEROF(P, R) ((struct dope *)((char *)(P) - HEADERSZOF(R, typeof(*P))))
+#define RANKOF(P) (dope_getrnk(HEADEROF(P, 1)+1)+1)
 
 #define aalloc(T, R, Ds) ({                                      \
 	struct dope *_ptr_;                                      \
 	                                                         \
-	size_t _hsz_ = offsetof(_ARRAYOF(T, R), e);              \
+	size_t _hsz_ = HEADERSZOF(R, T);                         \
 	size_t _cnt_, _i_;                                       \
 	lux_assert(R <= DOPE_RNK_MAX);                           \
 	for(_i_ = 0, _cnt_ = 1; _i_ < R; ++_i_) {                \
@@ -53,7 +61,7 @@
 	(T *)((char *)_ptr_ + (_ptr_ ? _hsz_ : 0));              \
 })
 
-#define afree(P)            free(_HEADEROF(P, dope_getrnk(_HEADEROF(P, 1)->d)+1))
-#define getdim(P, J) dope_getdim(_HEADEROF(P, dope_getrnk(_HEADEROF(P, 1)->d)+1)->d + J)
+#define afree(P)             free(HEADEROF(P, RANKOF(P)))
+#define agetdim(P, J) dope_getdim(HEADEROF(P, RANKOF(P))+1+J)
 
 #endif /* _LUX_ARRAY_H_ */
