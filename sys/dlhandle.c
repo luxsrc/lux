@@ -18,7 +18,6 @@
  * along with lux.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include <lux.h>
-#include <lux/libux.h>
 #include <lux/dlfcn.h>
 
 #if HAVE_STDDEF_H
@@ -28,11 +27,11 @@
 #endif
 
 void *
-dlhandle(struct libux *lux, void *s)
+dlhandle(Lmid_t namespace, void *s)
 {
 	const char *f = dlfname(s);
 	if(f) {
-		void *h = dlmopen(lux->namespace, f, RTLD_LAZY);
+		void *h = dlmopen(namespace, f, RTLD_LAZY);
 		dlclose(h); /* decrease refcount to "cancel" dlmopen() */
 		return h;
 	} else

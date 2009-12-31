@@ -20,8 +20,6 @@
 #ifndef _LUX_DLFCN_H_
 #define _LUX_DLFCN_H_
 
-#include <lux/libux.h>
-
 #ifndef _GNU_SOURCE
 #define _GNU_SOURCE
 #define _GNU_SOURCE_BY_ME
@@ -40,6 +38,6 @@ extern char *dlmopen(Lmid_t, const char *, int);
 
 extern const char  *dlfname (void *);
 extern       Lmid_t dllmid  (void *);
-extern       void  *dlhandle(struct libux *, void *);
+extern       void  *dlhandle(Lmid_t, void *);
 
 #endif /* _LUX_DLFCN_H_ */
