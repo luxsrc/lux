@@ -20,6 +20,7 @@
 #ifndef _LUX_LIBUX_H_
 #define _LUX_LIBUX_H_
 
+#include <lux/dlfcn.h>
 #include <lux/ap/timer.h>
 #include <lux/dm/load.h>
 #include <lux/vlog.h>
@@ -30,12 +31,13 @@
 #include <stdlib.h> /* for malloc() and free()   */
 
 #if HAVE_TIMESTAMP
-#define LIBUX_NULL {TIMESTAMP_NULL, VLOG_NULL, LOAD_NULL}
+#define LIBUX_NULL {LM_ID_BASE, TIMESTAMP_NULL, VLOG_NULL, LOAD_NULL}
 #else
-#define LIBUX_NULL {VLOG_NULL, LOAD_NULL}
+#define LIBUX_NULL {LM_ID_BASE, VLOG_NULL, LOAD_NULL}
 #endif
 
 struct libux {
+	Lmid_t namespace;
 #if HAVE_TIMESTAMP
 	timestamp t0;
 #endif
