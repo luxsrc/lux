@@ -17,29 +17,25 @@
  * You should have received a copy of the GNU General Public License
  * along with lux.  If not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef _LUX_DLFCN_H_
-#define _LUX_DLFCN_H_
+#include <lux.h>
+#include <lux/dlfcn.h>
 
-#include <lux/libux.h>
-
-#ifndef _GNU_SOURCE
-#define _GNU_SOURCE
-#define _GNU_SOURCE_BY_ME
-#endif
-#include <dlfcn.h>
-#ifdef  _GNU_SOURCE_BY_ME
-#undef  _GNU_SOURCE_BY_ME
-#undef  _GNU_SOURCE
+#if HAVE_STDDEF_H
+#include <stddef.h> /* for NULL */
+#else
+#include <stdlib.h> /* for NULL */
 #endif
 
-#ifndef HAVE_DLMOPEN /* define our own dlmopen() */
-typedef long int Lmid_t;
-#define LM_ID_BASE 0 /* initial namespace */
-extern char *dlmopen(Lmid_t, const char *, int);
+#ifndef HAVE_DLINFO
+#error cannot implment dllmid() when dlinfo() is missing
 #endif
 
-extern const char  *dlfname (void *);
-extern       Lmid_t dllmid  (void *);
-extern       void  *dlhandle(struct libux *, void *);
-
-#endif /* _LUX_DLFCN_H_ */
+Lmid_t
+dllmid(void *mod)
+{
+	Lmid_t namespace;
+	if(dlinfo(mod, RTLD_DI_LMID, &namespace) == 0)
+		return namespace;
+	else
+		return 0;
+}
