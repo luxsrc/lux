@@ -20,12 +20,17 @@
 #ifndef _LUX_DLFCN_H_
 #define _LUX_DLFCN_H_
 
+#include <lux/libux.h>
+
 #ifndef _GNU_SOURCE
 #define _GNU_SOURCE
 #define _GNU_SOURCE_BY_ME
 #endif
-
 #include <dlfcn.h>
+#ifdef  _GNU_SOURCE_BY_ME
+#undef  _GNU_SOURCE_BY_ME
+#undef  _GNU_SOURCE
+#endif
 
 #ifndef HAVE_DLMOPEN /* define our own dlmopen() */
 typedef long int Lmid_t;
@@ -34,11 +39,6 @@ extern char *dlmopen(Lmid_t, const char *, int);
 #endif
 
 extern const char *dlfname (void *);
-extern       void *dlhandle(void *);
-
-#ifdef  _GNU_SOURCE_BY_ME
-#undef  _GNU_SOURCE_BY_ME
-#undef  _GNU_SOURCE
-#endif
+extern       void *dlhandle(struct libux *, void *);
 
 #endif /* _LUX_DLFCN_H_ */
