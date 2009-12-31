@@ -38,12 +38,13 @@ struct dlib {
 };
 
 static inline struct dlib
-mkdlib(struct libux *lux, const char *restrict paths, const char *restrict name)
+mkdlib(struct libux *lux, const char *restrict name)
 {
 	struct dlib l = DLIB_NULL;
 
 	char lazybuf[256], *buf = lazybuf;
 	const size_t nlen = strlen(name);
+	const char *restrict paths = lux->load.paths;
 
 	if(name && name[0] == '/') {
 		buf = MALLOC(nlen + sizeof(".so"));
