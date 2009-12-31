@@ -20,16 +20,14 @@
 #include <lux.h>
 #include <lux/dlfcn.h>
 
-#if HAVE_STDDEF_H
-#include <stddef.h> /* for NULL */
-#else
-#include <stdlib.h> /* for NULL */
-#endif
-
-#ifndef HAVE_DLINFO
-#error cannot implment dllmid() when dlinfo() is missing
-#endif
-
+#if !HAVE_DLMOPEN /* always uses base namespace if dlmopen() is not defined */
+Lmid_t
+dllmid(void *mod)
+{
+	return LM_ID_BASE;
+	(void)mod; /* silence unused parameter warning */
+}
+#elif HAVE_DLINFO /* otherwise, try using dlinfo() to get namespace */
 Lmid_t
 dllmid(void *mod)
 {
@@ -39,3 +37,6 @@ dllmid(void *mod)
 	else
 		return 0;
 }
+#else /* give up */
+#error cannot implment dllmid() when dlinfo() is missing
+#endif
