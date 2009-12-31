@@ -20,7 +20,6 @@
 #ifndef _LUX_DLIB_H_
 #define _LUX_DLIB_H_
 
-#include <lux/libux.h>
 #include <lux/dm/dltry.h>
 #include <lux/failed.h>
 #include <lux/lazybuf.h>
@@ -38,7 +37,8 @@ struct dlib {
 };
 
 static inline struct dlib
-mkdlib(Lmid_t namespace, const char *restrict paths, const char *restrict name)
+mkdlib(Lmid_t namespace,
+       const char *restrict paths, const char *restrict name, int mode)
 {
 	struct dlib l = DLIB_NULL;
 
@@ -53,7 +53,7 @@ mkdlib(Lmid_t namespace, const char *restrict paths, const char *restrict name)
 		(void)memcpy(buf, name, nlen);
 		(void)memcpy(buf + nlen, ".so", sizeof(".so"));
 
-		l.hdl = dltryopen(namespace, buf, RTLD_LAZY | RTLD_LOCAL);
+		l.hdl = dltryopen(namespace, buf, mode);
 	} else while(paths && !l.hdl) {
 		const char  *psep = strchr(paths, ':');
 		const size_t plen = psep ? (size_t)(psep-paths) : strlen(paths);
@@ -72,7 +72,7 @@ mkdlib(Lmid_t namespace, const char *restrict paths, const char *restrict name)
 		(void)memcpy(buf + plen + 1 + nlen, ".so", sizeof(".so"));
 
 		paths = psep ? psep + 1 : NULL;
-		l.hdl = dltryopen(namespace, buf, RTLD_LAZY | RTLD_LOCAL);
+		l.hdl = dltryopen(namespace, buf, mode);
 	}
 
 	FREE(buf);

@@ -31,16 +31,12 @@
 #include <stdlib.h> /* for malloc() and free()   */
 
 #if HAVE_TIMESTAMP
-#define LIBUX_NULL {LM_ID_BASE, RTLD_LAZY | RTLD_LOCAL, TIMESTAMP_NULL, \
-                    VLOG_NULL, LOAD_NULL}
+#define LIBUX_NULL {TIMESTAMP_NULL, VLOG_NULL, LOAD_NULL}
 #else
-#define LIBUX_NULL {LM_ID_BASE, RTLD_LAZY | RTLD_LOCAL, \
-                    VLOG_NULL, LOAD_NULL}
+#define LIBUX_NULL {VLOG_NULL, LOAD_NULL}
 #endif
 
 struct libux {
-	Lmid_t namespace;
-	int    dlmode;
 #if HAVE_TIMESTAMP
 	timestamp t0;
 #endif

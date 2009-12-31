@@ -28,7 +28,7 @@
 #include <lux/strutils.h>
 #include <stdlib.h> /* for NULL, malloc(), and free() */
 
-#define LOAD_NULL {NULL, HTAB_NULL}
+#define LOAD_NULL {LM_ID_BASE, RTLD_LAZY | RTLD_LOCAL, NULL, HTAB_NULL}
 
 struct load_node {
 	struct htab_node super;
@@ -36,7 +36,8 @@ struct load_node {
 };
 
 struct load {
-	Lmid_t       namespace; /* system link map */
+	Lmid_t namespace; /* system link map */
+	int    mode;
 	const  char *paths;
 	struct htab  tab; /* last because of flexible array member */
 };
@@ -48,7 +49,7 @@ vload(struct load *load, const char *restrict name, const void *opts)
 	struct dmod m;
 	struct load_node *node;
 
-	l = mkdlib(load->namespace, load->paths, name);
+	l = mkdlib(load->namespace, load->paths, name, load->mode);
 	if(!l.hdl)
 		goto cleanup1; /* failure code was set by mkdlib() */
 
