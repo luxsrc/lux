@@ -27,8 +27,8 @@
 typedef long long ptrdiff_t;
 #endif
 
-#define LUX_ARRDIM_MAX (((size_t)1<<LUX_ARRDIM_BIT) - 1)
-#define LUX_ARRRNK_MAX ((size_t)1 << (LUX_SIZE_T_BIT-LUX_ARRDIM_BIT))
+#define DOPE_DIM_MAX (((size_t)1<<LUX_DIMENSION_BIT) - 1)
+#define DOPE_RNK_MAX ((size_t)1 << (LUX_SIZE_T_BIT-LUX_DIMENSION_BIT))
 
 struct dope {
 	ptrdiff_t s;  /* stride is in unit of bytes */
@@ -36,25 +36,25 @@ struct dope {
 };
 
 static inline struct dope
-pkdope(ptrdiff_t stride, size_t rank, size_t dim)
+pkdope(ptrdiff_t stride_in_bytes, size_t rnk, size_t dim)
 {
-	struct dope d = {stride, (rank << LUX_ARRDIM_BIT) | dim};
+	struct dope d = {stride_in_bytes, (rnk << LUX_DIMENSION_BIT) | dim};
 	return d;
 }
 
 static inline ptrdiff_t
-dope_gets(struct dope *d) {
+dope_getsib(struct dope *d) {
 	return d->s;
 }
 
 static inline size_t
-dope_getr(struct dope *d) {
-	return d->rd >> LUX_ARRDIM_BIT;
+dope_getrnk(struct dope *d) {
+	return d->rd >> LUX_DIMENSION_BIT;
 }
 
 static inline size_t
-dope_getd(struct dope *d) {
-	return d->rd & LUX_ARRDIM_MAX;
+dope_getdim(struct dope *d) {
+	return d->rd & DOPE_DIM_MAX;
 }
 
 #endif /* _LUX_DOPE_H_ */

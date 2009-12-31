@@ -77,7 +77,7 @@ mbits=`expr $ubits - $hbits - $fbits` # works properly even if $ubits is odd, al
 dnl Find out the number of bits required to hold array dimensions
 if   test $sbits -ge 64; then dbits=59 # at most rank 32
 elif test $sbits -ge 32; then dbits=28 # at most rank 16
-elif test $sbits -ge 16; then dbits=13 # at most rank 8, same as IDL ;-)
+elif test $sbits -ge 16; then dbits=13 # at most rank 8, same as IDL ;-) there can be (2**13 - 1) ~ 8k elements in one dimension
 else
 	AC_MSG_ERROR([A ${sbits}-bit size_t is unexpectedly small; please describe your platform to <$PACKAGE_BUGREPORT>])
 fi
@@ -125,14 +125,14 @@ else
 fi
 
 dnl Define error code related macros
-AC_DEFINE_UNQUOTED(LUX_ELAST,        $elast, [Define to the largest system error code.])
-AC_DEFINE_UNQUOTED(LUX_STRINGID_BIT, $hbits, [Define to the required bits to hold a string key.])
-AC_DEFINE_UNQUOTED(LUX_FACILITY_BIT, $mbits, [Define to the required bits to hold a facility key.])
-AC_DEFINE_UNQUOTED(LUX_FAILURE_BIT,  $fbits, [Define to the required bits to hold a lux failure code.])
-AC_DEFINE_UNQUOTED(LUX_INT_BIT,      $ibits, [Define to the number of bits of int.])
-AC_DEFINE_UNQUOTED(LUX_UNSIGNED_BIT, $ubits, [Define to the number of bits of unsigned.])
-AC_DEFINE_UNQUOTED(LUX_SIZE_T_BIT,   $sbits, [Define to the number of bits of int.])
-AC_DEFINE_UNQUOTED(LUX_ARRDIM_BIT,   $dbits, [Define to the number of bits of array dimensions.])
+AC_DEFINE_UNQUOTED(LUX_ELAST,         $elast, [Define to the largest system error code.])
+AC_DEFINE_UNQUOTED(LUX_STRINGID_BIT,  $hbits, [Define to the required bits to hold a string key.])
+AC_DEFINE_UNQUOTED(LUX_FACILITY_BIT,  $mbits, [Define to the required bits to hold a facility key.])
+AC_DEFINE_UNQUOTED(LUX_FAILURE_BIT,   $fbits, [Define to the required bits to hold a lux failure code.])
+AC_DEFINE_UNQUOTED(LUX_INT_BIT,       $ibits, [Define to the number of bits of int.])
+AC_DEFINE_UNQUOTED(LUX_UNSIGNED_BIT,  $ubits, [Define to the number of bits of unsigned.])
+AC_DEFINE_UNQUOTED(LUX_SIZE_T_BIT,    $sbits, [Define to the number of bits of int.])
+AC_DEFINE_UNQUOTED(LUX_DIMENSION_BIT, $dbits, [Define to the number of bits of array dimensions/size.])
 
 dnl Make assertion a configure option (default disabled)
 AC_ARG_ENABLE(assertion, [AC_HELP_STRING([--enable-assertion],[compile lux with assertion for debugging])], ok=$enableval, ok=no)

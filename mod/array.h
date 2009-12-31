@@ -35,9 +35,9 @@
 	                                                         \
 	size_t _hsz_ = offsetof(_ARRAYOF(T, R), e);              \
 	size_t _cnt_, _i_;                                       \
-	lux_assert(R <= LUX_ARRRNK_MAX);                         \
+	lux_assert(R <= DOPE_RNK_MAX);                           \
 	for(_i_ = 0, _cnt_ = 1; _i_ < R; ++_i_) {                \
-		lux_assert(Ds[_i_] <= LUX_ARRDIM_MAX);           \
+		lux_assert(Ds[_i_] <= DOPE_DIM_MAX);             \
 		_cnt_ *= Ds[_i_];                                \
 	}                                                        \
 	                                                         \
@@ -53,7 +53,7 @@
 	(T *)((char *)_ptr_ + (_ptr_ ? _hsz_ : 0));              \
 })
 
-#define afree(P)          free(_HEADEROF(P, dope_getr(_HEADEROF(P, 1)->d)+1))
-#define getdim(P, J) dope_getd(_HEADEROF(P, dope_getr(_HEADEROF(P, 1)->d)+1)->d + J)
+#define afree(P)            free(_HEADEROF(P, dope_getrnk(_HEADEROF(P, 1)->d)+1))
+#define getdim(P, J) dope_getdim(_HEADEROF(P, dope_getrnk(_HEADEROF(P, 1)->d)+1)->d + J)
 
 #endif /* _LUX_ARRAY_H_ */
