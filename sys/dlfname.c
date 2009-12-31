@@ -29,6 +29,10 @@
 #include <stdlib.h> /* for NULL */
 #endif
 
+#ifndef HAVE_DLADDR
+#error cannot implment dlfname() when dladdr() is missing
+#endif
+
 const char *
 dlfname(void *s)
 {
