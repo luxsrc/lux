@@ -27,6 +27,12 @@
 
 #include <dlfcn.h>
 
+#ifndef HAVE_DLMOPEN /* define our own dlmopen() */
+typedef long int Lmid_t;
+#define LM_ID_BASE 0 /* initial namespace */
+extern char *dlmopen(Lmid_t, const char *, int);
+#endif
+
 extern const char *dlfname (void *);
 extern       void *dlhandle(void *);
 
