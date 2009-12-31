@@ -17,23 +17,24 @@
  * You should have received a copy of the GNU General Public License
  * along with lux.  If not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef _LUX_AVER_H_
-#define _LUX_AVER_H_
-/*
- * Compile-time assertion; hence the more formal term "aver"
- *
- * The expression inside lux_aver() must be evaluated at compile time,
- * otherwise lux_aver() will simply fail.  Because there is no runtime
- * overhead, it does not make sense to disable lux_aver().  It is
- * always on if used.
- */
-#ifndef LUX_AVER_FAILURE
-#define LUX_AVER_FAILURE 0
+#ifndef _LUX_ALLOCA_H_
+#define _LUX_ALLOCA_H_ 1 /* allocate memory that is automatically freed */
+
+#ifdef HAVE_ALLOCA_H
+# include <alloca.h>
+#elif defined __GNUC__
+# define alloca __builtin_alloca
+#elif defined _AIX
+# define alloca __alloca
+#elif defined _MSC_VER
+# include <malloc.h>
+# define alloca _alloca
+#else
+# include <stddef.h>
+# ifdef  __cplusplus
+extern "C"
+# endif
+void *alloca (size_t);
 #endif
 
-#define lux_aver(E) do {                                                       \
-	char  negative_size_if_aver_failure[(E) == LUX_AVER_FAILURE ? -1 : 1]; \
-	(void)negative_size_if_aver_failure;                                   \
-} while(0)
-
-#endif /* _LUX_AVER_H_ */
+#endif /* _LUX_ALLOCA_H_ */
