@@ -38,13 +38,12 @@ struct dlib {
 };
 
 static inline struct dlib
-mkdlib(struct libux *lux, const char *restrict name)
+mkdlib(Lmid_t namespace, const char *restrict paths, const char *restrict name)
 {
 	struct dlib l = DLIB_NULL;
 
 	char lazybuf[256], *buf = lazybuf;
 	const size_t nlen = strlen(name);
-	const char *restrict paths = lux->load.paths;
 
 	if(name && name[0] == '/') {
 		buf = MALLOC(nlen + sizeof(".so"));
@@ -54,7 +53,7 @@ mkdlib(struct libux *lux, const char *restrict name)
 		(void)memcpy(buf, name, nlen);
 		(void)memcpy(buf + nlen, ".so", sizeof(".so"));
 
-		l.hdl = dltryopen(lux, buf);
+		l.hdl = dltryopen(namespace, buf, RTLD_LAZY | RTLD_LOCAL);
 	} else while(paths && !l.hdl) {
 		const char  *psep = strchr(paths, ':');
 		const size_t plen = psep ? (size_t)(psep-paths) : strlen(paths);
@@ -73,7 +72,7 @@ mkdlib(struct libux *lux, const char *restrict name)
 		(void)memcpy(buf + plen + 1 + nlen, ".so", sizeof(".so"));
 
 		paths = psep ? psep + 1 : NULL;
-		l.hdl = dltryopen(lux, buf);
+		l.hdl = dltryopen(namespace, buf, RTLD_LAZY | RTLD_LOCAL);
 	}
 
 	FREE(buf);

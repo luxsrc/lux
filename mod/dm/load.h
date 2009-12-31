@@ -20,7 +20,6 @@
 #ifndef _LUX_LOAD_H_
 #define _LUX_LOAD_H_
 
-#include <lux/libux.h>
 #include <lux/dlfcn.h>
 #include <lux/dm/dlib.h>
 #include <lux/dm/dmod.h>
@@ -37,18 +36,19 @@ struct load_node {
 };
 
 struct load {
+	Lmid_t       namespace; /* system link map */
 	const  char *paths;
 	struct htab  tab; /* last because of flexible array member */
 };
 
 static inline void *
-vload(struct libux *lux, const char *restrict name, const void *opts)
+vload(struct load *load, const char *restrict name, const void *opts)
 {
 	struct dlib l;
 	struct dmod m;
 	struct load_node *node;
 
-	l = mkdlib(lux, name);
+	l = mkdlib(load->namespace, load->paths, name);
 	if(!l.hdl)
 		goto cleanup1; /* failure code was set by mkdlib() */
 
@@ -61,7 +61,7 @@ vload(struct libux *lux, const char *restrict name, const void *opts)
 		goto cleanup3; /* failure code was set by malloc() */
 
 	node->rm = m.rm;
-	hadd(&lux->load.tab, (uintptr_t)m.ins, &node->super);
+	hadd(&load->tab, (uintptr_t)m.ins, &node->super);
 	return m.ins;
 
  cleanup3:
@@ -73,13 +73,13 @@ vload(struct libux *lux, const char *restrict name, const void *opts)
 }
 
 static inline void
-uload(struct libux *lux, void *ins)
+uload(struct load *load, void *ins)
 {
-	struct load_node *node = (struct load_node *)hpop(&lux->load.tab,
+	struct load_node *node = (struct load_node *)hpop(&load->tab,
 	                                                  (uintptr_t)ins);
 	if(node) {
 		struct dmod m = {ins, node->rm};
-		struct dlib l = {dlhandle(lux->namespace,
+		struct dlib l = {dlhandle(load->namespace,
 		                          m.rm ? (void *)m.rm : m.ins)};
 		rmdmod(m);
 		rmdlib(l);
