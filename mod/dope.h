@@ -19,25 +19,32 @@
  */
 #ifndef _LUX_DOPE_H_
 #define _LUX_DOPE_H_
-/*
- * Generalized <lux/tensor.h> to determines rank at runtime
- */
-#include <stddef.h> /* for ptrdiff_t */
 
-struct dope {
-	size_t    rd; /* bitwise-OR of rank and dimension */
-	ptrdiff_t s;  /* stride is in unit of bytes */
-};
+#if HAVE_STDDEF_H
+#include <stddef.h> /* for size_t and ptrdiff_t */
+#else
+#include <stdlib.h> /* for size_t */
+typedef long long ptrdiff_t;
+#endif
 
 #define LUX_ARRDIM_MAX (((size_t)1<<LUX_ARRDIM_BIT) - 1)
 #define LUX_ARRRNK_MAX ((size_t)1 << (LUX_SIZE_T_BIT-LUX_ARRDIM_BIT))
 
+struct dope {
+	ptrdiff_t s;  /* stride is in unit of bytes */
+	size_t    rd; /* bitwise-OR of rank and dimension */
+};
+
 static inline struct dope
-pkdope(size_t rank, size_t dim, ptrdiff_t stride)
+pkdope(ptrdiff_t stride, size_t rank, size_t dim)
 {
-	struct dope d = {(rank << LUX_ARRDIM_BIT) |
-	                 (dim  &  LUX_ARRDIM_MAX), stride};
+	struct dope d = {stride, (rank << LUX_ARRDIM_BIT) | dim};
 	return d;
+}
+
+static inline ptrdiff_t
+dope_gets(struct dope *d) {
+	return d->s;
 }
 
 static inline size_t
@@ -48,11 +55,6 @@ dope_getr(struct dope *d) {
 static inline size_t
 dope_getd(struct dope *d) {
 	return d->rd & LUX_ARRDIM_MAX;
-}
-
-static inline ptrdiff_t
-dope_gets(struct dope *d) {
-	return d->s;
 }
 
 #endif /* _LUX_DOPE_H_ */

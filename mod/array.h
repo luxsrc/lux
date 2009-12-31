@@ -43,10 +43,10 @@
 	                                                         \
 	_ptr_ = malloc(_hsz_ + sizeof(T) * _cnt_);               \
 	if(_ptr_) {                                              \
-		_ptr_[0] = pkdope(0, R, sizeof(struct dope));    \
+		_ptr_[0] = pkdope(sizeof(struct dope), 0, R);    \
 		for(_i_ = 0; _i_ < R; ++_i_) {                   \
-			_ptr_[_i_+1] = pkdope(_i_, Ds[_i_],      \
-			                      sizeof(T) * _cnt_);\
+			_ptr_[_i_+1] = pkdope(sizeof(T) * _cnt_, \
+			                      _i_, Ds[_i_]);     \
 			_cnt_ /= Ds[_i_];                        \
 		}                                                \
 	}                                                        \
