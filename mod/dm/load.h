@@ -20,6 +20,7 @@
 #ifndef _LUX_LOAD_H_
 #define _LUX_LOAD_H_
 
+#include <lux/libux.h>
 #include <lux/dlfcn.h>
 #include <lux/dm/dlib.h>
 #include <lux/dm/dmod.h>
@@ -41,13 +42,13 @@ struct load {
 };
 
 static inline void *
-vload(struct load *load, const char *restrict name, const void *opts)
+vload(struct libux *lux, const char *restrict name, const void *opts)
 {
 	struct dlib l;
 	struct dmod m;
 	struct load_node *node;
 
-	l = mkdlib(load->paths, name);
+	l = mkdlib(lux, name);
 	if(!l.hdl)
 		goto cleanup1; /* failure code was set by mkdlib() */
 
@@ -60,7 +61,7 @@ vload(struct load *load, const char *restrict name, const void *opts)
 		goto cleanup3; /* failure code was set by malloc() */
 
 	node->rm = m.rm;
-	hadd(&load->tab, (uintptr_t)m.ins, &node->super);
+	hadd(&lux->load.tab, (uintptr_t)m.ins, &node->super);
 	return m.ins;
 
  cleanup3:
@@ -72,9 +73,9 @@ vload(struct load *load, const char *restrict name, const void *opts)
 }
 
 static inline void
-uload(struct load *load, void *ins)
+uload(struct libux *lux, void *ins)
 {
-	struct load_node *node = (struct load_node *)hpop(&load->tab,
+	struct load_node *node = (struct load_node *)hpop(&lux->load.tab,
 	                                                  (uintptr_t)ins);
 	if(node) {
 		struct dmod m = {ins, node->rm};
