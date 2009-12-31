@@ -20,9 +20,19 @@
 #ifndef _LUX_DLFCN_H_
 #define _LUX_DLFCN_H_
 
+#ifndef _GNU_SOURCE
+#define _GNU_SOURCE
+#define _GNU_SOURCE_BY_ME
+#endif
+
 #include <dlfcn.h>
 
 extern const char *dlfname (void *);
 extern       void *dlhandle(void *);
+
+#ifdef  _GNU_SOURCE_BY_ME
+#undef  _GNU_SOURCE_BY_ME
+#undef  _GNU_SOURCE
+#endif
 
 #endif /* _LUX_DLFCN_H_ */
