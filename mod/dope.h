@@ -21,54 +21,51 @@
 #define _LUX_DOPE_H_
 /*
  * Generalized <lux/tensor.h> that determine rank at runtime
- *
- * FIXME: using pointer arithmetic to determine the offset of the data
- * array from the dope vector, although is self-consistent, may cause
- * incorrect data alignment.  For 64-bit machines, this only happens
- * if the data type of an array starts with `long double`.  In this
- * rare case, misalignment could significantly slow down the algorithm
- * or even produce incorrect results on some hardwares.
- *
- * For now, it is possible to follow <lux/tensor.h> and then use the
- * compile-time assertion macro lux_aver() to stop lux for compiling
- * for situations with incorrect alignment.
- *
- * #define _TENSOROF(T, R) struct { Lux_dope d[R]; T e[8]; }
- * #define _HEADERSZ(T, R) offsetof(_TENSOROF(T, R), e)
- * ...
- * {
- *	...
- * 	lux_aver(_HEADERSZ(long double, 3) == sizeof(Lux_dope[3]));
- * }
  */
-#include <lux/numeric.h>
-#include <lux/zalloc.h>
+#include <lux/assert.h>
+#include <stddef.h> /* for ptrdiff_t */
+#include <stdlib.h> /* for malloc() and free() */
 
-typedef struct {
-	Lux_int r; /* rank/dimension */
-	Lux_int c; /* count/size */
-	Lux_int s; /* stride */
-} Lux_dope;
+struct dope {
+	size_t    d; /* bitwise-OR of rank and dimension */
+	ptrdiff_t s; /* stride is in unit of bytes */
+};
 
-static inline Lux_dope *
-mkdope(size_t sz, int rank)
-{
-	Lux_dope *head = (Lux_dope *)zalloc(rank * sizeof(Lux_dope) + sz);
-	if(head) {
-		Lux_int r;
-		for(r = 0; r < rank; ++r)
-			head[r].r = r;
-		if(sz >= sizeof(Lux_int))
-			head[r].r = r; /* r == rank here */
-		return head + rank;
-	} else
-		return NULL;
-}
+#define LUX_TENSORDIM_MAX (((size_t)1 << LUX_TENSORDIM_BIT) - 1)
+#define LUX_TENSORRNK_MAX ((size_t)1 << (LUX_SIZE_T_BIT - LUX_TENSORDIM_BIT))
 
-static inline void
-rmdope(Lux_dope *dope)
-{
-	free(dope - dope->r);
-}
+#define _DOPEOF(T, R) struct { struct dope dd; struct dope d[R]; T e[8]; }
+#define _HEADEROF(P, R) headerof(_DOPEOF(typeof(*P), R), P, e)
+
+#define dalloc(T, R, Ds) ({                                         \
+	struct dope *_ptr_;                                         \
+	                                                            \
+	size_t _hsz_ = offsetof(_DOPEOF(T, R), e);                  \
+	size_t _cnt_, _i_;                                          \
+	lux_assert(R <= LUX_TENSORRNK_MAX);                         \
+	for(_i_ = 0, _cnt_ = 1; _i_ < R; ++_i_) {                   \
+		lux_assert(Ds[_i_] <= LUX_TENSORDIM_MAX);           \
+		_cnt_ *= Ds[_i_];                                   \
+	}                                                           \
+	                                                            \
+	_ptr_ = malloc(_hsz_ + sizeof(T) * _cnt_);                  \
+	if(_ptr_) {                                                 \
+		_ptr_[0].d = R;                                     \
+		_ptr_[0].s = sizeof(struct dope);                   \
+		for(_i_ = 0; _i_ < R; ++_i_) {                      \
+			_ptr_[_i_+1].d = _i_ << LUX_TENSORDIM_BIT | \
+			   (Ds[_i_] & LUX_TENSORDIM_MAX);           \
+			_ptr_[_i_+1].s = sizeof(T) * _cnt_;         \
+			_cnt_ /= Ds[_i_];                           \
+		}                                                   \
+	}                                                           \
+	(T *)((char *)_ptr_ + (_ptr_ ? _hsz_ : 0));                 \
+})
+
+#define dfree(P) free(_HEADEROF(P, 1 + (_HEADEROF(P, 1)->d[0].d >> \
+                                        LUX_TENSORDIM_BIT)))
+#define getdim(P, J) (_HEADEROF(P, 1 + (_HEADEROF(P, 1)->d[0].d >>    \
+                                        LUX_TENSORDIM_BIT))->d[J].d & \
+                      LUX_TENSORDIM_MAX)
 
 #endif /* _LUX_DOPE_H_ */
