@@ -19,18 +19,10 @@
  */
 #include "api.h"
 #include <lux/dm/load.h>
-#include <stdarg.h> /* for va_list, va_start(), and va_end() */
 
 void *
-lux_load(const void *name, ...)
+lux_load(const char *name, const void *opts)
 {
-	va_list ap;
-	const void *opts;
-
-	va_start(ap, name);
-	opts = va_arg(ap, const void *);
-	va_end(ap);
-
 	return vload(&LUX->load, name, opts);
 }
 

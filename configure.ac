@@ -184,7 +184,7 @@ extern void lux_error(const void *, ...);
 extern void lux_print(const void *, ...);
 extern void lux_debug(const void *, ...);
 
-extern void *lux_load(const void *, ...);
+extern void *lux_load(const char *, const void *);
 extern void  lux_unload(void *);
 
 /*===========================================================================*/
