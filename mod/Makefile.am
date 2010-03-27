@@ -1,3 +1,5 @@
+AM_LDFLAGS = -no-undefined -export-dynamic -export-symbols-regex '^lux[A-Z_]' -module
+
 pkginclude_HEADERS  = assert.h aver.h atomic.h check.h dlfcn.h failed.h
 SUBDIRS             = ap dm
 
@@ -17,5 +19,13 @@ pkginclude_HEADERS += alloca.h lazybuf.h zalloc.h
 pkginclude_HEADERS += dope.h htab.h libux.h vlog.h
 
 # Interfaces and implementations of dynamic modules
-pkginclude_HEADERS += job.h mpi.h
+pkginclude_HEADERS += job.h
 SUBDIRS            += job
+
+# Dynamic modules
+pkginclude_HEADERS += mpi.h
+pkglib_LTLIBRARIES  = mpi.la
+
+mpi_la_CPPFLAGS = -DLUX_MOD_NAME=mpi
+mpi_la_SOURCES  = mpi.h mangle.h mpi.c
+mpi_la_LIBADD   = $(MPILIBS) ../api/libux.la
