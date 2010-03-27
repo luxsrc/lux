@@ -60,7 +60,7 @@ LUX_MKMOD(const void *opts)
 	if(count != MPI_INITED_EXT) {
 		if(count == 0)
 			(void)MPI_Init_thread(NULL, NULL,
-			                      MPI_THREAD_SERIALIZED,
+			                      MPI_THREAD_MULTIPLE,
 			                      &thread_mode);
 		++count;
 	}
