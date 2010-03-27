@@ -26,16 +26,16 @@
 
 typedef pthread_mutex_t mutex;
 
-static inline void
+static inline int
 mutex_lock(mutex *l)
 {
-	(void)pthread_mutex_lock(l);
+	return pthread_mutex_lock(l);
 }
 
-static inline void
+static inline int
 mutex_unlock(mutex *l)
 {
-	(void)pthread_mutex_unlock(l);
+	return pthread_mutex_unlock(l);
 }
 
 #endif /* _LUX_MUTEX_H_ */
