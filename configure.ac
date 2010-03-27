@@ -16,6 +16,7 @@ AX_PROG_CC_FRAMEWORK
 AM_CONDITIONAL([SUPPORT_FRAMEWORK], [eval test \$ax_cv_prog_cc_${ac_cc}_framework = yes])
 
 AX_MPI([CC="$MPICC"])
+AX_PTHREAD([CC="$PTHREAD_CC"]) dnl correctly uses $CC from AX_MPI() unless on AIX
 
 AC_C_TYPEOF
 AC_C_CONST
