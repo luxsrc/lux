@@ -19,19 +19,37 @@
  */
 #include <lux.h>
 #include <lux/mangle.h>
+#include <lux/mutex.h>
 #include <stdlib.h> /* for NULL and malloc() */
 #include "mpi.h"
 
 #define EGO ((Lux_mpi *)ego)
 #define MPI_INITED_EXT (-1)
 
-static int count = 0;
+/* It is non-trivial to allow multiple threads to load the MPI module
+ * simutaniously.  We need to consider two situations here:
+ *
+ * 1) If MPI_Init() was called outside this module, then all threads
+ *    will obtain inited == 1.  At the same time, count can be 0 or
+ *    -1, depending on the thread.
+ *
+ * 2) If MPI_Init() was *not* called outside this module, then the
+ *    first executed thread will obtain inited == 0.  However, other
+ *    threads, depending on the execusion order, may obtain inited ==
+ *    0 or 1.
+ *
+ * Writing thread safe code using atomic operation here is tricky.
+ * Given that loading and unloading MPI module are not performance
+ * critical, we use mutex lock here to keep things simple.  */
+static mutex lock  = MUTEX_NULL;
+static int   count = 0;
 
 void *
 LUX_MKMOD(const void *opts)
 {
 	void *ego;
 
+	mutex_lock(&lock);
 	if(count == 0) {
 		int inited;
 		(void)MPI_Initialized(&inited); /* TODO: check MPI error */
@@ -43,6 +61,7 @@ LUX_MKMOD(const void *opts)
 			(void)MPI_Init(NULL, NULL);
 		++count;
 	}
+	mutex_unlock(&lock);
 
 	ego = malloc(sizeof(Lux_mpi));
 	if(!ego)
@@ -63,9 +82,11 @@ LUX_RMMOD(void *ego)
 	(void)MPI_Comm_free(&EGO->super); /* TODO: check MPI error */
 	free(ego);
 
+	mutex_lock(&lock);
 	if(count != MPI_INITED_EXT) {
 		--count;
 		if(count == 0)
 			(void)MPI_Finalize();
 	}
+	mutex_unlock(&lock);
 }
