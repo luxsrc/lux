@@ -17,5 +17,5 @@ pkginclude_HEADERS += alloca.h lazybuf.h zalloc.h
 pkginclude_HEADERS += dope.h htab.h libux.h vlog.h
 
 # Interfaces and implementations of dynamic modules
-pkginclude_HEADERS += job.h
+pkginclude_HEADERS += job.h mpi.h
 SUBDIRS            += job
