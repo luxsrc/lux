@@ -1,4 +1,5 @@
-AM_LDFLAGS = -no-undefined
+AM_CPPFLAGS = -I$(top_builddir)
+AM_LDFLAGS  = -no-undefined
 
 bin_PROGRAMS = lux
 

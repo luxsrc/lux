@@ -6,7 +6,7 @@ AC_CONFIG_MACRO_DIR([.build-m4])
 AC_CONFIG_SRCDIR([lux.hin])
 LT_PREREQ([2.2.6b])
 LT_INIT([dlopen])
-AM_INIT_AUTOMAKE([1.11 -Wall -Werror gnu]) dnl cannot use gnits because of version number and the missing "THANKS" file
+AM_INIT_AUTOMAKE([1.11 -Wall -Werror gnu nostdinc]) dnl cannot use gnits because of version number and the missing "THANKS" file
 
 dnl Check for programs and compiler characteristics
 AC_PROG_CPP
