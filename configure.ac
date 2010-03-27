@@ -15,7 +15,7 @@ AM_PROG_CC_C_O
 AX_PROG_CC_FRAMEWORK
 AM_CONDITIONAL([SUPPORT_FRAMEWORK], [eval test \$ax_cv_prog_cc_${ac_cc}_framework = yes])
 
-AX_MPI
+AX_MPI([CC="$MPICC"])
 
 AC_C_TYPEOF
 AC_C_CONST
