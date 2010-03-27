@@ -48,6 +48,7 @@ void *
 LUX_MKMOD(const void *opts)
 {
 	void *ego;
+	int   thread_mode;
 
 	mutex_lock(&lock);
 	if(count == 0) {
@@ -58,7 +59,9 @@ LUX_MKMOD(const void *opts)
 	}
 	if(count != MPI_INITED_EXT) {
 		if(count == 0)
-			(void)MPI_Init(NULL, NULL);
+			(void)MPI_Init_thread(NULL, NULL,
+			                      MPI_THREAD_SERIALIZED,
+			                      &thread_mode);
 		++count;
 	}
 	mutex_unlock(&lock);
@@ -67,6 +70,7 @@ LUX_MKMOD(const void *opts)
 	if(!ego)
 		goto cleanup;
 	(void)MPI_Comm_dup(MPI_COMM_WORLD, &EGO->super);
+	EGO->thread_mode = thread_mode;
 
 	return ego;
 

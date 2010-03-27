@@ -26,6 +26,7 @@ typedef struct LuxSmpi Lux_mpi;
 
 struct LuxSmpi {
 	MPI_Comm super;
+	int      thread_mode;
 };
 
 #endif /* _LUX_MPI_H_ */
