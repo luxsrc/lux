@@ -21,6 +21,7 @@
 #define _LUX_TPOOL_H_
 
 #include <lux/ap/task.h>
+#include <lux/mutex.h>
 #include <stdlib.h>
 
 struct tnode {
@@ -31,6 +32,7 @@ struct tnode {
 struct tpool {
 	struct tnode *head; /* == next */
 	struct tnode *tail;
+	mutex lock;
 };
 
 static struct tpool *
@@ -38,6 +40,7 @@ mktpool()
 {
 	struct tpool *q = malloc(sizeof(struct tpool));
 	q->tail = q->head = (struct tnode *)q;
+	q->lock = ({ mutex _ = MUTEX_NULL; _; });
 	return q;
 }
 
@@ -46,23 +49,31 @@ enqueue(struct tpool *q, Lux_task *t)
 {
 	struct tnode *n = malloc(sizeof(struct tnode));
 	n->task = t;
-	n->next = (struct tnode *)q; /* == q->tail->next */
-	q->tail->next = n;
-	q->tail       = n;
+	n->next = (struct tnode *)q; /* == q->tail->next always */
+
+	mutex_lock(&q->lock);
+	q->tail = q->tail->next = n;
+	mutex_unlock(&q->lock);
 }
 
 static Lux_task *
 dequeue(struct tpool *q)
 {
-	if(q->head == (struct tnode *)q)
-		return NULL;
-	else {
-		struct tnode *n = q->head;
-		Lux_task     *t = n->task;
+	struct tnode *n = NULL;
+
+	mutex_lock(&q->lock);
+	if(q->head != (struct tnode *)q) {
+		n = q->head;
 		q->head = n->next;
+	}
+	mutex_unlock(&q->lock);
+
+	if(n) {
+		Lux_task *t = n->task;
 		free(n);
 		return t;
-	}
+	} else
+		return NULL;
 }
 
 #endif /* _LUX_TPOOL_H_ */
