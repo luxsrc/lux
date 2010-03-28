@@ -64,7 +64,10 @@ dequeue(struct tpool *q)
 	mutex_lock(&q->lock);
 	if(q->head != (struct tnode *)q) {
 		n = q->head;
-		q->head = n->next;
+		if(n->next != (struct tnode *)q)
+			q->head = n->next;
+		else
+			q->tail = q->head = n->next;
 	}
 	mutex_unlock(&q->lock);
 
