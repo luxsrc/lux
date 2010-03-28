@@ -66,15 +66,16 @@ parafor(size_t n, size_t nthread,
 
 	/* Spawn */
 	for(i = 0; i < nthread; ++i) {
-		task[i].func = func;
-		task[i].data = data;
-		task[i].n    = n;
+		struct paratask *t = task + i;
 
-		task[i].l = i * bsz;
-		task[i].u = min((i+1)*bsz, n);
+		t->func = func;
+		t->data = data;
+		t->n    = n;
 
-		task[i].tid = mkthread(_execdrv, task+i,
-		                       THREAD_JOINABLE | PTHREAD_SCOPE_SYSTEM);
+		t->l   = i * bsz;
+		t->u   = min((i+1)*bsz, n);
+		t->tid = mkthread(_execdrv, t,
+		                  THREAD_JOINABLE | THREAD_SYSTEM);
 	}
 
 	/* Sync */
