@@ -6,7 +6,7 @@ AC_CONFIG_MACRO_DIR([.build-m4])
 AC_CONFIG_SRCDIR([lux.hin])
 LT_PREREQ([2.2.6b])
 LT_INIT([dlopen])
-AM_INIT_AUTOMAKE([1.11 -Wall -Werror gnu]) dnl cannot use gnits because of version number and the missing "THANKS" file
+AM_INIT_AUTOMAKE([1.11 -Wall -Werror gnu nostdinc]) dnl cannot use gnits because of version number and the missing "THANKS" file
 
 dnl Check for programs and compiler characteristics
 AC_PROG_CPP
@@ -14,6 +14,9 @@ AC_PROG_CC_STDC
 AM_PROG_CC_C_O
 AX_PROG_CC_FRAMEWORK
 AM_CONDITIONAL([SUPPORT_FRAMEWORK], [eval test \$ax_cv_prog_cc_${ac_cc}_framework = yes])
+
+AX_MPI([CC="$MPICC"])
+AX_PTHREAD([CC="$PTHREAD_CC"]) dnl correctly uses $CC from AX_MPI() unless on AIX
 
 AC_C_TYPEOF
 AC_C_CONST
@@ -25,7 +28,8 @@ AC_PROG_SED
 
 dnl Check for headers
 AC_HEADER_TIME
-AC_CHECK_HEADERS([stddef.h sys/time.h c_asm.h intrinsics.h mach/mach_time.h])
+AC_CHECK_HEADERS([sys/time.h c_asm.h intrinsics.h mach/mach_time.h])
+AC_CHECK_HEADERS([stddef.h obstack.h sys/mman.h sys/stat.h fcntl.h])
 
 dnl Check for types
 AC_CHECK_TYPE([off64_t])

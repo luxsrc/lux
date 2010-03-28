@@ -1,4 +1,5 @@
-AM_LDFLAGS = -no-undefined
+AM_CPPFLAGS = -I$(top_builddir)
+AM_LDFLAGS  = -no-undefined
 
 # Remember to add the symbols defined below to ../api/Makefile.am
 noinst_LTLIBRARIES = libsys.la

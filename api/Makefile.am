@@ -1,4 +1,5 @@
-AM_LDFLAGS = -no-undefined -export-dynamic -export-symbols-regex '^lux[A-Z_]|^dl|^fopencookie|^strfailure'
+AM_CPPFLAGS = -I$(top_builddir)
+AM_LDFLAGS  = -no-undefined -export-dynamic -export-symbols-regex '^lux[A-Z_]|^dl|^fopencookie|^strfailure'
 
 lib_LTLIBRARIES = libux.la
 
