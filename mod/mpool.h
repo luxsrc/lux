@@ -20,6 +20,10 @@
 #ifndef _LUX_MPOOL_H_
 #define _LUX_MPOOL_H_
 
+#include <lux/ap/ticks.h>
+#include <stdio.h>
+#include <unistd.h>
+
 #if HAVE_SYS_MMAN_H
 #include <sys/mman.h>
 #endif
@@ -37,6 +41,32 @@ struct mpool {
 	size_t sz;
 };
 
-#define MPOOL_NULL {0, 0}
+static inline struct mpool
+mkmpool(size_t sz)
+{
+	struct mpool mp;
+	int err;
+
+	ticks t = getticks();
+
+	char name[32]; /* 64-bit integer has at most 20 digits */
+	(void)snprintf(name, sizeof(name), "/lux-%u", (unsigned)t);
+
+	mp.fd = shm_open(name, O_RDWR|O_CREAT|O_EXCL|O_NOFOLLOW, 0600);
+	if(mp.fd != -1) {
+		err = ftruncate(mp.fd, sz);
+		(void)shm_unlink(name);
+	} else
+		err = 1;
+	mp.sz = err ? 0 : sz;
+
+	return mp;
+}
+
+static inline void
+rmmpool(struct mpool mp)
+{
+	close(mp.fd);
+}
 
 #endif /* _LUX_MPOOL_H_ */
