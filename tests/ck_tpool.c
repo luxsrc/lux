@@ -24,13 +24,17 @@ main()
 
 	struct tpool *q = mktpool(4);
 	struct task  *t = malloc(n * sizeof(struct task));
-
 	for(i = 0; i < n; ++i) {
 		t[i].super.exec = exec;
 		t[i].id         = i + 1;
-		enqueue(q, &t[i].super);
 	}
 
+	for(i = 0; i < n; ++i)
+		enqueue(q, &t[i].super);
+	sleep(3);
+
+	for(i = 0; i < n; ++i)
+		enqueue(q, &t[i].super);
 	sleep(3);
 
 	free(t);
