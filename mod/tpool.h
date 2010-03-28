@@ -119,4 +119,11 @@ tpool_wait(struct tpool *q)
 	mutex_unlock(&q->lock);
 }
 
+static void
+rmtpool(struct tpool *q)
+{
+	tpool_wait(q);
+	free(q);
+}
+
 #endif /* _LUX_TPOOL_H_ */
