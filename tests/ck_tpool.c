@@ -31,11 +31,11 @@ main()
 
 	for(i = 0; i < n; ++i)
 		enqueue(q, &t[i].super);
-	sleep(3);
 
 	for(i = 0; i < n; ++i)
 		enqueue(q, &t[i].super);
-	sleep(3);
+
+	tpool_wait(q);
 
 	free(t);
 	free(q);
