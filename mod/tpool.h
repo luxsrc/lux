@@ -41,7 +41,7 @@ struct tpool {
 };
 
 /* Forward declaration */
-static Lux_task *dequeue(struct tpool *);
+static Lux_task *tpool_dequeue(struct tpool *);
 
 #define Q ((struct tpool *)q)
 static void *
@@ -52,7 +52,7 @@ _execdrv(void *q)
 	mutex_unlock(&Q->lock);
 
 	for(;;) {
-		Lux_task *t = dequeue(q);
+		Lux_task *t = tpool_dequeue(q);
 		if(t) {
 			t->exec(t);
 			mutex_lock(&Q->lock);
@@ -90,7 +90,7 @@ mktpool(size_t nthread)
 }
 
 static void
-enqueue(struct tpool *q, Lux_task *t)
+tpool_enqueue(struct tpool *q, Lux_task *t)
 {
 	struct tnode *n = malloc(sizeof(struct tnode));
 	n->task = t;
@@ -103,7 +103,7 @@ enqueue(struct tpool *q, Lux_task *t)
 }
 
 static Lux_task *
-dequeue(struct tpool *q)
+tpool_dequeue(struct tpool *q)
 {
 	struct tnode *n = NULL;
 
