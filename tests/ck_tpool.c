@@ -32,13 +32,13 @@ main()
 	for(i = 0; i < n; ++i)
 		enqueue(q, &t[i].super);
 
+	tpool_wait(q);
+
 	for(i = 0; i < n; ++i)
 		enqueue(q, &t[i].super);
 
-	tpool_wait(q);
-
+	rmtpool(q);
 	free(t);
-	free(q);
 
 	return 0;
 }
