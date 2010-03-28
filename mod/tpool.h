@@ -36,6 +36,8 @@ struct tpool {
 	mutex  lock;
 	cond   done;
 	size_t njob;
+	size_t nactive;
+	size_t nthread;
 };
 
 /* Forward declaration */
@@ -45,6 +47,10 @@ static Lux_task *dequeue(struct tpool *);
 static void *
 _execdrv(void *q)
 {
+	mutex_lock(&Q->lock);
+	++Q->nactive;
+	mutex_unlock(&Q->lock);
+
 	for(;;) {
 		Lux_task *t = dequeue(q);
 		if(t) {
@@ -54,7 +60,14 @@ _execdrv(void *q)
 			cond_signal(&Q->done);
 			mutex_unlock(&Q->lock);
 		}
-	}
+		mutex_lock(&Q->lock);
+		if(Q->nactive > Q->nthread)
+			break;
+		mutex_unlock(&Q->lock); /* <---+                             */
+	}                               /*     |                             */
+	--Q->nactive;                   /*     +---- these two unlocks match */
+	cond_signal(&Q->done);          /*     |                             */
+	mutex_unlock(&Q->lock);         /* <---+                             */
 	return NULL;
 }
 #undef Q
@@ -67,6 +80,8 @@ mktpool(size_t nthread)
 	q->lock = ({ mutex _ = MUTEX_NULL; _; });
 	q->done = ({ cond  _ = COND_NULL;  _; });
  	q->njob = 0;
+	q->nactive = 0;
+	q->nthread = nthread;
 
 	while(nthread--)
 		(void)mkthread(_execdrv, q, THREAD_JOINABLE | THREAD_SYSTEM);
@@ -123,6 +138,13 @@ static void
 rmtpool(struct tpool *q)
 {
 	tpool_wait(q);
+
+	mutex_lock(&q->lock);
+	q->nthread = 0;
+	while(q->nactive)
+		cond_wait(&q->done, &q->lock);
+	mutex_unlock(&q->lock);
+
 	free(q);
 }
 
