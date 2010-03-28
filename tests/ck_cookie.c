@@ -28,13 +28,26 @@
 
 static char cookie[1024];
 
+static ssize_t
+dummy(void *c, const char *buf, size_t sz)
+{
+	return 0;
+}
+
 int
 main()
 {
-	cookie_io_functions_t cookie_func = {NULL, NULL, NULL, NULL};
+	cookie_io_functions_t funcs = {0};
 	FILE *f;
 
-	lux_assert(f = fopencookie(cookie, "w+", cookie_func));
+	funcs.read = dummy;
+	f = fopencookie(cookie, "w+", funcs);
+	lux_assert(f == NULL);
+
+	funcs.write = dummy;
+	f = fopencookie(cookie, "w+", funcs);
+	lux_assert(f != NULL);
+
 	lux_assert(fclose(f) == 0);
 
 	return 0;
