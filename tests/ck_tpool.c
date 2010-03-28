@@ -1,42 +1,40 @@
 #include <lux.h>
-#include <lux/assert.h>
+#include <lux/thread.h>
 #include <lux/tpool.h>
 #include <stdio.h>
 #include <stddef.h>
+#include <unistd.h>
+
+struct task {
+	Lux_task super;
+	int id;
+};
+
+void
+exec(Lux_task *t)
+{
+	printf("[%p] %d\n", pthread_self(), ((struct task *)t)->id);
+	sleep(1);
+}
 
 int
 main()
 {
-	struct tpool *tp = mktpool();
 	int i, n = 8;
 
-	for(i = 0; i < n; ++i) {
-		ptrdiff_t p = i+1;
-		enqueue(tp, (void *)p);
-	}
-
-	fputs("Test: ", stdout);
-	for(i = 0; i < n + 2; ++i) {
-		ptrdiff_t p = (ptrdiff_t)dequeue(tp);
-		printf("%zd ", p);
-		lux_assert(p == i < n ? i+1 : 0);
-	}
-	fputs("DONE\n", stdout);
+	struct tpool *q = mktpool(4);
+	struct task  *t = malloc(n * sizeof(struct task));
 
 	for(i = 0; i < n; ++i) {
-		ptrdiff_t p = i + 1;
-		enqueue(tp, (void *)p);
+		t[i].super.exec = exec;
+		t[i].id         = i + 1;
+		enqueue(q, &t[i].super);
 	}
 
-	fputs("Test: ", stdout);
-	for(i = 0; i < n + 2; ++i) {
-		ptrdiff_t p = (ptrdiff_t)dequeue(tp);
-		printf("%zd ", p);
-		lux_assert(p == i < n ? i+1 : 0);
-	}
-	fputs("DONE\n", stdout);
+	sleep(3);
 
-	free(tp);
+	free(t);
+	free(q);
 
 	return 0;
 }
