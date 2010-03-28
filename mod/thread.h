@@ -26,11 +26,37 @@ typedef struct {
 	pthread_t id;
 } thread;
 
+#define THREAD_JOINABLE (1U << 0)
+#define THREAD_DETACHED (1U << 1)
+#define THREAD_STATE   (THREAD_JOINABLE | THREAD_DETACHED)
+
+#define THREAD_SYSTEM   (1U << 2)
+#define THREAD_PROCESS  (1U << 3)
+#define THREAD_SCOPE    (THREAD_SYSTEM | THREAD_PROCESS)
+
 static inline thread
-mkthread(void *(*pro)(void *), void *arg)
+mkthread(void *(*pro)(void *), void *arg, unsigned flags)
 {
+	pthread_attr_t attr;
 	thread t;
-	(void)pthread_create(&t.id, NULL, pro, arg);
+
+	(void)pthread_attr_init(&attr);
+	if(flags & THREAD_STATE)
+		(void)pthread_attr_setdetachstate
+			(&attr,
+			 flags & THREAD_JOINABLE ?
+			 PTHREAD_CREATE_JOINABLE :
+			 PTHREAD_CREATE_DETACHED);
+	if(flags & THREAD_SCOPE)
+		(void)pthread_attr_setscope
+			(&attr,
+			 flags & THREAD_SYSTEM ?
+			 PTHREAD_SCOPE_SYSTEM  :
+			 PTHREAD_SCOPE_PROCESS);
+
+	(void)pthread_create(&t.id, &attr, pro, arg);
+
+	(void)pthread_attr_destroy(&attr);
 	return t;
 }
 
