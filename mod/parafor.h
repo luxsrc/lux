@@ -22,7 +22,12 @@
 
 #include <lux/alloca.h>
 #include <lux/assert.h>
+#if _OPENMP
+#define LUX_OPENMP 1
+#else
+#define LUX_THREAD 1
 #include <lux/thread.h>
+#endif
 
 struct paratask {
 	void (*func)(size_t, size_t, void *);
@@ -30,7 +35,9 @@ struct paratask {
 	size_t n;
 	size_t l;
 	size_t u;
+	#if LUX_THREAD
 	thread tid;
+	#endif
 };
 
 #define T ((struct paratask *)t)
@@ -64,8 +71,10 @@ parafor(size_t n, size_t nthread,
 
 	task = alloca(sizeof(struct paratask) * nthread);
 
-	/* Spawn */
-	for(i = 0; i < nthread; ++i) {
+	#if LUX_OPENMP
+	#pragma omp parallel for
+	#endif
+	for(i = 0; i < nthread; ++i) { /* spawn */
 		struct paratask *t = task + i;
 
 		t->func = func;
@@ -75,16 +84,19 @@ parafor(size_t n, size_t nthread,
 		t->l   = i * bsz;
 		t->u   = min((i+1)*bsz, n);
 
-		if(i == nthread-1)
-			(void)_execdrv(t); /* do the job ourself */
-		else
+		#if LUX_THREAD
+		if(i < nthread-1)
 			t->tid = mkthread(_execdrv, t,
 			                  THREAD_JOINABLE | THREAD_SYSTEM);
+		else
+		#endif
+			(void)_execdrv(t); /* do the job ourself */
 	}
 
-	/* Sync */
-	for(i = 0; i < nthread-1; ++i)
+	#if LUX_THREAD
+	for(i = 0; i < nthread-1; ++i) /* sync */
 		(void)thread_join(task[i].tid);
+	#endif
 }
 
 #endif /* _LUX_PARAFOR_H_ */
