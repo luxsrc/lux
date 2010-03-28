@@ -22,6 +22,7 @@
 
 #include <lux/ap/task.h>
 #include <lux/mutex.h>
+#include <lux/cond.h>
 #include <stdlib.h>
 
 struct tnode {
@@ -33,30 +34,39 @@ struct tpool {
 	struct tnode *head; /* == next */
 	struct tnode *tail;
 	mutex lock;
+	cond  done;
+	int   running;
 };
 
 /* Forward declaration */
 static Lux_task *dequeue(struct tpool *);
 
-#define W ((struct worker *)w)
+#define Q ((struct tpool *)q)
 static void *
 _execdrv(void *q)
 {
 	for(;;) {
 		Lux_task *t = dequeue(q);
-		if(t)
+		if(t) {
 			t->exec(t);
+			mutex_lock(&Q->lock);
+			--Q->running;
+			cond_signal(&Q->done);
+			mutex_unlock(&Q->lock);
+		}
 	}
 	return NULL;
 }
-#undef W
+#undef Q
 
 static struct tpool *
 mktpool(size_t nthread)
 {
 	struct tpool *q = malloc(sizeof(struct tpool));
-	q->tail = q->head = (struct tnode *)q;
-	q->lock = ({ mutex _ = MUTEX_NULL; _; });
+	q->tail    = q->head = (struct tnode *)q;
+	q->lock    = ({ mutex _ = MUTEX_NULL; _; });
+	q->done    = ({ cond  _ = COND_NULL;  _; });
+ 	q->running = 0;
 
 	while(nthread--)
 		(void)mkthread(_execdrv, q, THREAD_JOINABLE | THREAD_SYSTEM);
@@ -88,6 +98,7 @@ dequeue(struct tpool *q)
 			q->head = n->next;
 		else
 			q->tail = q->head = n->next;
+		++q->running;
 	}
 	mutex_unlock(&q->lock);
 
@@ -97,6 +108,15 @@ dequeue(struct tpool *q)
 		return t;
 	} else
 		return NULL;
+}
+
+static void
+tpool_wait(struct tpool *q)
+{
+	mutex_lock(&q->lock);
+	while((q->head != q) || q->running)
+		cond_wait(&q->done, &q->lock);
+	mutex_unlock(&q->lock);
 }
 
 #endif /* _LUX_TPOOL_H_ */
