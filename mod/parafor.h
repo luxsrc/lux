@@ -22,10 +22,9 @@
 
 #include <lux/alloca.h>
 #include <lux/assert.h>
-#include <lux/tfork.h>
+#include <lux/thread.h>
 
 struct paratask {
-	Lux_task super;
 	void (*func)(size_t, size_t, void *);
 	void  *data;
 	size_t n;
@@ -35,12 +34,13 @@ struct paratask {
 };
 
 #define T ((struct paratask *)t)
-static void
-_paradrv(Lux_task *t)
+static void *
+_execdrv(void *t)
 {
 	size_t i;
 	for(i = T->l; i < T->u; ++i)
 		T->func(T->n, i, T->data);
+	return NULL;
 }
 #undef T
 
@@ -66,18 +66,20 @@ parafor(size_t n, size_t nthread,
 
 	/* Spawn */
 	for(i = 0; i < nthread; ++i) {
-		task[i].super.exec = _paradrv;
 		task[i].func = func;
 		task[i].data = data;
 		task[i].n    = n;
-		task[i].l    = i * bsz;
-		task[i].u    = min((i+1)*bsz, n);
-		task[i].tid  = tfork(&task[i].super);
+
+		task[i].l = i * bsz;
+		task[i].u = min((i+1)*bsz, n);
+
+		task[i].tid = mkthread(_execdrv, task+i,
+		                       THREAD_JOINABLE | PTHREAD_SCOPE_SYSTEM);
 	}
 
 	/* Sync */
 	for(i = 0; i < nthread; ++i)
-		tjoin(task[i].tid);
+		(void)thread_join(task[i].tid);
 }
 
 #endif /* _LUX_PARAFOR_H_ */
