@@ -35,12 +35,32 @@ struct tpool {
 	mutex lock;
 };
 
+/* Forward declaration */
+static Lux_task *dequeue(struct tpool *);
+
+#define W ((struct worker *)w)
+static void *
+_execdrv(void *q)
+{
+	for(;;) {
+		Lux_task *t = dequeue(q);
+		if(t)
+			t->exec(t);
+	}
+	return NULL;
+}
+#undef W
+
 static struct tpool *
-mktpool()
+mktpool(size_t nthread)
 {
 	struct tpool *q = malloc(sizeof(struct tpool));
 	q->tail = q->head = (struct tnode *)q;
 	q->lock = ({ mutex _ = MUTEX_NULL; _; });
+
+	while(nthread--)
+		(void)mkthread(_execdrv, q, THREAD_JOINABLE | THREAD_SYSTEM);
+
 	return q;
 }
 
