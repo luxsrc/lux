@@ -33,7 +33,7 @@ _execdrv(void *t)
 static inline thread
 tfork(Lux_task *t)
 {
-	return mkthread(_execdrv, t, THREAD_JOINABLE | PTHREAD_SCOPE_SYSTEM);
+	return mkthread(_execdrv, t, THREAD_JOINABLE | THREAD_SYSTEM);
 }
 
 static inline void
