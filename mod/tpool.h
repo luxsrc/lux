@@ -33,9 +33,9 @@ struct tnode {
 struct tpool {
 	struct tnode *head; /* == next */
 	struct tnode *tail;
-	mutex lock;
-	cond  done;
-	int   running;
+	mutex  lock;
+	cond   done;
+	size_t njob;
 };
 
 /* Forward declaration */
@@ -50,7 +50,7 @@ _execdrv(void *q)
 		if(t) {
 			t->exec(t);
 			mutex_lock(&Q->lock);
-			--Q->running;
+			--Q->njob;
 			cond_signal(&Q->done);
 			mutex_unlock(&Q->lock);
 		}
@@ -63,10 +63,10 @@ static struct tpool *
 mktpool(size_t nthread)
 {
 	struct tpool *q = malloc(sizeof(struct tpool));
-	q->tail    = q->head = (struct tnode *)q;
-	q->lock    = ({ mutex _ = MUTEX_NULL; _; });
-	q->done    = ({ cond  _ = COND_NULL;  _; });
- 	q->running = 0;
+	q->tail = q->head = (struct tnode *)q;
+	q->lock = ({ mutex _ = MUTEX_NULL; _; });
+	q->done = ({ cond  _ = COND_NULL;  _; });
+ 	q->njob = 0;
 
 	while(nthread--)
 		(void)mkthread(_execdrv, q, THREAD_JOINABLE | THREAD_SYSTEM);
@@ -83,6 +83,7 @@ enqueue(struct tpool *q, Lux_task *t)
 
 	mutex_lock(&q->lock);
 	q->tail = q->tail->next = n;
+	++q->njob;
 	mutex_unlock(&q->lock);
 }
 
@@ -98,7 +99,6 @@ dequeue(struct tpool *q)
 			q->head = n->next;
 		else
 			q->tail = q->head = n->next;
-		++q->running;
 	}
 	mutex_unlock(&q->lock);
 
@@ -114,7 +114,7 @@ static void
 tpool_wait(struct tpool *q)
 {
 	mutex_lock(&q->lock);
-	while((q->head != q) || q->running)
+	while(q->njob)
 		cond_wait(&q->done, &q->lock);
 	mutex_unlock(&q->lock);
 }
