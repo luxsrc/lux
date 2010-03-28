@@ -29,7 +29,7 @@ AC_PROG_SED
 dnl Check for headers
 AC_HEADER_TIME
 AC_CHECK_HEADERS([sys/time.h c_asm.h intrinsics.h mach/mach_time.h])
-AC_CHECK_HEADERS([stddef.h obstack.h])
+AC_CHECK_HEADERS([stddef.h obstack.h sys/mman.h sys/stat.h fcntl.h])
 
 dnl Check for types
 AC_CHECK_TYPE([hrtime_t], [AC_DEFINE(HAVE_HRTIME_T, 1, [Define to 1 if hrtime_t is defined in <sys/time.h>])], , [#if HAVE_SYS_TIME_H

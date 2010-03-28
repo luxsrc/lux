@@ -20,6 +20,18 @@
 #ifndef _LUX_MPOOL_H_
 #define _LUX_MPOOL_H_
 
+#if HAVE_SYS_MMAN_H
+#include <sys/mman.h>
+#endif
+
+#if HAVE_SYS_STAT_H
+#include <sys/stat.h>
+#endif
+
+#if HAVE_FCNTL_H
+#include <fcntl.h>
+#endif
+
 struct mpool {
 	int    fd;
 	size_t sz;
