@@ -74,12 +74,16 @@ parafor(size_t n, size_t nthread,
 
 		t->l   = i * bsz;
 		t->u   = min((i+1)*bsz, n);
-		t->tid = mkthread(_execdrv, t,
-		                  THREAD_JOINABLE | THREAD_SYSTEM);
+
+		if(i == nthread-1)
+			(void)_execdrv(t); /* do the job ourself */
+		else
+			t->tid = mkthread(_execdrv, t,
+			                  THREAD_JOINABLE | THREAD_SYSTEM);
 	}
 
 	/* Sync */
-	for(i = 0; i < nthread; ++i)
+	for(i = 0; i < nthread-1; ++i)
 		(void)thread_join(task[i].tid);
 }
 
