@@ -28,9 +28,11 @@ AC_PROG_SED
 
 dnl Check for headers
 AC_HEADER_TIME
-AC_CHECK_HEADERS([stddef.h sys/time.h c_asm.h intrinsics.h mach/mach_time.h])
+AC_CHECK_HEADERS([sys/time.h c_asm.h intrinsics.h mach/mach_time.h])
+AC_CHECK_HEADERS([stddef.h obstack.h sys/mman.h sys/stat.h fcntl.h])
 
 dnl Check for types
+AC_CHECK_TYPE([off64_t])
 AC_CHECK_TYPE([hrtime_t], [AC_DEFINE(HAVE_HRTIME_T, 1, [Define to 1 if hrtime_t is defined in <sys/time.h>])], , [#if HAVE_SYS_TIME_H
 #include <sys/time.h>
 #endif])
@@ -40,7 +42,7 @@ AC_FUNC_ALLOCA
 AC_SEARCH_LIBS([dlinfo],  [dl], [AC_DEFINE(HAVE_DLINFO,  1, [Define to 1 if you have the `dlinfo' function.])],  [AC_MSG_WARN([failed to find the dlinfo() function])])
 AC_SEARCH_LIBS([dladdr],  [dl], [AC_DEFINE(HAVE_DLADDR,  1, [Define to 1 if you have the `dladdr' function.])],  [AC_MSG_WARN([failed to find the dladdr() function])])
 AC_SEARCH_LIBS([dlmopen], [dl], [AC_DEFINE(HAVE_DLMOPEN, 1, [Define to 1 if you have the `dlmopen' function.])], [AC_MSG_WARN([failed to find the dlmopen() function])])
-AC_CHECK_FUNCS([vsnprintf])
+AC_CHECK_FUNCS([fopencookie funopen vsnprintf])
 AC_CHECK_FUNCS([BSDgettimeofday gettimeofday gethrtime read_real_time time_base_to_time clock_gettime mach_absolute_time])
 
 dnl Cray UNICOS _rtc() (real-time clock) intrinsic
