@@ -77,8 +77,8 @@ mktpool(size_t nthread)
 {
 	struct tpool *q = malloc(sizeof(struct tpool));
 	q->tail = q->head = (struct tnode *)q;
-	q->lock = ({ mutex _ = MUTEX_NULL; _; });
-	q->done = ({ cond  _ = COND_NULL;  _; });
+	q->lock = localof(mutex, MUTEX_NULL);
+	q->done = localof(cond,  COND_NULL);
  	q->njob = 0;
 	q->nactive = 0;
 	q->nthread = nthread;
