@@ -23,12 +23,12 @@
 
 #include <lux.h>
 #include <lux/assert.h>
-#include <lux/clist.h>
+#include <lux/stack.h>
 #include <stdlib.h>
 #include <stdio.h>
 
 struct node {
-	struct cnode super;
+	struct snode super;
 	int value;
 };
 
@@ -36,7 +36,7 @@ static inline struct node *
 mknode(int value)
 {
 	struct node *n = malloc(sizeof(struct node));
-	clist_init(&n->super);
+	stack_init(&n->super);
 	n->value = value;
 	return n;
 }
@@ -50,31 +50,31 @@ main()
 
 	offset = 100;
 	for(i = 0; i < n; ++i)
-		clist_ins(&h->super, &mknode(offset+i)->super);
+		stack_push(&h->super, &mknode(offset+i)->super);
 	for(i = 0; i < n+1; ++i) {
-		struct node *c = (struct node *)clist_del(&h->super);
-		if(c == h) {
+		struct node *s = (struct node *)stack_pop(&h->super);
+		if(s == h) {
 			printf("empty\n");
-			lux_assert(c->value == -1);
+			lux_assert(s->value == -1);
 		} else {
-			printf("%d ", c->value);
-			lux_assert(c->value == offset+(n-1-i));
-			free(c);
+			printf("%d ", s->value);
+			lux_assert(s->value == offset+(n-1-i));
+			free(s);
 		}
 	}
 
 	offset = 110;
 	for(i = 0; i < n; ++i)
-		clist_ins(&h->super, &mknode(offset+i)->super);
+		stack_push(&h->super, &mknode(offset+i)->super);
 	for(i = 0; i < n+1; ++i) {
-		struct node *c = (struct node *)clist_del(&h->super);
-		if(c == h) {
+		struct node *s = (struct node *)stack_pop(&h->super);
+		if(s == h) {
 			printf("empty\n");
-			lux_assert(c->value == -1);
+			lux_assert(s->value == -1);
 		} else {
-			printf("%d ", c->value);
-			lux_assert(c->value == offset+(n-1-i));
-			free(c);
+			printf("%d ", s->value);
+			lux_assert(s->value == offset+(n-1-i));
+			free(s);
 		}
 	}
 
