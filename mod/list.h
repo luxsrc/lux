@@ -17,38 +17,16 @@
  * You should have received a copy of the GNU General Public License
  * along with lux.  If not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef _LUX_QUEUE_H_
-#define _LUX_QUEUE_H_
+#ifndef _LUX_LIST_H_
+#define _LUX_LIST_H_
 
-#include <lux/list.h>
-#include <lux/ring.h>
-
-struct qhead {
-	struct snode *head;
-	struct snode *tail;
+struct snode {
+	struct snode *next;
 };
 
-static inline struct qhead *
-queue_init(struct qhead *h)
-{
-	return (struct qhead *)(h->tail = h->head = (struct snode *)h);
-}
+struct dnode {
+	struct dnode *next;
+	struct dnode *prev;
+};
 
-static inline struct snode *
-enqueue(struct qhead *h, struct snode *s)
-{
-	ring_ins(h->tail, s);
-	h->tail = s;
-	return s;
-}
-
-static inline struct snode *
-dequeue(struct qhead *h)
-{
-	struct snode *s = (struct snode *)ring_pop((struct snode *)h);
-	if(s->next == (struct snode *)h) /* last one or empty */
-		h->tail = (struct snode *)h;
-	return s;
-}
-
-#endif /* _LUX_QUEUE_H_ */
+#endif /* _LUX_LIST_H_ */

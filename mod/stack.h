@@ -19,33 +19,31 @@
  */
 #ifndef _LUX_STACK_H_
 #define _LUX_STACK_H_
-/*
- * Stack based on circular singly linked list
- */
-struct snode {
-	struct snode *next;
-};
+
+#include <lux/list.h>
+#include <stddef.h>
 
 static inline struct snode *
-stack_init(struct snode *s)
+stack_init(struct snode *h)
 {
-	return s->next = s;
+	return h->next = NULL;
 }
 
 static inline struct snode *
-stack_push(struct snode *s, struct snode *n)
+stack_push(struct snode *h, struct snode *s)
 {
-	n->next = s->next;
-	s->next = n;
+	s->next = h->next;
+	h->next = s;
+	return h;
+}
+
+static inline struct snode *
+stack_pop(struct snode *h)
+{
+	struct snode *s = h->next;
+	if(s)
+		h->next = s->next;
 	return s;
-}
-
-static inline struct snode *
-stack_pop(struct snode *s)
-{
-	struct snode *n = s->next;
-	s->next = n->next;
-	return n;
 }
 
 #endif /* _LUX_STACK_H_ */

@@ -10,7 +10,7 @@ pkginclude_HEADERS += mangle.h numeric.h shorthand.h switch.h
 pkginclude_HEADERS += array.h hash.h parafor.h strutils.h tensor.h tfork.h vector.h
 
 # Static modules (like pure static modules but also declare trivial types)
-pkginclude_HEADERS += clist.h counter.h queue.h refcnt.h stack.h
+pkginclude_HEADERS += counter.h list.h queue.h refcnt.h ring.h stack.h
 
 # Resource allocator (allocate other resource that need to be freed)
 pkginclude_HEADERS += alloca.h lazybuf.h zalloc.h

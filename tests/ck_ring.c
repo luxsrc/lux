@@ -23,7 +23,7 @@
 
 #include <lux.h>
 #include <lux/assert.h>
-#include <lux/queue.h>
+#include <lux/ring.h>
 #include <stdlib.h>
 #include <stdio.h>
 
@@ -36,6 +36,7 @@ static inline struct node *
 mknode(int value)
 {
 	struct node *n = malloc(sizeof(struct node));
+	ring_init(&n->super);
 	n->value = value;
 	return n;
 }
@@ -45,32 +46,34 @@ main()
 {
 	int i, n = 10, offset;
 
-	struct qhead *h = queue_init(malloc(sizeof(struct qhead)));
+	struct node *h = mknode(-1);
 
 	offset = 100;
 	for(i = 0; i < n; ++i)
-		enqueue(h, &mknode(offset+i)->super);
+		ring_ins(&h->super, &mknode(offset+i)->super);
 	for(i = 0; i < n+1; ++i) {
-		struct node *s = (struct node *)dequeue(h);
-		if(s == (struct node *)h)
+		struct node *s = (struct node *)ring_pop(&h->super);
+		if(s == h) {
 			printf("empty\n");
-		else {
+			lux_assert(s->value == -1);
+		} else {
 			printf("%d ", s->value);
-			lux_assert(s->value == i+offset);
+			lux_assert(s->value == offset+(n-1-i));
 			free(s);
 		}
 	}
 
 	offset = 110;
 	for(i = 0; i < n; ++i)
-		enqueue(h, &mknode(offset+i)->super);
+		ring_ins(&h->super, &mknode(offset+i)->super);
 	for(i = 0; i < n+1; ++i) {
-		struct node *s = (struct node *)dequeue(h);
-		if(s == (struct node *)h)
+		struct node *s = (struct node *)ring_pop(&h->super);
+		if(s == h) {
 			printf("empty\n");
-		else {
+			lux_assert(s->value == -1);
+		} else {
 			printf("%d ", s->value);
-			lux_assert(s->value == i+offset);
+			lux_assert(s->value == offset+(n-1-i));
 			free(s);
 		}
 	}

@@ -53,14 +53,12 @@ main()
 		stack_push(&h->super, &mknode(offset+i)->super);
 	for(i = 0; i < n+1; ++i) {
 		struct node *s = (struct node *)stack_pop(&h->super);
-		if(s == h) {
-			printf("empty\n");
-			lux_assert(s->value == -1);
-		} else {
+		if(s) {
 			printf("%d ", s->value);
 			lux_assert(s->value == offset+(n-1-i));
 			free(s);
-		}
+		} else
+			printf("empty\n");
 	}
 
 	offset = 110;
@@ -68,14 +66,12 @@ main()
 		stack_push(&h->super, &mknode(offset+i)->super);
 	for(i = 0; i < n+1; ++i) {
 		struct node *s = (struct node *)stack_pop(&h->super);
-		if(s == h) {
-			printf("empty\n");
-			lux_assert(s->value == -1);
-		} else {
+		if(s) {
 			printf("%d ", s->value);
 			lux_assert(s->value == offset+(n-1-i));
 			free(s);
-		}
+		} else
+			printf("empty\n");
 	}
 
 	free(h);

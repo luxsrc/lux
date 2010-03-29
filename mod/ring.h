@@ -17,35 +17,32 @@
  * You should have received a copy of the GNU General Public License
  * along with lux.  If not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef _LUX_CLIST_H_
-#define _LUX_CLIST_H_
-/*
- * Circular singly linked list
- */
-struct cnode {
-	struct cnode *next;
-};
+#ifndef _LUX_RING_H_
+#define _LUX_RING_H_
 
-static inline struct cnode *
-clist_init(struct cnode *c)
+#include <lux/list.h>
+#include <lux/stack.h>
+
+static inline struct snode *
+ring_init(struct snode *h)
 {
-	return c->next = c;
+	return h->next = h;
 }
 
-static inline struct cnode *
-clist_ins(struct cnode *c, struct cnode *n)
+static inline struct snode *
+ring_ins(struct snode *h, struct snode *s)
 {
-	n->next = c->next;
-	c->next = n;
-	return c;
+	s->next = h->next;
+	h->next = s;
+	return h;
 }
 
-static inline struct cnode *
-clist_del(struct cnode *c)
+static inline struct snode *
+ring_pop(struct snode *h)
 {
-	struct cnode *n = c->next;
-	c->next = n->next;
-	return n;
+	struct snode *s = h->next;
+	h->next = s->next;
+	return s;
 }
 
-#endif /* _LUX_CLIST_H_ */
+#endif /* _LUX_RING_H_ */
