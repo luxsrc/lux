@@ -14,7 +14,7 @@ void
 exec(Lux_task *t)
 {
 	printf("[%p] %d\n", pthread_self(), ((struct task *)t)->id);
-	sleep(1);
+	usleep(1);
 }
 
 int
