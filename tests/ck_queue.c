@@ -46,20 +46,19 @@ main()
 {
 	int i, n = 10, offset;
 
-	struct queue_head *h = dynamic(struct queue_head, QUEUE_INIT(_));
+	struct queue_head *h = dynamic(struct queue_head, QUEUE_HEAD_INIT(_));
 
 	offset = 100;
 	for(i = 0; i < n; ++i)
 		enqueue(h, &mknode(offset+i)->super);
 	for(i = 0; i < n+1; ++i) {
 		struct node *s = (struct node *)dequeue(h);
-		if(s == (struct node *)h)
-			printf("empty\n");
-		else {
+		if(s) {
 			printf("%d ", s->value);
 			lux_assert(s->value == i+offset);
 			free(s);
-		}
+		} else
+			printf("empty\n");
 	}
 
 	offset = 110;
@@ -67,13 +66,12 @@ main()
 		enqueue(h, &mknode(offset+i)->super);
 	for(i = 0; i < n+1; ++i) {
 		struct node *s = (struct node *)dequeue(h);
-		if(s == (struct node *)h)
-			printf("empty\n");
-		else {
+		if(s) {
 			printf("%d ", s->value);
 			lux_assert(s->value == i+offset);
 			free(s);
-		}
+		} else
+			printf("empty\n");
 	}
 
 	free(h);

@@ -22,13 +22,15 @@
 
 #include <lux/list.h>
 #include <lux/ring.h>
+#include <stddef.h>
 
 struct queue_head {
 	struct slist_node *head;
 	struct slist_node *tail;
 };
 
-#define QUEUE_INIT(h) {(struct slist_node *)h, (struct slist_node *)h}
+#define QUEUE_HEAD_INIT(h) {(struct slist_node *)h, (struct slist_node *)h}
+#define QUEUE_NODE_NULL    {NULL}
 
 static inline void
 enqueue(struct queue_head *h, struct slist_node *s)
@@ -41,7 +43,9 @@ static inline struct slist_node *
 dequeue(struct queue_head *h)
 {
 	struct slist_node *s = ring_pop((struct slist_node *)h);
-	if(s->next == (struct slist_node *)h) /* last one or empty */
+	if(s == (struct slist_node *)h) /* empty */
+		return NULL;
+	if(s->next == (struct slist_node *)h) /* last one */
 		h->tail = (struct slist_node *)h;
 	return s;
 }
