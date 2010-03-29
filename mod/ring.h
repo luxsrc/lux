@@ -21,20 +21,14 @@
 #define _LUX_RING_H_
 
 #include <lux/list.h>
-#include <lux/stack.h>
 
-static inline struct slist_node *
-ring_init(struct slist_node *h)
-{
-	return h->next = h;
-}
+#define RING_INIT(h) {h}
 
-static inline struct slist_node *
+static inline void
 ring_ins(struct slist_node *h, struct slist_node *s)
 {
 	s->next = h->next;
 	h->next = s;
-	return h;
 }
 
 static inline struct slist_node *

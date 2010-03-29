@@ -45,7 +45,8 @@ main()
 {
 	int i, n = 10, offset;
 
-	struct queue_head *h = queue_init(malloc(sizeof(struct queue_head)));
+	struct queue_head *h = malloc(sizeof(struct queue_head));
+	*h = ({ struct queue_head _ = QUEUE_INIT(h); _; });
 
 	offset = 100;
 	for(i = 0; i < n; ++i)

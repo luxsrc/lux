@@ -23,27 +23,21 @@
 #include <lux/list.h>
 #include <stddef.h>
 
-static inline struct slist_node *
-stack_init(struct slist_node *h)
-{
-	return h->next = NULL;
-}
+#define STACK_NULL {NULL}
 
-static inline struct slist_node *
+static inline void
 stack_push(struct slist_node *h, struct slist_node *s)
 {
 	s->next = h->next;
 	h->next = s;
-	return h;
 }
 
 static inline struct slist_node *
 stack_pop(struct slist_node *h)
 {
 	struct slist_node *s = h->next;
-	if(!s) /* empty list */
-		return NULL;
-	h->next = s->next;
+	if(s)
+		h->next = s->next;
 	return s;
 }
 

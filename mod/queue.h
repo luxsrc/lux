@@ -28,18 +28,13 @@ struct queue_head {
 	struct slist_node *tail;
 };
 
-static inline struct queue_head *
-queue_init(struct queue_head *h)
-{
-	return (struct queue_head *)(h->tail = h->head = (struct slist_node *)h);
-}
+#define QUEUE_INIT(h) {(struct slist_node *)h, (struct slist_node *)h}
 
-static inline struct slist_node *
+static inline void
 enqueue(struct queue_head *h, struct slist_node *s)
 {
 	ring_ins(h->tail, s);
 	h->tail = s;
-	return s;
 }
 
 static inline struct slist_node *

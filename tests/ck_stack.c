@@ -36,7 +36,7 @@ static inline struct node *
 mknode(int value)
 {
 	struct node *n = malloc(sizeof(struct node));
-	stack_init(&n->super);
+	n->super = ({ struct slist_node _ = STACK_NULL; _; });
 	n->value = value;
 	return n;
 }
