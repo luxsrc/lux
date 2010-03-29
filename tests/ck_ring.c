@@ -28,7 +28,7 @@
 #include <stdio.h>
 
 struct node {
-	struct snode super;
+	struct slist_node super;
 	int value;
 };
 

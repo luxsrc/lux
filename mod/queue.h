@@ -23,31 +23,31 @@
 #include <lux/list.h>
 #include <lux/ring.h>
 
-struct qhead {
-	struct snode *head;
-	struct snode *tail;
+struct queue_head {
+	struct slist_node *head;
+	struct slist_node *tail;
 };
 
-static inline struct qhead *
-queue_init(struct qhead *h)
+static inline struct queue_head *
+queue_init(struct queue_head *h)
 {
-	return (struct qhead *)(h->tail = h->head = (struct snode *)h);
+	return (struct queue_head *)(h->tail = h->head = (struct slist_node *)h);
 }
 
-static inline struct snode *
-enqueue(struct qhead *h, struct snode *s)
+static inline struct slist_node *
+enqueue(struct queue_head *h, struct slist_node *s)
 {
 	ring_ins(h->tail, s);
 	h->tail = s;
 	return s;
 }
 
-static inline struct snode *
-dequeue(struct qhead *h)
+static inline struct slist_node *
+dequeue(struct queue_head *h)
 {
-	struct snode *s = (struct snode *)ring_pop((struct snode *)h);
-	if(s->next == (struct snode *)h) /* last one or empty */
-		h->tail = (struct snode *)h;
+	struct slist_node *s = ring_pop((struct slist_node *)h);
+	if(s->next == (struct slist_node *)h) /* last one or empty */
+		h->tail = (struct slist_node *)h;
 	return s;
 }
 

@@ -23,24 +23,24 @@
 #include <lux/list.h>
 #include <lux/stack.h>
 
-static inline struct snode *
-ring_init(struct snode *h)
+static inline struct slist_node *
+ring_init(struct slist_node *h)
 {
 	return h->next = h;
 }
 
-static inline struct snode *
-ring_ins(struct snode *h, struct snode *s)
+static inline struct slist_node *
+ring_ins(struct slist_node *h, struct slist_node *s)
 {
 	s->next = h->next;
 	h->next = s;
 	return h;
 }
 
-static inline struct snode *
-ring_pop(struct snode *h)
+static inline struct slist_node *
+ring_pop(struct slist_node *h)
 {
-	struct snode *s = h->next;
+	struct slist_node *s = h->next;
 	h->next = s->next;
 	return s;
 }

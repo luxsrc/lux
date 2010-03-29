@@ -20,13 +20,13 @@
 #ifndef _LUX_LIST_H_
 #define _LUX_LIST_H_
 
-struct snode {
-	struct snode *next;
+struct slist_node {
+	struct slist_node *next;
 };
 
-struct dnode {
-	struct dnode *next;
-	struct dnode *prev;
+struct dlist_node {
+	struct dlist_node *next;
+	struct dlist_node *prev;
 };
 
 #endif /* _LUX_LIST_H_ */

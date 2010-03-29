@@ -28,7 +28,7 @@
 #include <stdio.h>
 
 struct node {
-	struct snode super;
+	struct slist_node super;
 	int value;
 };
 
@@ -45,7 +45,7 @@ main()
 {
 	int i, n = 10, offset;
 
-	struct qhead *h = queue_init(malloc(sizeof(struct qhead)));
+	struct queue_head *h = queue_init(malloc(sizeof(struct queue_head)));
 
 	offset = 100;
 	for(i = 0; i < n; ++i)
