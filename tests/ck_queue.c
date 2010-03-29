@@ -23,6 +23,7 @@
 
 #include <lux.h>
 #include <lux/assert.h>
+#include <lux/dynamic.h>
 #include <lux/queue.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -45,8 +46,7 @@ main()
 {
 	int i, n = 10, offset;
 
-	struct queue_head *h = malloc(sizeof(struct queue_head));
-	*h = localof(struct queue_head, QUEUE_INIT(h));
+	struct queue_head *h = dynamic(struct queue_head, QUEUE_INIT(_));
 
 	offset = 100;
 	for(i = 0; i < n; ++i)

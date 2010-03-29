@@ -23,6 +23,7 @@
 
 #include <lux.h>
 #include <lux/assert.h>
+#include <lux/dynamic.h>
 #include <lux/stack.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -35,10 +36,7 @@ struct node {
 static inline struct node *
 mknode(int value)
 {
-	struct node *n = malloc(sizeof(struct node));
-	n->super = localof(struct slist_node, STACK_NULL);
-	n->value = value;
-	return n;
+	return dynamic(struct node, {STACK_NULL, value});
 }
 
 int

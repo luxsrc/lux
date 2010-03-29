@@ -23,6 +23,7 @@
 
 #include <lux.h>
 #include <lux/assert.h>
+#include <lux/dynamic.h>
 #include <lux/ring.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -35,10 +36,7 @@ struct node {
 static inline struct node *
 mknode(int value)
 {
-	struct node *n = malloc(sizeof(struct node));
-	n->super = localof(struct slist_node, RING_INIT(&n->super));
-	n->value = value;
-	return n;
+	return dynamic(struct node, {RING_INIT(&_->super), value});
 }
 
 int
