@@ -1,7 +1,10 @@
 AM_CPPFLAGS = -I$(top_builddir)
 
-check_PROGRAMS = ck_stack ck_tpool
+check_PROGRAMS = ck_queue ck_stack ck_tpool
 TESTS = $(check_PROGRAMS)
+
+ck_queue_SOURCES = ck_queue.c ../mod/queue.h
+ck_queue_LDADD   = ../api/libux.la
 
 ck_stack_SOURCES = ck_stack.c ../mod/stack.h
 ck_stack_LDADD   = ../api/libux.la
