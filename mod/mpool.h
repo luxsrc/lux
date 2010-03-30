@@ -20,21 +20,8 @@
 #ifndef _LUX_MPOOL_H_
 #define _LUX_MPOOL_H_
 
-#include <lux/ap/ticks.h>
-#include <stdio.h>
+#include <lux/memfd.h>
 #include <unistd.h>
-
-#if HAVE_SYS_MMAN_H
-#include <sys/mman.h>
-#endif
-
-#if HAVE_SYS_STAT_H
-#include <sys/stat.h>
-#endif
-
-#if HAVE_FCNTL_H
-#include <fcntl.h>
-#endif
 
 struct mpool {
 	int    fd;
@@ -44,22 +31,17 @@ struct mpool {
 static inline struct mpool
 mkmpool(size_t sz)
 {
-	struct mpool mp;
-	int err;
-
-	ticks t = getticks();
-
-	char name[32]; /* 64-bit integer has at most 20 digits */
-	(void)snprintf(name, sizeof(name), "/lux-%u", (unsigned)t);
-
-	mp.fd = shm_open(name, O_RDWR|O_CREAT|O_EXCL|O_NOFOLLOW, 0600);
-	if(mp.fd != -1) {
-		err = ftruncate(mp.fd, sz);
-		(void)shm_unlink(name);
-	} else
-		err = 1;
-	mp.sz = err ? 0 : sz;
-
+	struct mpool mp = {memfd_create("mpool", 0), sz};
+	if(mp.fd == -1) /* file open error */
+		mp.sz = 0;
+	else {
+		int err = ftruncate(mp.fd, sz);
+		if(err) {
+			close(mp.fd);
+			mp.fd = -1;
+			mp.sz =  0;
+		}
+	}
 	return mp;
 }
 
