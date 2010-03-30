@@ -21,28 +21,33 @@
 #define _LUX_MPOOL_H_
 
 #include <lux/memfd.h>
+#include <sys/stat.h>
 #include <unistd.h>
 
 struct mpool {
-	int    fd;
-	size_t sz;
+	int fd;
 };
 
 static inline struct mpool
 mkmpool(size_t sz)
 {
-	struct mpool mp = {memfd_create("mpool", 0), sz};
-	if(mp.fd == -1) /* file open error */
-		mp.sz = 0;
-	else {
+	struct mpool mp = {memfd_create("mpool", 0)};
+	if(mp.fd != -1) {
 		int err = ftruncate(mp.fd, sz);
 		if(err) {
 			close(mp.fd);
 			mp.fd = -1;
-			mp.sz =  0;
 		}
 	}
 	return mp;
+}
+
+static inline size_t
+mpool_sz(struct mpool mp)
+{
+	struct stat s;
+	fstat(mp.fd, &s);
+	return (size_t)s.st_size;
 }
 
 static inline void
