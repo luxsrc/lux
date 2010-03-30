@@ -1,6 +1,6 @@
 AM_LDFLAGS = -no-undefined -export-dynamic -export-symbols-regex '^lux[A-Z_]' -module
 
-pkginclude_HEADERS  = assert.h aver.h atomic.h check.h cond.h dlfcn.h failed.h mutex.h sem.h thread.h tpool.h
+pkginclude_HEADERS  = assert.h aver.h atomic.h check.h cond.h dlfcn.h failed.h memfd.h mutex.h sem.h thread.h tpool.h
 SUBDIRS             = ap dm
 
 # Convenience static modules (typically for renaming stuffs)
