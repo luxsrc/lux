@@ -25,6 +25,7 @@
 #include <lux/assert.h>
 #include <lux/mpool.h>
 #include <stdio.h>
+#include <unistd.h>
 
 int
 main()
@@ -32,8 +33,8 @@ main()
 	size_t sz = 1024;
 	struct mpool mp = mkmpool(sz);
 
-	lux_assert(mp.sz == sz);
-	printf("memory pool size: %zu\n", sz);
+	printf("memory pool size: %zu\n", mpool_sz(mp));
+	lux_assert(mpool_sz(mp) == sz);
 
 	rmmpool(mp);
 	return 0;
