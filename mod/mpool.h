@@ -33,7 +33,8 @@ mkmpool(size_t sz)
 {
 	struct mpool mp = {memfd_create("mpool", 0)};
 	if(mp.fd != -1) {
-		int err = ftruncate(mp.fd, sz);
+		int psz = getpagesize();
+		int err = ftruncate(mp.fd, ((sz + psz - 1) / psz) * psz);
 		if(err) {
 			close(mp.fd);
 			mp.fd = -1;
