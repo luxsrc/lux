@@ -21,7 +21,6 @@
 #define _LUX_MPOOL_H_
 
 #include <lux/memfd.h>
-#include <sys/stat.h>
 #include <unistd.h>
 
 struct mpool {
@@ -53,14 +52,6 @@ mkmpool(size_t sz)
 	mp.psz = psz;
 	mp.sz  = sz;
 	return mp;
-}
-
-static inline size_t
-mpool_sz(struct mpool mp)
-{
-	struct stat s;
-	fstat(mp.fd, &s);
-	return (size_t)s.st_size;
 }
 
 static inline void
