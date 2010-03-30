@@ -21,6 +21,7 @@
 #define _LUX_MPOOL_H_
 
 #include <lux/memfd.h>
+#include <stdlib.h>
 #include <unistd.h>
 
 struct mpool {
@@ -28,36 +29,44 @@ struct mpool {
 	size_t psz, sz;
 };
 
-#define MPOOL_NULL {-1, 0, 0}
-
-static inline struct mpool
+static inline struct mpool *
 mkmpool(size_t sz)
 {
-	struct mpool mp = MPOOL_NULL;
+	struct mpool *mp;
 	int fd, psz, err;
+
+	mp = malloc(sizeof(struct mpool));
+	if(!mp)
+		goto cleanup1;
 
 	fd = memfd_create("mpool", 0);
 	if(fd == -1)
-		return mp;
+		goto cleanup2;
 
 	psz = getpagesize();
 	sz  = ((sz + psz - 1) / psz) * psz;
 	err = ftruncate(fd, sz);
-	if(err) {
-		close(fd);
-		return mp;
-	}
+	if(err)
+		goto cleanup3;
 
-	mp.fd  = fd;
-	mp.psz = psz;
-	mp.sz  = sz;
+	mp->fd  = fd;
+	mp->psz = psz;
+	mp->sz  = sz;
 	return mp;
+
+ cleanup3:
+	close(fd);
+ cleanup2:
+	free(mp);
+ cleanup1:
+	return NULL;
 }
 
 static inline void
-rmmpool(struct mpool mp)
+rmmpool(struct mpool *mp)
 {
-	close(mp.fd);
+	close(mp->fd);
+	free(mp);
 }
 
 #endif /* _LUX_MPOOL_H_ */
