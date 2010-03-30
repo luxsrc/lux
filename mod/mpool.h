@@ -25,21 +25,33 @@
 #include <unistd.h>
 
 struct mpool {
-	int fd;
+	int    fd;
+	size_t psz, sz;
 };
+
+#define MPOOL_NULL {-1, 0, 0}
 
 static inline struct mpool
 mkmpool(size_t sz)
 {
-	struct mpool mp = {memfd_create("mpool", 0)};
-	if(mp.fd != -1) {
-		int psz = getpagesize();
-		int err = ftruncate(mp.fd, ((sz + psz - 1) / psz) * psz);
-		if(err) {
-			close(mp.fd);
-			mp.fd = -1;
-		}
+	struct mpool mp = MPOOL_NULL;
+	int fd, psz, err;
+
+	fd = memfd_create("mpool", 0);
+	if(fd == -1)
+		return mp;
+
+	psz = getpagesize();
+	sz  = ((sz + psz - 1) / psz) * psz;
+	err = ftruncate(fd, sz);
+	if(err) {
+		close(fd);
+		return mp;
 	}
+
+	mp.fd  = fd;
+	mp.psz = psz;
+	mp.sz  = sz;
 	return mp;
 }
 
