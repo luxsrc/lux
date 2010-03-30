@@ -24,21 +24,20 @@
 #include <unistd.h>
 
 static inline void *
-mkmview(struct mpool *mp, size_t lower, size_t length, unsigned flags)
+mkmview(struct mpool *mp, size_t lower, size_t length)
 {
-	if(mp->sz < upper) {
-		size_t sz  = ((mp->sz + mp->psz - 1) / mp->psz) * mp->psz;
-		int    err = ftruncate(mp->fd, mp->sz);
-		if(!err)
-			mp->sz = sz;
-	}
-	return mmap(NULL, length, flags, mp->fd, lower);
+	mpool_resize(mp, lower+length);
+	return mmap(NULL, length,
+	            PROT_READ | PROT_WRITE,
+	            MAP_SHARED,
+	            mp->fd, lower);
 }
 
 static inline void
-rmview(struct mpool *mp, void *v, size_t length)
+rmmview(struct mpool *mp, void *v, size_t length)
 {
 	(void)munmap(v, length);
+	(void)mp; /* silence unused variable warning */
 }
 
 #endif /* _LUX_MVIEW_H_ */
