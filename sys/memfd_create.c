@@ -24,6 +24,7 @@
 /* Use the system memfd_create() in <sys/mman.h>; declare nothing */
 #else
 /* Implement memfd_create() using shm_open() */
+#include <lux/ap/ticks.h>
 #include <lux/assert.h>
 #include <stdio.h>
 
@@ -38,16 +39,22 @@
 int
 memfd_create(const char *name, unsigned flags)
 {
-	int  fd;
-	char uniq[64];
+	int fd, i;
 
 	lux_assert(flags); /* do not accept any flag */
 
-	(void)snprintf(uniq, sizeof(uniq), "/lux-%s", name);
-	fd = shm_open(uniq, O_RDWR|O_CREAT|O_EXCL|O_NOFOLLOW,
-	              S_IRUSR|S_IWUSR);
-	if(fd != -1)
-		(void)shm_unlink(uniq);
+	for(i = 0; i < 8; ++i) {
+		ticks t = getticks();
+		char  uniq[128]; /* 64-bit integer has at most 20 digits */
+		(void)snprintf(uniq, sizeof(uniq), "/lux-%s-%u",
+		                                   name, (unsigned)t);
+		fd = shm_open(uniq, O_RDWR|O_CREAT|O_EXCL|O_NOFOLLOW,
+		                    S_IRUSR|S_IWUSR);
+		if(fd != -1) {
+			(void)shm_unlink(uniq);
+			break;
+		}
+	}
 
 	return fd;
 
