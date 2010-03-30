@@ -41,9 +41,12 @@ main(int argc, char *argv[])
 	size_t sz  = argc > 1 ? atoi(argv[1]) : 5000;
 
 	struct mpool mp = mkmpool(sz);
-
 	printf("memory pool size: %zu -> %zu\n", sz, mp.sz);
 	lux_assert(mp.sz == roundup(sz, psz));
+
+	mpool_resize(&mp, 2*sz);
+	printf("memory pool size: %zu -> %zu\n", 2*sz, mp.sz);
+	lux_assert(mp.sz == roundup(2*sz, psz));
 
 	rmmpool(mp);
 	return 0;
