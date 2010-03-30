@@ -34,11 +34,11 @@ struct tnode {
 
 struct tpool {
 	struct queue_head super;
-	mutex  lock;
-	cond   done;
-	size_t njob;
-	size_t nactive;
-	size_t nthread;
+	mutex lock;
+	cond  done;
+	volatile size_t njob;
+	volatile size_t nactive;
+	volatile size_t nthread;
 };
 
 /* Forward declaration */

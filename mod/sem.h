@@ -26,7 +26,7 @@
 #define SEM_NULL {0, MUTEX_NULL, COND_NULL}
 
 typedef struct {
-	int   super;
+	volatile int super;
 	mutex m;
 	cond  c;
 } sem;
