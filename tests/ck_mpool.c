@@ -24,17 +24,26 @@
 #include <lux.h>
 #include <lux/assert.h>
 #include <lux/mpool.h>
-#include <stdio.h>
+#include <stdlib.h>
 #include <unistd.h>
+#include <stdio.h>
+
+static inline size_t
+roundup(size_t sz, size_t psz)
+{
+	return ((sz + psz - 1) / psz) * psz;
+}
 
 int
-main()
+main(int argc, char *argv[])
 {
-	size_t sz = 1024;
+	size_t psz = getpagesize();
+	size_t sz  = argc > 1 ? atoi(argv[1]) : 5000;
+
 	struct mpool mp = mkmpool(sz);
 
-	printf("memory pool size: %zu\n", mpool_sz(mp));
-	lux_assert(mpool_sz(mp) == sz);
+	printf("memory pool size: %zu -> %zu\n", sz, mp.sz);
+	lux_assert(mp.sz == roundup(sz, psz));
 
 	rmmpool(mp);
 	return 0;
