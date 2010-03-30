@@ -55,19 +55,6 @@ mkmpool(size_t sz)
 }
 
 static inline void
-mpool_resize(struct mpool *mp, size_t sz)
-{
-	sz = ((sz + mp->psz - 1) / mp->psz) * mp->psz;
-	if(sz != mp->sz) {
-		int err = ftruncate(mp->fd, sz);
-		if(err)
-			lux_fatal("mpool_resize(%zu) failed\n", sz);
-		else
-			mp->sz = sz;
-	}
-}
-
-static inline void
 rmmpool(struct mpool mp)
 {
 	close(mp.fd);

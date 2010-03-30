@@ -20,13 +20,14 @@
 #ifndef _LUX_MVIEW_H_
 #define _LUX_MVIEW_H_
 
+#include <lux/assert.h>
 #include <lux/mpool.h>
 #include <unistd.h>
 
 static inline void *
 mkmview(struct mpool *mp, size_t lower, size_t length)
 {
-	mpool_resize(mp, lower+length);
+	lux_assert(mp->sz >= lower+length);
 	return mmap(NULL, length,
 	            PROT_READ | PROT_WRITE,
 	            MAP_SHARED,
