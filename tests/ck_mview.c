@@ -34,9 +34,9 @@ main(int argc, char *argv[])
 {
 	size_t sz = argc > 1 ? atoi(argv[1]) : 5000;
 
-	struct mpool mp = mkmpool(sz);
-	char *v1 = mkmview(&mp, 0, 16);
-	char *v2 = mkmview(&mp, 0, 16);
+	struct mpool *mp = mkmpool(sz);
+	char *v1 = mkmview(mp, 0, 16);
+	char *v2 = mkmview(mp, 0, 16);
 
 	(void)strcpy(v1, "testing");
 
@@ -47,8 +47,8 @@ main(int argc, char *argv[])
 	printf("v2: \"%s\"\n", v2);
 	lux_assert(!strcmp(v1, v2));
 
-	rmmview(&mp, v1, 16);
-	rmmview(&mp, v2, 16);
+	rmmview(mp, v1, 16);
+	rmmview(mp, v2, 16);
 	rmmpool(mp);
 
 	return 0;
