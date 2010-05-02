@@ -429,6 +429,54 @@ PLANNERS and TASKS: while planners and tasks are described above in
 	sim->exec(sim);
 	...
 
+STRUCT AS TUPLE: like in many other programming languages, a function
+  in C can return at most one variable.  Although it is possible to
+  use structures to imitate tuples, returning a structure is usually
+  consider a bad practice in C.  This is probably due to the idea that
+  copying a large structure is time consuming.  Hence, the
+  conventional wisdom is that a C function should always consume and
+  return pointers to structures, instead of structures themselves.
+
+  Although the above idea is correct, returning a pointer actually has
+  some sticky issues---the memory pointed by the returned pointer must
+  have a lifetime longer than the callee.  This can be achieved by two
+  methods
+
+  - Declaring a static type structure which has a lifetime as long as
+    the program and then return a pointer to it
+
+	struct large *f()
+	{
+		static struct large v;
+		...
+		return &v;
+	}
+
+  - Using malloc() to allocate the memory on the heap
+
+	struct large *f()
+	{
+		struct large *p = malloc(sizeof(struct large));
+		...
+		return p;
+	}
+
+  Of course, there are situations that these are appropriate methods.
+  However, in some other cases, e.g., if we simply want a function to
+  return a small tuple, both methods have significant drawbacks.
+  Specifically, the first method is not (thread-) safe because the
+  values pointed by the return pointer may change if the same function
+  is called multiple times, possible in different threads.  The second
+  method requires the expensive malloc(), and it requires the caller
+  to explicitly free the returned pointer, which can easily lead to
+  memory leakage.
+
+  Therefore, in lux, we encourage developers not to discard the idea
+  of returning (small) structure.  Returning multiple related
+  variables as a structure can avoid unnecessary static variables and
+  malloc()/free(), and can be a very good pattern if used carefully.
+  In fact, "dm/dmod.h" is a good use case of it.
+
 MEMORY ORDER and DOPE VECTOR: in order to describe the memory layout
   of a high-rank/multi-dimensional array, we define the notions of
   logical and memory orders.
@@ -563,54 +611,6 @@ MESSAGE PASSING: to support adaptive performance of tasks and make
   Nevertheless, subclassing Lux_message like above would allow
   Lux_message to modify the data of a task, hence "passing" message
   around.
-
-STRUCT AS TUPLE: like in many other programming languages, a function
-  in C can return at most one variable.  Although it is possible to
-  use structures to imitate tuples, returning a structure is usually
-  consider a bad practice in C.  This is probably due to the idea that
-  copying a large structure is time consuming.  Hence, the
-  conventional wisdom is that a C function should always consume and
-  return pointers to structures, instead of structures themselves.
-
-  Although the above idea is correct, returning a pointer actually has
-  some sticky issues---the memory pointed by the returned pointer must
-  have a lifetime longer than the callee.  This can be achieved by two
-  methods
-
-  - Declaring a static type structure which has a lifetime as long as
-    the program and then return a pointer to it
-
-	struct large *f()
-	{
-		static struct large v;
-		...
-		return &v;
-	}
-
-  - Using malloc() to allocate the memory on the heap
-
-	struct large *f()
-	{
-		struct large *p = malloc(sizeof(struct large));
-		...
-		return p;
-	}
-
-  Of course, there are situations that these are appropriate methods.
-  However, in some other cases, e.g., if we simply want a function to
-  return a small tuple, both methods have significant drawbacks.
-  Specifically, the first method is not (thread-) safe because the
-  values pointed by the return pointer may change if the same function
-  is called multiple times, possible in different threads.  The second
-  method requires the expensive malloc(), and it requires the caller
-  to explicitly free the returned pointer, which can easily lead to
-  memory leakage.
-
-  Therefore, in lux, we encourage developers not to discard the idea
-  of returning (small) structure for all use cases.  Returning
-  multiple related variables as a structure can avoid unnecessary
-  static variables and malloc()/free(), and can be a very good pattern
-  if used carefully.  In fact, dlib.h is a good use case of it.
 
 ERROR/FAILURE HANDLING: the terms "error" here refers to a recoverable
   and expected runtime error.  It is the type of errors typically
