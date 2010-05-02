@@ -17,14 +17,13 @@
  * You should have received a copy of the GNU General Public License
  * along with lux.  If not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef _LUX_ARRAY_H_
-#define _LUX_ARRAY_H_
+#ifndef _LUX_DARRAY_H_
+#define _LUX_DARRAY_H_
 /*
- * Generalized <lux/tensor.h> that determines rank at runtime
+ * Generalized <lux/parray.h> that determines dimension at runtime
  */
 #include <lux/assert.h>
 #include <lux/dope.h>
-#include <stddef.h> /* for ptrdiff_t */
 #include <stdlib.h> /* for malloc() and free() */
 
 static inline size_t
@@ -38,7 +37,7 @@ roundup(size_t n, size_t m)
 #define HEADEROF(P, D) ((struct dope *)((char *)(P)-HEADERSZOF(typeof(*P), D)))
 #define DIMOF(P) (dope_getd(HEADEROF(P, 1)+1)+1)
 
-#define aalloc(T, D, Ns) ({                                                 \
+#define dalloc(T, D, Ns) ({                                                 \
 	struct dope *_p_;                                                   \
 	                                                                    \
 	size_t _hsz_ = HEADERSZOF(T, D);                                    \
@@ -60,7 +59,8 @@ roundup(size_t n, size_t m)
 	(T *)((char *)_p_ + (_p_ ? _hsz_ : 0));                             \
 })
 
-#define afree(P)         free(HEADEROF(P, DIMOF(P)))
-#define agetn(P, J) dope_getn(HEADEROF(P, DIMOF(P))+1+J)
+#define dfree(P)         free(HEADEROF(P, DIMOF(P)))
 
-#endif /* _LUX_ARRAY_H_ */
+#define dgetn(P, J) dope_getn(HEADEROF(P, DIMOF(P))+1+J)
+
+#endif /* _LUX_DARRAY_H_ */

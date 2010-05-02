@@ -7,7 +7,7 @@ SUBDIRS             = ap dm
 pkginclude_HEADERS += mangle.h numeric.h shorthand.h switch.h
 
 # Pure static modules (include only static inline functions and macros)
-pkginclude_HEADERS += array.h hash.h obstack.h parafor.h parray.h strutils.h tfork.h
+pkginclude_HEADERS += darray.h hash.h obstack.h parafor.h parray.h strutils.h tfork.h
 
 # Static modules (like pure static modules but also declare trivial types)
 pkginclude_HEADERS += counter.h list.h queue.h refcnt.h ring.h stack.h
