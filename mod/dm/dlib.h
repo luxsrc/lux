@@ -46,10 +46,10 @@ mkdlib(Lmid_t namespace,
 	const size_t nlen = strlen(name);
 
 	if(name && name[0] == '/') {
-		buf = MALLOC(nlen + sizeof(".so"));
+		buf = lzmalloc(nlen + sizeof(".so"));
 		if(!buf)
-			return l; /* == DLIB_NULL; no need to FREE(buf);
-			             failure code was set by MALLOC() */
+			return l; /* == DLIB_NULL; no need to lzfree(buf);
+			             failure code was set by lzmalloc() */
 		(void)memcpy(buf, name, nlen);
 		(void)memcpy(buf + nlen, ".so", sizeof(".so"));
 
@@ -58,13 +58,13 @@ mkdlib(Lmid_t namespace,
 		const char  *psep = strchr(paths, ':');
 		const size_t plen = psep ? (size_t)(psep-paths) : strlen(paths);
 
-		void *tmp = REALLOC(buf, plen + sizeof("/.so") + nlen);
+		void *tmp = lzrealloc(buf, plen + sizeof("/.so") + nlen);
 		if(tmp)
 			buf = (char *)tmp;
 		else {
-			FREE(buf); /* as REALLOC() may succeed a few times */
-			return l;  /* == DLIB_NULL;
-			              failure code was set by REALLOC()    */
+			lzfree(buf); /* lzrealloc() may succeed a few times */
+			return l;    /* == DLIB_NULL;
+			                failure code was set by lzrealloc() */
 		}
 		(void)memcpy(buf, paths, plen);
 		buf[plen] = '/';
@@ -75,7 +75,7 @@ mkdlib(Lmid_t namespace,
 		l.hdl = dltryopen(namespace, buf, mode);
 	}
 
-	FREE(buf);
+	lzfree(buf);
 	if(!l.hdl)
 		failed = FNOLIB;
 	return l;

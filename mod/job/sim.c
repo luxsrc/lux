@@ -33,14 +33,14 @@ LUX_MKMOD(const void *opts)
 
 		char lazybuf[256] = "sim/", *buf = lazybuf;
 		size_t len = strlen(opts);
-		buf = (char *)REALLOC(buf, sizeof("sim/") + len);
+		buf = (char *)lzrealloc(buf, sizeof("sim/") + len);
 		if(!buf)
-			return NULL; /* no need to FREE(buf);
-			                failure code was set by REALLOC() */
+			return NULL; /* no need to lzfree(buf);
+			                failure code was set by lzrealloc() */
 		(void)memcpy(buf + sizeof("sim/") - 1, opts, len + 1);
 		sim = lux_load(buf, NULL); /* chain-loading works because of
 		                              htab's array-of-stacks design */
-		FREE(buf);
+		lzfree(buf);
 		return sim;
 	}
 }

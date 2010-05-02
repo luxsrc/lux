@@ -47,10 +47,10 @@ mkdmod(struct dlib l, const char *restrict name, const void *opts)
 	char lazybuf[256] = "luxC", *buf = lazybuf;
 	const size_t nlen = strlen(name);
 
-	buf = (char *)REALLOC(buf, sizeof("luxC") + nlen);
+	buf = (char *)lzrealloc(buf, sizeof("luxC") + nlen);
 	if(!buf)
-		return m; /* == DMOD_NULL; no need to FREE(buf);
-		             failure code was set by REALLOC() */
+		return m; /* == DMOD_NULL; no need to lzfree(buf);
+		             failure code was set by lzrealloc() */
 	(void)memcpy(buf + sizeof("luxC") - 1, name, nlen + 1);
 
 	mk = (void *(*)(const void *))dltrysym(l.hdl, buf);
@@ -67,7 +67,7 @@ mkdmod(struct dlib l, const char *restrict name, const void *opts)
 			failed = FNOSYM;
 	}
 
-	FREE(buf);
+	lzfree(buf);
 	return m;
 }
 

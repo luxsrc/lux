@@ -24,13 +24,13 @@
 #include <string.h> /* for memcpy() */
 
 static inline void *
-_malloc(void *b, size_t bsz, size_t sz)
+_lzmalloc(void *b, size_t bsz, size_t sz)
 {
 	return sz > bsz ? malloc(sz) : b;
 }
 
 static inline void *
-_realloc(void *b, size_t bsz, void *pt, size_t sz)
+_lzrealloc(void *b, size_t bsz, void *pt, size_t sz)
 {
 	if(pt != b) /* most likely, use system realloc() */
 		return realloc(pt, sz);
@@ -45,14 +45,14 @@ _realloc(void *b, size_t bsz, void *pt, size_t sz)
 }
 
 static inline void
-_free(void *b, void *pt)
+_lzfree(void *b, void *pt)
 {
 	if(pt != b)
 		free(pt);
 }
 
-#define MALLOC(sz)      _malloc(lazybuf, sizeof(lazybuf), sz)
-#define REALLOC(pt, sz) _realloc(lazybuf, sizeof(lazybuf), pt, sz)
-#define FREE(pt)        _free(lazybuf, pt)
+#define lzmalloc(sz)      _lzmalloc(lazybuf, sizeof(lazybuf), sz)
+#define lzrealloc(pt, sz) _lzrealloc(lazybuf, sizeof(lazybuf), pt, sz)
+#define lzfree(pt)        _lzfree(lazybuf, pt)
 
 #endif /* _LUX_LAZYBUF_H_ */
