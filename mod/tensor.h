@@ -42,19 +42,16 @@
  * simply use fixed dimension arryas, e.g., `arr[16][16][16]`.
  */
 #include <lux/assert.h>
+#include <lux/dope.h>
 #include <stdlib.h> /* for malloc() and free() */
 
 #if !HAVE_TYPEOF
 # error typeof() is not available; <lux/tensor.h> cannot be used as is
 #endif
 
-#define TENSOROF(T, D) struct { size_t d[D]; T e[8]; }
+#define TENSOROF(T, D) struct { size_t dn[D]; T e[8]; }
 #define HEADERSZOF(T, D) offsetof(TENSOROF(T, D), e)
 #define HEADEROF(P, D) headerof(TENSOROF(typeof(*P), D), P, e)
-
-#if LUX_ASSERTION
-
-#include <lux/dope.h>
 
 #define talloc(T, ...) ({                               \
 	size_t *_p_;                                    \
@@ -78,35 +75,9 @@
 
 #define tfree(P, D) free(HEADEROF(P, D))
 
-#define tgetn(P, D, J) ({                                         \
-	size_t _d_ = (HEADEROF(P, D)->d[(D)-1] >> LUX_N_BIT) + 1; \
-	lux_assert(_d_ == (D));                                   \
-	HEADEROF(P, D)->d[J] & DOPE_N_MAX;                        \
+#define tgetn(P, D, J) ({                                       \
+	lux_assert(GETD(HEADEROF(P, D)->dn[(D)-1]) + 1 == (D)); \
+	GETN(HEADEROF(P, D)->dn[J]);                            \
 })
-
-#else
-
-#define talloc(T, ...) ({                           \
-	size_t *_p_;                                \
-	                                            \
-	size_t _n_[] = {__VA_ARGS__};               \
-	size_t _d_   = countof(_n_);                \
-	size_t _hsz_ = HEADERSZOF(T, countof(_n_)); \
-	size_t _c_, _i_;                            \
-	for(_i_ = 0, _c_ = 1; _i_ < _d_; ++_i_)     \
-		_c_ *= _n_[_i_];                    \
-	                                            \
-	_p_ = malloc(_hsz_ + sizeof(T) * _c_);      \
-	if(_p_)                                     \
-		for(_i_ = 0; _i_ < _d_; ++_i_)      \
-			_p_[_i_] = _n_[_i_];        \
-	(T *)((char *)_p_ + (_p_ ? _hsz_ : 0));     \
-})
-
-#define tfree(P, D) free(HEADEROF(P, D))
-
-#define tgetn(P, D, J)  (HEADEROF(P, D)->d[J])
-
-#endif
 
 #endif /* _LUX_TENSOR_H_ */
