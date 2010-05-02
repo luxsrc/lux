@@ -20,61 +20,60 @@
 #ifndef _LUX_VECTOR_H_
 #define _LUX_VECTOR_H_
 /*
- * There are 6 ways to keep track of the shapes/lengths/counts of 1D
- * arrays that make sense in standard C.  For convenience, we call
- * these 1D arrays "vectors" so that their shapes are naturally called
- * "dimensions".  These 6 ways are:
+ * There are 6 ways to keep track of the shapes/lengths/counts of
+ * arrays that make sense in standard C.  For convenience, we use 1D
+ * arrays as example here:
  *
  * 1. Use two variables manually: GOOD if everything is in the same
  *    scope; cannot be returned; BAD to pass as argument
  *
- *	size_t d;
- *	char   v[d];
+ *	size_t n;
+ *	char   v[n];
  *
  * 2. Use pointer for the vector: FINE if everything is in the same
  *    scope; cannot be returned; OK to pass as argument
  *
- *	size_t d;
- *	char  *v; // -> char _v[d];
+ *	size_t n;
+ *	char  *v; // -> char _v[n];
  *
  * 3. struct with flexible array element: same as 1---large struct to
  *    passed (for pointer to this struct, see method 5)
  *
  *	struct {
- *		size_t d;
- *		char   v[d];
+ *		size_t n;
+ *		char   v[n];
  *	} v;
  *
  * 4. struct with pointer: FINE to return result; GOOD to pass
  *    argument
  *
  *	struct {
- *		size_t d;
- *		char  *v; // -> char _v[d];
+ *		size_t n;
+ *		char  *v; // -> char _v[n];
  *	} v;
  *
  * 5. Pointer to struct with flexible array element: GOOD to return
  *    result, FINE to pass argument
  *
  *	struct {
- *		size_t d;
- *		char   v[d];
+ *		size_t n;
+ *		char   v[n];
  *	} *v;
  *
  * 6. Pointer to struct with pointer: BAD because of double
  *    de-referencing---not much point to use it
  *
  *	struct string {
- *		size_t d;
- *		char  *v; // -> char _v[d];
+ *		size_t n;
+ *		char  *v; // -> char _v[n];
  *	} *v;
  *
- * Traditionally, C APIs use methods 2, which cannot be returned.
- * Hence, C APIs "return" by using arguments:
+ * Traditionally, C APIs use methods 2, which can only be "returned"
+ * by using arguments:
  *
- *	void mkvect(size_t *d_out, char **v_out);
+ *	void mkvect(size_t *n_out, char **v_out);
  *
- * which is cumbersome.  In lux, we have used both methods 4 and 5,
+ * and is cumbersome.  In lux, we have used both methods 4 and 5,
  * depending on if passing or returning is more important.
  *
  * For this static module, we introduce yet another method using a
@@ -87,8 +86,8 @@
  *     length
  *
  *	struct {
- *		size_t d;
- *		char   v[d];
+ *		size_t n;
+ *		char   v[n];
  *	} _v; // in memory
  *
  *	char *v = _v.v; // pointer to v[] instead of _v.
@@ -103,7 +102,7 @@
  */
 #include <lux/tensor.h>
 
-#define valloc(T, D) talloc(T, D)
+#define valloc(T, N) talloc(T, N)
 #define vfree(P)     tfree(P, 1)
 #define vdimof(P)    tgetdim(P, 1, 0)
 
