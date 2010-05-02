@@ -116,22 +116,16 @@
 # error typeof() is not available; <lux/parray.h> cannot be used as is
 #endif
 
-#define PARRAYOF(T, D) struct { size_t n[D]; T e[8]; }
-#define HEADERSZOF(T, D) offsetof(PARRAYOF(T, D), e)
-#define HEADEROF(P, D) headerof(PARRAYOF(typeof(*P), D), P, e)
-
-#if LUX_ASSERTION
-#define pkdn(d, n) PKDN(d, n) /* pack d for runtime assertion */
-#else
-#define pkdn(d, n) (n) /* for performance critical inner loops */
-#endif
+#define STRUCTOF(T, D) struct { size_t n[D]; T e[8]; }
+#define OFFSETOF(T, D) offsetof(STRUCTOF(T, D), e)
+#define HEADEROF(P, D) headerof(STRUCTOF(typeof(*P), D), P, e)
 
 #define palloc(T, ...) ({                               \
 	size_t *_p_;                                    \
 	                                                \
 	size_t _n_[] = {__VA_ARGS__};                   \
 	size_t _d_   = countof(_n_);                    \
-	size_t _hsz_ = HEADERSZOF(T, countof(_n_));     \
+	size_t _hsz_ = OFFSETOF(T, countof(_n_));       \
 	size_t _c_, _i_;                                \
 	lux_aver(_d_ <= DOPE_D_MAX);                    \
 	for(_i_ = 0, _c_ = 1; _i_ < _d_; ++_i_) {       \
@@ -142,15 +136,18 @@
 	_p_ = malloc(_hsz_ + sizeof(T) * _c_);          \
 	if(_p_)                                         \
 		for(_i_ = 0; _i_ < _d_; ++_i_)          \
-			_p_[_i_] = pkdn(_i_, _n_[_i_]); \
+			_p_[_i_] = PKDN(_i_, _n_[_i_]); \
+	                                                \
 	(T *)((char *)_p_ + (_p_ ? _hsz_ : 0));         \
 })
 
-#define pfree(P, D) free(HEADEROF(P, D))
+#define pfree(P) free(HEADEROF(P, pgetd(P)))
 
-#define pgetn(P, D, J) ({                                      \
-	lux_assert(GETD(HEADEROF(P, D)->n[(D)-1]) + 1 == (D)); \
-	GETN(HEADEROF(P, D)->n[J]);                            \
+#define pgetd(P) (GETD(HEADEROF(P, 1)->n[0])+1)
+
+#define pgetn(P, J) ({	                   \
+	lux_assert(J < pgetd(P));          \
+	GETN(HEADEROF(P, pgetd(P))->n[J]); \
 })
 
 #endif /* _LUX_PARRAY_H_ */
