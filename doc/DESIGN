@@ -475,7 +475,7 @@ STRUCT AS TUPLE: like in many other programming languages, a function
   of returning (small) structure.  Returning multiple related
   variables as a structure can avoid unnecessary static variables and
   malloc()/free(), and can be a very good pattern if used carefully.
-  In fact, "dm/dmod.h" is a good use case of it.
+  In fact, <lux/dm/dmod.h> is a good use case of it.
 
 MEMORY ORDER and DOPE VECTOR: in order to describe the memory layout
   of a high-rank/multi-dimensional array, we define the notions of
@@ -496,23 +496,19 @@ MEMORY ORDER and DOPE VECTOR: in order to describe the memory layout
   Generally speaking, applying recursive loop in memory order should
   increase cache performance of modern CPUs.  Differentiating these
   two orders allows us to dynamically construct fast memory accessing
-  pattern in an algo even if the logical order of an array is fixed at
-  compile-time.
+  pattern in a struct algo even if the logical order of an array is
+  fixed by a user.
 
   A dope vector holds information about memory layout of an array.
-  Because lux allows for changing memory accessing pattern at runtime,
-  in addition to count/size and stride, we need to store the logical
-  order of every rank/dimension.  A lux dope vector is therefore an
-  array of
+  Defined in <lux/dope.h>, a lux dope vector is an array of
 
-	typedef struct {
-		Lux_int r; /* rank/dimension */
-		Lux_int c; /* count/size */
-		Lux_int s; /* stride */
-	} Lux_dope;
+	struct dope {
+		ptrdiff_t s;  /* stride is in unit of bytes */
+		size_t    rd; /* bitwise-OR of rank and dimension */
+	};
 
-  with an offset of rank Lux_dope's.  In other word, a dope pointer
-  always points to the last element of the dope vector.
+  In other word, a dope pointer always points to the last element of
+  the dope vector.
 
 	Lux_dope *head = malloc((rank+1) * sizeof(Lux_dope));
 	Lux_dope *dope = head + rank;
