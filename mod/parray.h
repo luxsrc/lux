@@ -120,13 +120,13 @@
 #define OFFSETOF(T, D) (offsetof(STRUCTOF(T), e) + ((D)-1) * sizeof(size_t))
 #define HEADEROF(P, D) (headerof(STRUCTOF(typeof(*P)), P, e)->dn - ((D)-1))
 
-#define pallocv(T, ...) ({            \
+#define palloc(T, ...) ({             \
 	size_t _n_[] = {__VA_ARGS__}; \
 	size_t _d_   = countof(_n_);  \
-	palloc(T, _d_, _n_);          \
+	pallocdn(T, _d_, _n_);        \
 })
 
-#define palloc(T, D, Ns) ({	                       \
+#define pallocdn(T, D, Ns) ({                          \
 	size_t _i_, _c_, _o_, *_p_;                    \
 	lux_aver(D <= DOPE_D_MAX);                     \
 	for(_i_ = 0, _c_ = 1; _i_ < D; ++_i_) {        \
