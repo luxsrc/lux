@@ -132,14 +132,14 @@ else
 fi
 
 dnl Define error code related macros
-AC_DEFINE_UNQUOTED(LUX_ELAST,         $elast, [Define to the largest system error code.])
-AC_DEFINE_UNQUOTED(LUX_STRINGID_BIT,  $hbits, [Define to the required bits to hold a string key.])
-AC_DEFINE_UNQUOTED(LUX_FACILITY_BIT,  $mbits, [Define to the required bits to hold a facility key.])
-AC_DEFINE_UNQUOTED(LUX_FAILURE_BIT,   $fbits, [Define to the required bits to hold a lux failure code.])
-AC_DEFINE_UNQUOTED(LUX_INT_BIT,       $ibits, [Define to the number of bits of int.])
-AC_DEFINE_UNQUOTED(LUX_UNSIGNED_BIT,  $ubits, [Define to the number of bits of unsigned.])
-AC_DEFINE_UNQUOTED(LUX_SIZE_T_BIT,    $sbits, [Define to the number of bits of int.])
-AC_DEFINE_UNQUOTED(LUX_DIMENSION_BIT, $dbits, [Define to the number of bits of array dimensions/size.])
+AC_DEFINE_UNQUOTED(LUX_ELAST,        $elast, [Define to the largest system error code.])
+AC_DEFINE_UNQUOTED(LUX_STRINGID_BIT, $hbits, [Define to the required bits to hold a string key.])
+AC_DEFINE_UNQUOTED(LUX_FACILITY_BIT, $mbits, [Define to the required bits to hold a facility key.])
+AC_DEFINE_UNQUOTED(LUX_FAILURE_BIT,  $fbits, [Define to the required bits to hold a lux failure code.])
+AC_DEFINE_UNQUOTED(LUX_INT_BIT,      $ibits, [Define to the number of bits of int.])
+AC_DEFINE_UNQUOTED(LUX_UNSIGNED_BIT, $ubits, [Define to the number of bits of unsigned.])
+AC_DEFINE_UNQUOTED(LUX_SIZE_T_BIT,   $sbits, [Define to the number of bits of int.])
+AC_DEFINE_UNQUOTED(LUX_N_BIT,        $dbits, [Define to the number of bits of number of elements in each array dimension.])
 
 dnl Make assertion a configure option (default disabled)
 AC_ARG_ENABLE(assertion, [AC_HELP_STRING([--enable-assertion],[compile lux with assertion for debugging])], ok=$enableval, ok=no)
