@@ -120,25 +120,24 @@
 #define OFFSETOF(T, D) offsetof(STRUCTOF(T, D), e)
 #define HEADEROF(P, D) headerof(STRUCTOF(typeof(*P), D), P, e)
 
-#define palloc(T, ...) ({                               \
-	size_t *_p_;                                    \
-	                                                \
-	size_t _n_[] = {__VA_ARGS__};                   \
-	size_t _d_   = countof(_n_);                    \
-	size_t _hsz_ = OFFSETOF(T, countof(_n_));       \
-	size_t _c_, _i_;                                \
-	lux_aver(_d_ <= DOPE_D_MAX);                    \
-	for(_i_ = 0, _c_ = 1; _i_ < _d_; ++_i_) {       \
-		lux_assert(_n_[_i_] <= DOPE_N_MAX);     \
-		_c_ *= _n_[_i_];                        \
-	}                                               \
-	                                                \
-	_p_ = malloc(_hsz_ + sizeof(T) * _c_);          \
-	if(_p_)                                         \
-		for(_i_ = 0; _i_ < _d_; ++_i_)          \
-			_p_[_i_] = PKDN(_i_, _n_[_i_]); \
-	                                                \
-	(T *)((char *)_p_ + (_p_ ? _hsz_ : 0));         \
+#define pallocv(T, ...) ({            \
+	size_t _n_[] = {__VA_ARGS__}; \
+	palloc(T, countof(_n_), _n_); \
+})
+
+#define palloc(T, D, Ns) ({	                       \
+	size_t _i_, _c_, _o_, *_p_;                    \
+	lux_aver(D <= DOPE_D_MAX);                     \
+	for(_i_ = 0, _c_ = 1; _i_ < D; ++_i_) {        \
+		lux_assert(Ns[_i_] <= DOPE_N_MAX);     \
+		_c_ *= Ns[_i_];                        \
+	}                                              \
+	_o_ = OFFSETOF(T, D);                          \
+	_p_ = malloc(_o_ + sizeof(T) * _c_);           \
+	if(_p_)                                        \
+		for(_i_ = 0; _i_ < D; ++_i_)           \
+			_p_[_i_] = PKDN(_i_, Ns[_i_]); \
+	(T *)((char *)_p_ + (_p_ ? _o_ : 0));          \
 })
 
 #define pfree(P) free(HEADEROF(P, pgetd(P)))
