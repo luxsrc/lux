@@ -33,35 +33,34 @@ roundup(size_t n, size_t m)
 	return ((n + m - 1) / m) * m;
 }
 
-#define DOPESZOF(R) ((1+(R))*sizeof(struct dope))
-#define HEADERSZOF(R, T) roundup(DOPESZOF(R), alignof(T))
-#define HEADEROF(P, R) ((struct dope *)((char *)(P) - HEADERSZOF(R, typeof(*P))))
-#define RANKOF(P) (dope_getrnk(HEADEROF(P, 1)+1)+1)
+#define DOPESZOF(D) ((1+(D))*sizeof(struct dope))
+#define HEADERSZOF(T, D) roundup(DOPESZOF(D), alignof(T))
+#define HEADEROF(P, D) ((struct dope *)((char *)(P)-HEADERSZOF(typeof(*P), D)))
+#define DIMOF(P) (dope_getd(HEADEROF(P, 1)+1)+1)
 
-#define aalloc(T, R, Ds) ({                                      \
-	struct dope *_ptr_;                                      \
-	                                                         \
-	size_t _hsz_ = HEADERSZOF(R, T);                         \
-	size_t _cnt_, _i_;                                       \
-	lux_assert(R <= DOPE_RNK_MAX);                           \
-	for(_i_ = 0, _cnt_ = 1; _i_ < R; ++_i_) {                \
-		lux_assert(Ds[_i_] <= DOPE_DIM_MAX);             \
-		_cnt_ *= Ds[_i_];                                \
-	}                                                        \
-	                                                         \
-	_ptr_ = malloc(_hsz_ + sizeof(T) * _cnt_);               \
-	if(_ptr_) {                                              \
-		_ptr_[0] = pkdope(sizeof(struct dope), 0, R);    \
-		for(_i_ = 0; _i_ < R; ++_i_) {                   \
-			_ptr_[_i_+1] = pkdope(sizeof(T) * _cnt_, \
-			                      _i_, Ds[_i_]);     \
-			_cnt_ /= Ds[_i_];                        \
-		}                                                \
-	}                                                        \
-	(T *)((char *)_ptr_ + (_ptr_ ? _hsz_ : 0));              \
+#define aalloc(T, D, Ns) ({                                                 \
+	struct dope *_p_;                                                   \
+	                                                                    \
+	size_t _hsz_ = HEADERSZOF(T, D);                                    \
+	size_t _c_, _i_;                                                    \
+	lux_assert(D <= DOPE_D_MAX);                                        \
+	for(_i_ = 0, _c_ = 1; _i_ < D; ++_i_) {                             \
+		lux_assert(Ns[_i_] <= DOPE_N_MAX);                          \
+		_c_ *= Ns[_i_];                                             \
+	}                                                                   \
+	                                                                    \
+	_p_ = malloc(_hsz_ + sizeof(T) * _c_);                              \
+	if(_p_) {                                                           \
+		_p_[0] = pkdope(sizeof(struct dope), 0, D);                 \
+		for(_i_ = 0; _i_ < D; ++_i_) {                              \
+			_p_[_i_+1] = pkdope(sizeof(T) * _c_, _i_, Ns[_i_]); \
+			_c_ /= Ns[_i_];                                     \
+		}                                                           \
+	}                                                                   \
+	(T *)((char *)_p_ + (_p_ ? _hsz_ : 0));                             \
 })
 
-#define afree(P)             free(HEADEROF(P, RANKOF(P)))
-#define agetdim(P, J) dope_getdim(HEADEROF(P, RANKOF(P))+1+J)
+#define afree(P)         free(HEADEROF(P, DIMOF(P)))
+#define agetn(P, J) dope_getn(HEADEROF(P, DIMOF(P))+1+J)
 
 #endif /* _LUX_ARRAY_H_ */
