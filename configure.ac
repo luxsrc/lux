@@ -39,11 +39,11 @@ AC_CHECK_TYPE([hrtime_t], [AC_DEFINE(HAVE_HRTIME_T, 1, [Define to 1 if hrtime_t 
 
 dnl Check for functions
 AC_FUNC_ALLOCA
+AC_CHECK_FUNCS([BSDgettimeofday gettimeofday gethrtime read_real_time time_base_to_time clock_gettime mach_absolute_time])
 AC_SEARCH_LIBS([dlinfo],  [dl], [AC_DEFINE(HAVE_DLINFO,  1, [Define to 1 if you have the `dlinfo' function.])],  [AC_MSG_WARN([failed to find the dlinfo() function])])
 AC_SEARCH_LIBS([dladdr],  [dl], [AC_DEFINE(HAVE_DLADDR,  1, [Define to 1 if you have the `dladdr' function.])],  [AC_MSG_WARN([failed to find the dladdr() function])])
 AC_SEARCH_LIBS([dlmopen], [dl], [AC_DEFINE(HAVE_DLMOPEN, 1, [Define to 1 if you have the `dlmopen' function.])], [AC_MSG_WARN([failed to find the dlmopen() function])])
-AC_CHECK_FUNCS([fopencookie funopen vsnprintf])
-AC_CHECK_FUNCS([BSDgettimeofday gettimeofday gethrtime read_real_time time_base_to_time clock_gettime mach_absolute_time])
+AC_CHECK_FUNCS([fopencookie funopen vsnprintf memfd_create shm_open])
 
 dnl Cray UNICOS _rtc() (real-time clock) intrinsic
 AC_MSG_CHECKING([for _rtc intrinsic])

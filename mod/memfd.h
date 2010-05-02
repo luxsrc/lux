@@ -17,47 +17,21 @@
  * You should have received a copy of the GNU General Public License
  * along with lux.  If not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef _LUX_MPOOL_H_
-#define _LUX_MPOOL_H_
+#ifndef _LUX_MEMFD_H_
+#define _LUX_MEMFD_H_
 
-#include <lux/memfd.h>
-#include <unistd.h>
+#if HAVE_SYS_MMAN_H
+#define _GNU_SOURCE
+#include <sys/mman.h> /* needed even if memfd_create() is not available */
+#else
+#error <sys/mman.h> not found
+#endif
 
-struct mpool {
-	int    fd;
-	size_t psz, sz;
-};
+#if HAVE_MEMFD_CREATE
+/* Use the system memfd_create() in <sys/mman.h>; declare nothing */
+#else
+/* Declare memfd_create() and related types */
+int memfd_create(const char *, unsigned);
+#endif
 
-#define MPOOL_NULL {-1, 0, 0}
-
-static inline struct mpool
-mkmpool(size_t sz)
-{
-	struct mpool mp = MPOOL_NULL;
-	int fd, psz, err;
-
-	fd = memfd_create("mpool", 0);
-	if(fd == -1)
-		return mp;
-
-	psz = getpagesize();
-	sz  = ((sz + psz - 1) / psz) * psz;
-	err = ftruncate(fd, sz);
-	if(err) {
-		close(fd);
-		return mp;
-	}
-
-	mp.fd  = fd;
-	mp.psz = psz;
-	mp.sz  = sz;
-	return mp;
-}
-
-static inline void
-rmmpool(struct mpool mp)
-{
-	close(mp.fd);
-}
-
-#endif /* _LUX_MPOOL_H_ */
+#endif /* _LUX_MEMFD_H_ */

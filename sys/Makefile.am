@@ -6,4 +6,5 @@ noinst_LTLIBRARIES = libsys.la
 libsys_la_SOURCES  = ../mod/cookie.h fopencookie.c
 libsys_la_SOURCES += ../mod/dlfcn.h dlmopen.c dlfname.c dllmid.c dlhandle.c
 libsys_la_SOURCES += ../mod/failed.h strfailure.c
+libsys_la_SOURCES += ../mod/memfd.h memfd_create.c
 libsys_la_LIBADD   = -ldl
