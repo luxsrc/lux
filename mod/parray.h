@@ -116,13 +116,14 @@
 # error typeof() is not available; <lux/parray.h> cannot be used as is
 #endif
 
-#define STRUCTOF(T, D) struct { size_t n[D]; T e[8]; }
-#define OFFSETOF(T, D) offsetof(STRUCTOF(T, D), e)
-#define HEADEROF(P, D) headerof(STRUCTOF(typeof(*P), D), P, e)
+#define STRUCTOF(T)    struct { size_t dn[1]; T e[1]; }
+#define OFFSETOF(T, D) (offsetof(STRUCTOF(T), e) + ((D)-1) * sizeof(size_t))
+#define HEADEROF(P, D) (headerof(STRUCTOF(typeof(*P)), P, e)->dn - ((D)-1))
 
 #define pallocv(T, ...) ({            \
 	size_t _n_[] = {__VA_ARGS__}; \
-	palloc(T, countof(_n_), _n_); \
+	size_t _d_   = countof(_n_);  \
+	palloc(T, _d_, _n_);          \
 })
 
 #define palloc(T, D, Ns) ({	                       \
@@ -142,11 +143,12 @@
 
 #define pfree(P) free(HEADEROF(P, pgetd(P)))
 
-#define pgetd(P) (GETD(HEADEROF(P, 1)->n[0])+1)
+#define pgetd(P) (GETD(HEADEROF(P, 1)[0])+1)
 
-#define pgetn(P, J) ({	                   \
-	lux_assert(J < pgetd(P));          \
-	GETN(HEADEROF(P, pgetd(P))->n[J]); \
+#define pgetn(P, J) ({	           \
+	size_t _d_ = pgetd(P);     \
+	lux_assert(J < _d_);       \
+	GETN(HEADEROF(P, _d_)[J]); \
 })
 
 #endif /* _LUX_PARRAY_H_ */
