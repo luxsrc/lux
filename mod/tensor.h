@@ -42,6 +42,7 @@
  * simply use fixed dimension arryas, e.g., `arr[16][16][16]`.
  */
 #include <lux/assert.h>
+#include <lux/aver.h>
 #include <lux/dope.h>
 #include <stdlib.h> /* for malloc() and free() */
 
@@ -60,7 +61,7 @@
 	size_t _d_   = countof(_n_);                    \
 	size_t _hsz_ = HEADERSZOF(T, countof(_n_));     \
 	size_t _c_, _i_;                                \
-	lux_assert(_d_ <= DOPE_D_MAX);                  \
+	lux_aver(_d_ <= DOPE_D_MAX);                    \
 	for(_i_ = 0, _c_ = 1; _i_ < _d_; ++_i_) {       \
 		lux_assert(_n_[_i_] <= DOPE_N_MAX);     \
 		_c_ *= _n_[_i_];                        \
