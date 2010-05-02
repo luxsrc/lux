@@ -56,24 +56,24 @@
 
 #include <lux/dope.h>
 
-#define talloc(T, ...) ({                                                    \
-	size_t *_p_;                                                         \
-	                                                                     \
-	size_t _n_[] = {__VA_ARGS__};                                        \
-	size_t _d_   = countof(_n_);                                         \
-	size_t _hsz_ = HEADERSZOF(T, countof(_n_));                          \
-	size_t _c_, _i_;                                                     \
-	lux_assert(_d_ <= DOPE_D_MAX);                                       \
-	for(_i_ = 0, _c_ = 1; _i_ < _d_; ++_i_) {                            \
-		lux_assert(_n_[_i_] <= DOPE_N_MAX);                          \
-		_c_ *= _n_[_i_];                                             \
-	}                                                                    \
-	                                                                     \
-	_p_ = malloc(_hsz_ + sizeof(T) * _c_);                               \
-	if(_p_)                                                              \
-		for(_i_ = 0; _i_ < _d_; ++_i_)                               \
-			_p_[_i_] = (_i_<<LUX_N_BIT) | (_n_[_i_]&DOPE_N_MAX); \
-	(T *)((char *)_p_ + (_p_ ? _hsz_ : 0));                              \
+#define talloc(T, ...) ({                               \
+	size_t *_p_;                                    \
+	                                                \
+	size_t _n_[] = {__VA_ARGS__};                   \
+	size_t _d_   = countof(_n_);                    \
+	size_t _hsz_ = HEADERSZOF(T, countof(_n_));     \
+	size_t _c_, _i_;                                \
+	lux_assert(_d_ <= DOPE_D_MAX);                  \
+	for(_i_ = 0, _c_ = 1; _i_ < _d_; ++_i_) {       \
+		lux_assert(_n_[_i_] <= DOPE_N_MAX);     \
+		_c_ *= _n_[_i_];                        \
+	}                                               \
+	                                                \
+	_p_ = malloc(_hsz_ + sizeof(T) * _c_);          \
+	if(_p_)                                         \
+		for(_i_ = 0; _i_ < _d_; ++_i_)          \
+			_p_[_i_] = pkdn(_i_, _n_[_i_]); \
+	(T *)((char *)_p_ + (_p_ ? _hsz_ : 0));         \
 })
 
 #define tfree(P, D) free(HEADEROF(P, D))

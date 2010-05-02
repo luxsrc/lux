@@ -35,10 +35,16 @@ struct dope {
 	size_t    dn; /* bitwise-OR of dim and number of elements */
 };
 
+static inline size_t
+pkdn(size_t d, size_t n)
+{
+	return (d << LUX_N_BIT) | n;
+}
+
 static inline struct dope
 pkdope(ptrdiff_t stride_in_bytes, size_t d, size_t n)
 {
-	struct dope _ = {stride_in_bytes, (d << LUX_N_BIT) | n};
+	struct dope _ = {stride_in_bytes, pkdn(d, n)};
 	return _;
 }
 
