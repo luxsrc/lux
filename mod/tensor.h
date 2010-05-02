@@ -72,7 +72,7 @@
 	_p_ = malloc(_hsz_ + sizeof(T) * _c_);          \
 	if(_p_)                                         \
 		for(_i_ = 0; _i_ < _d_; ++_i_)          \
-			_p_[_i_] = pkdn(_i_, _n_[_i_]); \
+			_p_[_i_] = PKDN(_i_, _n_[_i_]); \
 	(T *)((char *)_p_ + (_p_ ? _hsz_ : 0));         \
 })
 
