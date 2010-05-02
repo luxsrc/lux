@@ -531,6 +531,39 @@ MEMORY ORDER and DOPE VECTOR: in order to describe the memory layout
 	Lux_dope *head = malloc(rank * sizeof(Lux_dope) + sizeof(Subclass));
 	Subclass *data = (Subclass *)(head + rank);
 
+MESSAGE PASSING: to support adaptive performance of tasks and make
+  runtime optimization efficient, lux provides an internal
+  asynchronous communication mechanism that enables different tasks to
+  communicate and wait for each other.  Lux_message is an anchor
+  structure that may be embedded in a custom message type:
+
+	struct my_message {
+		Lux_message super;
+		double data;
+		double more_data;
+		...
+	};
+
+  One can then submit a task to custom hardware resources to execute
+  tasks:
+
+	Lux_message *message = resman->submit(resman, my_task, other_messages);
+
+  where other_messages is a NULL-terminated array of Lux_message *
+  that my_task needs to wait before it starts.  resman->submit() would
+  return immediately with the returned message containing a
+  LUX_MESSAGE_RUNNING status.  One may use
+
+  	resman->wait(message);
+
+  to wait for the message turning into a LUX_MESSAGE_DONE status,
+  which indicate the task is done.
+
+  The default message implementation simply tracks progress of a task.
+  Nevertheless, subclassing Lux_message like above would allow
+  Lux_message to modify the data of a task, hence "passing" message
+  around.
+
 STRUCT AS TUPLE: like in many other programming languages, a function
   in C can return at most one variable.  Although it is possible to
   use structures to imitate tuples, returning a structure is usually

@@ -13,7 +13,7 @@ pkginclude_HEADERS += array.h hash.h obstack.h parafor.h strutils.h tensor.h tfo
 pkginclude_HEADERS += counter.h list.h queue.h refcnt.h ring.h stack.h
 
 # Resource allocator (allocate other resource that need to be freed)
-pkginclude_HEADERS += alloca.h dynamic.h lazybuf.h zalloc.h
+pkginclude_HEADERS += alloca.h dynamic.h lazybuf.h resman.h zalloc.h
 
 # Hybrid modules (dynamically allocate their own resources)
 pkginclude_HEADERS += dope.h htab.h libux.h mpool.h vlog.h
