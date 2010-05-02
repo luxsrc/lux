@@ -516,6 +516,18 @@ MEMORY ORDER and DOPE VECTOR: lux uses dope vector (instead of Iliffe
   following section for the different options of attaching the dope
   vector with memory.
 
+ARRAY OBJECTS: in order to support general-purpose computing on
+  graphics processing units (GPGPUs), lux is aware of memory on
+  different devices.  However, manually keeping track of many related
+  pointers is confusing.
+
+  We introduce here the concept of device-independent array objects.
+  An array object is describe by a (pointer to) strcuture on the host
+  that contains the dope vector, optionally bitfields to mark invalid
+  data, and potentially multiple pointers to the assocated memory on
+  different devices.  Manually or automatic data synchronization are
+  supported based on the devices and backend drivers.
+
 MESSAGE PASSING: to support adaptive performance of tasks and make
   runtime optimization efficient, lux provides an internal
   asynchronous communication mechanism that enables different tasks to
