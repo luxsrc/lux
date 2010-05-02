@@ -477,9 +477,10 @@ STRUCT AS TUPLE: like in many other programming languages, a function
   malloc()/free(), and can be a very good pattern if used carefully.
   In fact, <lux/dm/dmod.h> is a good use case of it.
 
-MEMORY ORDER and DOPE VECTOR: in order to describe the memory layout
-  of a high-rank/multi-dimensional array, we define the notions of
-  logical and memory orders.
+MEMORY ORDER and DOPE VECTOR: lux uses dope vector (instead of Iliffe
+  vector) by default to describe multi-dimensional arrays.  To provide
+  efficient memory access of a high-rank/multi-dimensional array, we
+  define the notions of logical and memory orders.
 
   * Logical order describes how an array is accessed from a numerical
     analysis perspective.  For example, (x, y, z) defines a logical
@@ -500,80 +501,20 @@ MEMORY ORDER and DOPE VECTOR: in order to describe the memory layout
   fixed by a user.
 
   A dope vector holds information about memory layout of an array.
-  Defined in <lux/dope.h>, a lux dope vector is an array of
+  Defined in <lux/dope.h>, a lux dope vector is an one-dimension array
+  of the following structure:
 
 	struct dope {
 		ptrdiff_t s;  /* stride is in unit of bytes */
-		size_t    rd; /* bitwise-OR of rank and dimension */
+		size_t    dn; /* bitwise-OR of dim and number of elements */
 	};
 
-  In other word, a dope pointer always points to the last element of
-  the dope vector.
-
-	Lux_dope *head = malloc((rank+1) * sizeof(Lux_dope));
-	Lux_dope *dope = head + rank;
-
-  This way, the negative elements in the dope vector dope[] store the
-  rank-number, count, and strides for each rank.  For a tightly packed
-  column-major (Fortran) array, we have the relations
-
-	dope[r].r == r + rank;
-	dope[r].s == dope[r-1].c * dope[r-1].s;
-
-  Hence, it is natural to extend these to the zeroth element and make
-
-  * dope->r the total rank so the dope values of the r-th rank can
-    be accessed by dope[r-dope->r].
-
-  * dope->s the number total number of elements including padding if
-    the array is not tightly packed
-
-  * dope->c the size of each element in bytes so the total size can
-    be easily computed by dope->c * dope->s.
-
-  As an example, a tightly packed two-dimensional/second-rank 4 x 3
-  column-major array of double has the following dope vector
-
-                     |  r*  c   s
-    -----------------+-------------
-    head == dope[-2] |  0   4   1
-            dope[-1] |  1   3   4
-            dope[ 0] |  2   8  12
-
-  while the same logical array casted into row-major on a machine
-  supporting 256 bits vector operator has the following dope vector
-
-                     |  r*  c   s
-    -----------------+-------------
-    head == dope[-2] |  0   4   4 (extra 64-bit padding)
-            dope[-1] |  1   3   1
-            dope[ 0] |  2   8  16
-
-  The stars next to the 'r's above indicate that these dope vectors
-  are sorted in rank, and hence are logical orders.  To access the
-  above arrays efficiently, we sort the dope vectors according to the
-  stride,
-
-                     |  1st array  |  2nd array
-                     |  r   c   s* |  r   c   s*
-    -----------------+-------------+-------------
-    head == dope[-2] |  0   4   1  |  1   3   1
-            dope[-1] |  1   3   4  |  0   4   4
-            dope[ 0] |  2   8  12  |  2   8  16
-
-  For the column-major arrays like the 1st one, the logical and memory
-  orders are the same.
-
-  When inheriting from Lux_dope, the dope vector is effectively a
-  "backward flexible array member" of the subclass:
-
-	typedef struct {
-		Lux_dope dope[1]; /* embedded superclass; must be first */
-		...
-	} Subclass;
-
-	Lux_dope *head = malloc(rank * sizeof(Lux_dope) + sizeof(Subclass));
-	Subclass *data = (Subclass *)(head + rank);
+  By attaching the dope vector with a block or memory, lux is capable
+  of deducing the proper memory orders to loop through the memory
+  efficiently, measure their real performance at runtime, and optimize
+  toward the most efficient memory accessing pattern.  See the
+  following section for the different options of attaching the dope
+  vector with memory.
 
 MESSAGE PASSING: to support adaptive performance of tasks and make
   runtime optimization efficient, lux provides an internal
