@@ -23,6 +23,7 @@
 
 #include <lux.h>
 #include <lux/assert.h>
+#include <lux/dope.h>
 #include <lux/mview.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -35,13 +36,7 @@ main()
 	char *v1, *v2;
 
 	struct mpool *mp = mkmpool(64000);
-	struct dope  *dp = palloc(struct dope, 3);
-
-	size_t s = sizeof(double);
-	size_t n = 17;
-	size_t i;
-	for(i = 0; i < 3; ++i, s *= n)
-		dp[i] = pkdope(s, i, n);
+	struct dope  *dp = mkdope(double, 8, 17, 17, 17);
 
 	v1 = mkmview(mp, 0, dp);
 	v2 = mkmview(mp, 0, dp);
@@ -58,7 +53,7 @@ main()
 	rmmview(mp, v2);
 
 	rmmpool(mp);
-	pfree(dp);
+	rmdope(dp);
 
 	return 0;
 }
