@@ -1,6 +1,6 @@
 /*
- * Copyright (C) 2010 Chi-kwan Chan
- * Copyright (C) 2010 Harvard-Smithsonian Center for Astrophysics
+ * Copyright (C) 2009 Chi-kwan Chan
+ * Copyright (C) 2009 Harvard-Smithsonian Center for Astrophysics
  *
  * This file is part of lux.
  *
@@ -17,37 +17,19 @@
  * You should have received a copy of the GNU General Public License
  * along with lux.  If not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef _LUX_SEM_H_
-#define _LUX_SEM_H_
+#ifndef _LUX_RESMAN_H_
+#define _LUX_RESMAN_H_
 
-#include <lux/mutex.h>
-#include <lux/cond.h>
+#include <lux/ap/message.h>
+#include <lux/ap/task.h>
 
-#define SEM_NULL {0, MUTEX_NULL, COND_NULL}
+typedef struct LuxSresman Lux_resman;
 
-typedef struct {
-	volatile int super;
-	mutex m;
-	cond  c;
-} sem;
+struct LuxSresman {
+	Lux_message *(*submit)(Lux_resman *, Lux_task *, Lux_message **);
+	void (*wait)(Lux_resman *, Lux_message **);
+};
 
-static inline void
-sem_post(sem *s)
-{
-	mutex_lock(&s->m);
-	++s->super;
-	cond_signal(&s->c);
-	mutex_unlock(&s->m);
-}
+#define LUX_RESMAN_INIT {NULL, NULL}
 
-static inline void
-sem_wait(sem *s)
-{
-	mutex_lock(&s->m);
-	while(s->super <= 0)
-		cond_wait(&s->c, &s->m);
-	--s->super;
-	mutex_unlock(&s->m);
-}
-
-#endif /* _LUX_SEM_H_ */
+#endif /* _LUX_RESMAN_H_ */

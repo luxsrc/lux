@@ -21,23 +21,24 @@
 #define _LUX_TPOOL_H_
 
 #include <lux/ap/task.h>
-#include <lux/mutex.h>
 #include <lux/cond.h>
+#include <lux/dynamic.h>
+#include <lux/mutex.h>
+#include <lux/queue.h>
 #include <stdlib.h>
 
 struct tnode {
-	struct tnode *next;
-	Lux_task     *task;
+	struct slist_node super;
+	Lux_task *task;
 };
 
 struct tpool {
-	struct tnode *head; /* == next */
-	struct tnode *tail;
-	mutex  lock;
-	cond   done;
-	size_t njob;
-	size_t nactive;
-	size_t nthread;
+	struct queue_head super;
+	mutex lock;
+	cond  done;
+	volatile size_t njob;
+	volatile size_t nactive;
+	volatile size_t nthread;
 };
 
 /* Forward declaration */
@@ -76,10 +77,10 @@ static struct tpool *
 mktpool(size_t nthread)
 {
 	struct tpool *q = malloc(sizeof(struct tpool));
-	q->tail = q->head = (struct tnode *)q;
-	q->lock = ({ mutex _ = MUTEX_NULL; _; });
-	q->done = ({ cond  _ = COND_NULL;  _; });
- 	q->njob = 0;
+	q->super   = localof(struct queue_head, QUEUE_HEAD_INIT(&q->super));
+	q->lock    = localof(mutex, MUTEX_NULL);
+	q->done    = localof(cond,  COND_NULL);
+ 	q->njob    = 0;
 	q->nactive = 0;
 	q->nthread = nthread;
 
@@ -92,12 +93,10 @@ mktpool(size_t nthread)
 static void
 tpool_enqueue(struct tpool *q, Lux_task *t)
 {
-	struct tnode *n = malloc(sizeof(struct tnode));
-	n->task = t;
-	n->next = (struct tnode *)q; /* == q->tail->next always */
+	struct tnode *n = dynamic(struct tnode, {{NULL}, t});
 
 	mutex_lock(&q->lock);
-	q->tail = q->tail->next = n;
+	enqueue(&q->super, &n->super);
 	++q->njob;
 	mutex_unlock(&q->lock);
 }
@@ -105,19 +104,14 @@ tpool_enqueue(struct tpool *q, Lux_task *t)
 static Lux_task *
 tpool_dequeue(struct tpool *q)
 {
-	struct tnode *n = NULL;
+	struct slist_node *s;
 
 	mutex_lock(&q->lock);
-	if(q->head != (struct tnode *)q) {
-		n = q->head;
-		if(n->next != (struct tnode *)q)
-			q->head = n->next;
-		else
-			q->tail = q->head = n->next;
-	}
+	s = dequeue(&q->super);
 	mutex_unlock(&q->lock);
 
-	if(n) {
+	if(s) {
+		struct tnode *n = headerof(struct tnode, s, super);
 		Lux_task *t = n->task;
 		free(n);
 		return t;

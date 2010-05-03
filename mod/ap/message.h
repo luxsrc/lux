@@ -1,6 +1,6 @@
 /*
- * Copyright (C) 2010 Chi-kwan Chan
- * Copyright (C) 2010 Harvard-Smithsonian Center for Astrophysics
+ * Copyright (C) 2009 Chi-kwan Chan
+ * Copyright (C) 2009 Harvard-Smithsonian Center for Astrophysics
  *
  * This file is part of lux.
  *
@@ -17,37 +17,22 @@
  * You should have received a copy of the GNU General Public License
  * along with lux.  If not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef _LUX_SEM_H_
-#define _LUX_SEM_H_
+#ifndef _LUX_MESSAGE_H_
+#define _LUX_MESSAGE_H_
 
-#include <lux/mutex.h>
-#include <lux/cond.h>
+#include <lux/atomic.h>
+#include <lux/ap/task.h>
 
-#define SEM_NULL {0, MUTEX_NULL, COND_NULL}
+typedef struct LuxSmessage Lux_message;
 
-typedef struct {
-	volatile int super;
-	mutex m;
-	cond  c;
-} sem;
+struct LuxSmessage {
+	atomic status;
+	void (*pass)(Lux_message *, Lux_task *);
+};
 
-static inline void
-sem_post(sem *s)
-{
-	mutex_lock(&s->m);
-	++s->super;
-	cond_signal(&s->c);
-	mutex_unlock(&s->m);
-}
+#define LUX_MESSAGE_INIT {ATOMIC_NULL, NULL}
 
-static inline void
-sem_wait(sem *s)
-{
-	mutex_lock(&s->m);
-	while(s->super <= 0)
-		cond_wait(&s->c, &s->m);
-	--s->super;
-	mutex_unlock(&s->m);
-}
+#define LUX_MESSAGE_RUNNING (1 << 0)
+#define LUX_MESSAGE_DONE    (1 << 1)
 
-#endif /* _LUX_SEM_H_ */
+#endif /* _LUX_MESSAGE_H_ */

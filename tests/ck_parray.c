@@ -17,37 +17,35 @@
  * You should have received a copy of the GNU General Public License
  * along with lux.  If not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef _LUX_SEM_H_
-#define _LUX_SEM_H_
+#ifndef LUX_ASSERTION
+#define LUX_ASSERTION 1
+#endif
 
-#include <lux/mutex.h>
-#include <lux/cond.h>
+#include <lux.h>
+#include <lux/assert.h>
+#include <lux/parray.h>
 
-#define SEM_NULL {0, MUTEX_NULL, COND_NULL}
-
-typedef struct {
-	volatile int super;
-	mutex m;
-	cond  c;
-} sem;
-
-static inline void
-sem_post(sem *s)
+int
+main()
 {
-	mutex_lock(&s->m);
-	++s->super;
-	cond_signal(&s->c);
-	mutex_unlock(&s->m);
-}
+	struct xyz {
+		float x, y, z;
+	} *a;
 
-static inline void
-sem_wait(sem *s)
-{
-	mutex_lock(&s->m);
-	while(s->super <= 0)
-		cond_wait(&s->c, &s->m);
-	--s->super;
-	mutex_unlock(&s->m);
-}
+	size_t n[] = {10, 11, 12, 13, 14, 15};
+	size_t i;
 
-#endif /* _LUX_SEM_H_ */
+	a = pallocdn(struct xyz, 6, n);
+	lux_assert(a && pgetd(a) == 6);
+	for(i = 0; i < pgetd(a); ++i)
+		lux_assert(pgetn(a, i) == n[i]);
+	pfree(a);
+
+	a = palloc(struct xyz, 20, 21, 22, 23, 24, 25);
+	lux_assert(a && pgetd(a) == 6);
+	for(i = 0; i < pgetd(a); ++i)
+		lux_assert(pgetn(a, i) == n[i] + 10);
+	pfree(a);
+
+	return 0;
+}

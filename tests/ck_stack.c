@@ -22,46 +22,59 @@
 #endif
 
 #include <lux.h>
-#include <lux/thread.h>
-#include <lux/tpool.h>
+#include <lux/assert.h>
+#include <lux/dynamic.h>
+#include <lux/stack.h>
+#include <stdlib.h>
 #include <stdio.h>
-#include <stddef.h>
-#include <unistd.h>
 
-struct task {
-	Lux_task super;
-	int id;
+struct node {
+	struct slist_node super;
+	int value;
 };
 
-void
-exec(Lux_task *t)
+static inline struct node *
+mknode(int value)
 {
-	printf("[%p] %d\n", pthread_self(), ((struct task *)t)->id);
-	usleep(1);
+	return dynamic(struct node, {STACK_NULL, value});
 }
 
 int
 main()
 {
-	int i, n = 8;
+	int i, n = 10, offset;
 
-	struct tpool *q = mktpool(4);
-	struct task  *t = malloc(n * sizeof(struct task));
-	for(i = 0; i < n; ++i) {
-		t[i].super.exec = exec;
-		t[i].id         = i + 1;
+	struct node *h = mknode(-1);
+
+	offset = 100;
+	for(i = 0; i < n; ++i)
+		stack_push(&h->super, &mknode(offset+i)->super);
+	for(i = 0; i < n+1; ++i) {
+		struct node *s = (struct node *)stack_pop(&h->super);
+		if(s == NULL)
+			printf("empty\n");
+		else {
+			printf("%d ", s->value);
+			lux_assert(s->value == offset+(n-1-i));
+			free(s);
+		}
 	}
 
+	offset = 110;
 	for(i = 0; i < n; ++i)
-		tpool_enqueue(q, &t[i].super);
+		stack_push(&h->super, &mknode(offset+i)->super);
+	for(i = 0; i < n+1; ++i) {
+		struct node *s = (struct node *)stack_pop(&h->super);
+		if(s == NULL)
+			printf("empty\n");
+		else {
+			printf("%d ", s->value);
+			lux_assert(s->value == offset+(n-1-i));
+			free(s);
+		}
+	}
 
-	tpool_wait(q);
-
-	for(i = 0; i < n; ++i)
-		tpool_enqueue(q, &t[i].super);
-
-	rmtpool(q);
-	free(t);
+	free(h);
 
 	return 0;
 }

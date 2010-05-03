@@ -17,37 +17,37 @@
  * You should have received a copy of the GNU General Public License
  * along with lux.  If not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef _LUX_SEM_H_
-#define _LUX_SEM_H_
+#ifndef _LUX_QUEUE_H_
+#define _LUX_QUEUE_H_
 
-#include <lux/mutex.h>
-#include <lux/cond.h>
+#include <lux/list.h>
+#include <lux/ring.h>
+#include <stddef.h>
 
-#define SEM_NULL {0, MUTEX_NULL, COND_NULL}
+struct queue_head {
+	struct slist_node *head;
+	struct slist_node *tail;
+};
 
-typedef struct {
-	volatile int super;
-	mutex m;
-	cond  c;
-} sem;
-
-static inline void
-sem_post(sem *s)
-{
-	mutex_lock(&s->m);
-	++s->super;
-	cond_signal(&s->c);
-	mutex_unlock(&s->m);
-}
+#define QUEUE_HEAD_INIT(h) {(struct slist_node *)h, (struct slist_node *)h}
+#define QUEUE_NODE_NULL    {NULL}
 
 static inline void
-sem_wait(sem *s)
+enqueue(struct queue_head *h, struct slist_node *s)
 {
-	mutex_lock(&s->m);
-	while(s->super <= 0)
-		cond_wait(&s->c, &s->m);
-	--s->super;
-	mutex_unlock(&s->m);
+	ring_ins(h->tail, s);
+	h->tail = s;
 }
 
-#endif /* _LUX_SEM_H_ */
+static inline struct slist_node *
+dequeue(struct queue_head *h)
+{
+	struct slist_node *s = ring_pop((struct slist_node *)h);
+	if(s == (struct slist_node *)h) /* empty */
+		return NULL;
+	if(s->next == (struct slist_node *)h) /* last one */
+		h->tail = (struct slist_node *)h;
+	return s;
+}
+
+#endif /* _LUX_QUEUE_H_ */

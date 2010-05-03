@@ -27,34 +27,41 @@
 typedef long long ptrdiff_t;
 #endif
 
-#define DOPE_DIM_MAX (((size_t)1 << LUX_DIMENSION_BIT) - 1)
-#define DOPE_RNK_MAX ((size_t)1 << (LUX_SIZE_T_BIT - LUX_DIMENSION_BIT))
+#define DOPE_N_MAX (((size_t)1 << LUX_N_BIT) - 1)
+#define DOPE_D_MAX ((size_t)1 << (LUX_SIZE_T_BIT - LUX_N_BIT))
+
+#define PKDN(d, n) (((d) << LUX_N_BIT) | (n))
+#define GETD(dn)   ((dn) >> LUX_N_BIT)
+#define GETN(dn)   ((dn) & DOPE_N_MAX)
 
 struct dope {
 	ptrdiff_t s;  /* stride is in unit of bytes */
-	size_t    rd; /* bitwise-OR of rank and dimension */
+	size_t    dn; /* bitwise-OR of dim and number of elements */
 };
 
 static inline struct dope
-pkdope(ptrdiff_t stride_in_bytes, size_t rnk, size_t dim)
+pkdope(ptrdiff_t stride_in_bytes, size_t d, size_t n)
 {
-	struct dope d = {stride_in_bytes, (rnk << LUX_DIMENSION_BIT) | dim};
-	return d;
+	struct dope _ = {stride_in_bytes, PKDN(d, n)};
+	return _;
 }
 
 static inline ptrdiff_t
-dope_getsib(struct dope *d) {
+dope_gets(struct dope *d)
+{
 	return d->s;
 }
 
 static inline size_t
-dope_getrnk(struct dope *d) {
-	return d->rd >> LUX_DIMENSION_BIT;
+dope_getd(struct dope *d)
+{
+	return GETD(d->dn);
 }
 
 static inline size_t
-dope_getdim(struct dope *d) {
-	return d->rd & DOPE_DIM_MAX;
+dope_getn(struct dope *d)
+{
+	return GETN(d->dn);
 }
 
 #endif /* _LUX_DOPE_H_ */

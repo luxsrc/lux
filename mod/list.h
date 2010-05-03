@@ -17,37 +17,16 @@
  * You should have received a copy of the GNU General Public License
  * along with lux.  If not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef _LUX_SEM_H_
-#define _LUX_SEM_H_
+#ifndef _LUX_LIST_H_
+#define _LUX_LIST_H_
 
-#include <lux/mutex.h>
-#include <lux/cond.h>
+struct slist_node {
+	struct slist_node *next;
+};
 
-#define SEM_NULL {0, MUTEX_NULL, COND_NULL}
+struct dlist_node {
+	struct dlist_node *next;
+	struct dlist_node *prev;
+};
 
-typedef struct {
-	volatile int super;
-	mutex m;
-	cond  c;
-} sem;
-
-static inline void
-sem_post(sem *s)
-{
-	mutex_lock(&s->m);
-	++s->super;
-	cond_signal(&s->c);
-	mutex_unlock(&s->m);
-}
-
-static inline void
-sem_wait(sem *s)
-{
-	mutex_lock(&s->m);
-	while(s->super <= 0)
-		cond_wait(&s->c, &s->m);
-	--s->super;
-	mutex_unlock(&s->m);
-}
-
-#endif /* _LUX_SEM_H_ */
+#endif /* _LUX_LIST_H_ */

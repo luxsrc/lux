@@ -32,6 +32,7 @@ AC_CHECK_HEADERS([sys/time.h c_asm.h intrinsics.h mach/mach_time.h])
 AC_CHECK_HEADERS([stddef.h obstack.h sys/mman.h sys/stat.h fcntl.h])
 
 dnl Check for types
+AC_CHECK_TYPE([off64_t])
 AC_CHECK_TYPE([hrtime_t], [AC_DEFINE(HAVE_HRTIME_T, 1, [Define to 1 if hrtime_t is defined in <sys/time.h>])], , [#if HAVE_SYS_TIME_H
 #include <sys/time.h>
 #endif])
@@ -42,7 +43,7 @@ AC_CHECK_FUNCS([BSDgettimeofday gettimeofday gethrtime read_real_time time_base_
 AC_SEARCH_LIBS([dlinfo],  [dl], [AC_DEFINE(HAVE_DLINFO,  1, [Define to 1 if you have the `dlinfo' function.])],  [AC_MSG_WARN([failed to find the dlinfo() function])])
 AC_SEARCH_LIBS([dladdr],  [dl], [AC_DEFINE(HAVE_DLADDR,  1, [Define to 1 if you have the `dladdr' function.])],  [AC_MSG_WARN([failed to find the dladdr() function])])
 AC_SEARCH_LIBS([dlmopen], [dl], [AC_DEFINE(HAVE_DLMOPEN, 1, [Define to 1 if you have the `dlmopen' function.])], [AC_MSG_WARN([failed to find the dlmopen() function])])
-AC_CHECK_FUNCS([memfd_create shm_open])
+AC_CHECK_FUNCS([fopencookie funopen vsnprintf memfd_create shm_open])
 
 dnl Cray UNICOS _rtc() (real-time clock) intrinsic
 AC_MSG_CHECKING([for _rtc intrinsic])
@@ -131,14 +132,14 @@ else
 fi
 
 dnl Define error code related macros
-AC_DEFINE_UNQUOTED(LUX_ELAST,         $elast, [Define to the largest system error code.])
-AC_DEFINE_UNQUOTED(LUX_STRINGID_BIT,  $hbits, [Define to the required bits to hold a string key.])
-AC_DEFINE_UNQUOTED(LUX_FACILITY_BIT,  $mbits, [Define to the required bits to hold a facility key.])
-AC_DEFINE_UNQUOTED(LUX_FAILURE_BIT,   $fbits, [Define to the required bits to hold a lux failure code.])
-AC_DEFINE_UNQUOTED(LUX_INT_BIT,       $ibits, [Define to the number of bits of int.])
-AC_DEFINE_UNQUOTED(LUX_UNSIGNED_BIT,  $ubits, [Define to the number of bits of unsigned.])
-AC_DEFINE_UNQUOTED(LUX_SIZE_T_BIT,    $sbits, [Define to the number of bits of int.])
-AC_DEFINE_UNQUOTED(LUX_DIMENSION_BIT, $dbits, [Define to the number of bits of array dimensions/size.])
+AC_DEFINE_UNQUOTED(LUX_ELAST,        $elast, [Define to the largest system error code.])
+AC_DEFINE_UNQUOTED(LUX_STRINGID_BIT, $hbits, [Define to the required bits to hold a string key.])
+AC_DEFINE_UNQUOTED(LUX_FACILITY_BIT, $mbits, [Define to the required bits to hold a facility key.])
+AC_DEFINE_UNQUOTED(LUX_FAILURE_BIT,  $fbits, [Define to the required bits to hold a lux failure code.])
+AC_DEFINE_UNQUOTED(LUX_INT_BIT,      $ibits, [Define to the number of bits of int.])
+AC_DEFINE_UNQUOTED(LUX_UNSIGNED_BIT, $ubits, [Define to the number of bits of unsigned.])
+AC_DEFINE_UNQUOTED(LUX_SIZE_T_BIT,   $sbits, [Define to the number of bits of int.])
+AC_DEFINE_UNQUOTED(LUX_N_BIT,        $dbits, [Define to the number of bits of number of elements in each array dimension.])
 
 dnl Make assertion a configure option (default disabled)
 AC_ARG_ENABLE(assertion, [AC_HELP_STRING([--enable-assertion],[compile lux with assertion for debugging])], ok=$enableval, ok=no)
@@ -175,6 +176,10 @@ AH_BOTTOM([/*===================================================================
 
 #ifndef headerof
 #define headerof(T, P, E) ((T *)((char *)(P) - offsetof(T, E)))
+#endif
+
+#ifndef localof
+#define localof(T, I) ({ T _ = I; _; })
 #endif
 
 /*===========================================================================*/
