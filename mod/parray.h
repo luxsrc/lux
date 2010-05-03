@@ -109,7 +109,6 @@
  */
 #include <lux/assert.h>
 #include <lux/aver.h>
-#include <lux/dope.h>
 #include <stdlib.h> /* for malloc() and free() */
 
 #if !HAVE_TYPEOF
@@ -150,5 +149,10 @@
 	lux_assert(J < _d_);       \
 	GETN(HEADEROF(P, _d_)[J]); \
 })
+
+#include <lux/dope.h> /* must be last so that the static inline
+                         functions mkdopedn() and rmdope() in
+                         <lux/dope.h> can see palloc() and pfree()
+                         when included from this file.  */
 
 #endif /* _LUX_PARRAY_H_ */
