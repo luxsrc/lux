@@ -30,13 +30,18 @@
 #include <string.h>
 #include <stdio.h>
 
+#define ALIGN 256
+#define N1 5
+#define N2 7
+#define N3 11
+
 int
 main()
 {
 	char *v1, *v2;
 
-	struct mpool *mp = mkmpool(64000);
-	struct dope  *dp = mkdope(double, 8, 17, 17, 17);
+	struct mpool *mp = mkmpool(20000);
+	struct dope  *dp = mkdope(double [5], ALIGN, N1, N2, N3);
 
 	v1 = mkmview(mp, 0, dp);
 	v2 = mkmview(mp, 0, dp);
