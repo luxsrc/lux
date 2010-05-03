@@ -32,7 +32,7 @@ int main()
 
 	lux_setup();
 
-	mpi = lux_load("mpi", NULL);
+	mpi = lux_load("../mod/.libs/mpi", NULL);
 	lux_assert(mpi);
 
 	switch(mpi->thread_mode) {
