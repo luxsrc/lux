@@ -47,14 +47,14 @@ struct libux {
 static inline const char *
 getpaths(void)
 {
-	const char fmt[] = "%s:%s/.lux/lib/lux:" LUX_MOD_PATH;
+	const char fmt[] = "%s:%s/mod:%s/.lux/lib/lux:" LUX_MOD_PATH;
 
 	char *cwd   = getcwd(NULL, 0);
 	char *home  = getenv("HOME");
-	char *paths = (char *)malloc(strlen(cwd)  +
-	                             strlen(home) +
-	                             sizeof(fmt)  - 4);
-	(void)sprintf(paths, fmt, cwd, home);
+	char *paths = (char *)malloc(strlen(cwd) * 2 +
+	                             strlen(home)    +
+	                             sizeof(fmt) - 6);
+	(void)sprintf(paths, fmt, cwd, cwd, home);
 
 	free(cwd);
 	/* no need to free home */
