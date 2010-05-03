@@ -1,6 +1,6 @@
 AM_CPPFLAGS = -I$(top_builddir)
 
-check_PROGRAMS = ck_cookie ck_lazybuf ck_mpi ck_mpool ck_parray ck_parafor ck_queue ck_ring ck_stack ck_tpool
+check_PROGRAMS = ck_cookie ck_lazybuf ck_mpi ck_mpool ck_mview ck_parafor ck_parray ck_queue ck_ring ck_stack ck_tpool
 TESTS = $(check_PROGRAMS)
 
 ck_cookie_SOURCES = ck_cookie.c ../mod/cookie.h
@@ -14,6 +14,9 @@ ck_mpi_LDADD   = ../api/libux.la
 
 ck_mpool_SOURCES = ck_mpool.c ../mod/mpool.h
 ck_mpool_LDADD   = ../api/libux.la
+
+ck_mview_SOURCES = ck_mview.c ../mod/mview.h
+ck_mview_LDADD   = ../api/libux.la
 
 ck_parray_SOURCES = ck_parray.c ../mod/parray.h
 ck_parray_LDADD   = ../api/libux.la

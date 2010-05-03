@@ -16,7 +16,7 @@ pkginclude_HEADERS += counter.h list.h queue.h refcnt.h ring.h stack.h
 pkginclude_HEADERS += alloca.h dynamic.h lazybuf.h parray.h resman.h zalloc.h
 
 # Hybrid modules (dynamically allocate their own resources)
-pkginclude_HEADERS += dope.h htab.h libux.h mpool.h vlog.h
+pkginclude_HEADERS += dope.h htab.h libux.h mpool.h mview.h vlog.h
 
 # Interfaces and implementations of dynamic modules
 pkginclude_HEADERS += job.h

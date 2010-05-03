@@ -34,6 +34,10 @@ typedef long long ptrdiff_t;
 #define GETD(dn)   ((dn) >> LUX_N_BIT)
 #define GETN(dn)   ((dn) & DOPE_N_MAX)
 
+#include <lux/parray.h> /* must be before mkdopedn() and rmdope() so
+                           that the palloc() and pfree() macros are
+                           defined.  */
+
 struct dope {
 	ptrdiff_t s;  /* stride is in unit of bytes */
 	size_t    dn; /* bitwise-OR of dim and number of elements */
@@ -62,6 +66,32 @@ static inline size_t
 dope_getn(struct dope *d)
 {
 	return GETN(d->dn);
+}
+
+#define mkdope(T, a, ...) ({              \
+	size_t _n_[] = {__VA_ARGS__};     \
+	size_t _d_   = countof(_n_);      \
+	mkdopedn(sizeof(T), a, _d_, _n_); \
+})
+
+static inline struct dope *
+mkdopedn(size_t esz, size_t a, size_t d, size_t *n)
+{
+	struct dope *dp = palloc(struct dope, d);
+	size_t s = esz;
+	size_t i;
+	for(i = 0; i < d; s *= n[i++]) {
+		if(i == 1)
+			s = ((s + a - 1) / a) * a;
+		dp[i] = pkdope(s, i, n[i]);
+	}
+	return dp;
+}
+
+static inline void
+rmdope(struct dope *dp)
+{
+	pfree(dp);
 }
 
 #endif /* _LUX_DOPE_H_ */

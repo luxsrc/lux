@@ -23,29 +23,37 @@
 
 #include <lux.h>
 #include <lux/assert.h>
-#include <lux/mpool.h>
+#include <lux/dope.h>
+#include <lux/mview.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <string.h>
 #include <stdio.h>
 
-static inline size_t
-roundup(size_t sz, size_t psz)
-{
-	return ((sz + psz - 1) / psz) * psz;
-}
-
 int
-main(int argc, char *argv[])
+main()
 {
-	size_t psz = getpagesize();
-	size_t sz  = argc > 1 ? atoi(argv[1]) : 5000;
+	char *v1, *v2;
 
-	struct mpool *mp = mkmpool(sz);
+	struct mpool *mp = mkmpool(64000);
+	struct dope  *dp = mkdope(double, 8, 17, 17, 17);
 
-	printf("memory pool size: %zu -> %zu\n", sz, mp->sz);
-	lux_assert(mp->sz == roundup(sz, psz));
+	v1 = mkmview(mp, 0, dp);
+	v2 = mkmview(mp, 0, dp);
+
+	printf("%p %p\n", v1, v2);
+	lux_assert(v1 != v2);
+
+	(void)strcpy(v1, "testing");
+	printf("v1: \"%s\"\n", v1);
+	printf("v2: \"%s\"\n", v2);
+	lux_assert(!strcmp(v1, v2));
+
+	rmmview(mp, v1);
+	rmmview(mp, v2);
 
 	rmmpool(mp);
+	rmdope(dp);
 
 	return 0;
 }
