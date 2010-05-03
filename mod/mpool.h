@@ -20,14 +20,18 @@
 #ifndef _LUX_MPOOL_H_
 #define _LUX_MPOOL_H_
 
+#include <lux/htab.h>
 #include <lux/memfd.h>
-#include <stdlib.h> /* malloc() and free() */
-#include <unistd.h> /* getpagesize(), ftruncate(), and close() */
+#include <lux/zalloc.h> /* zalloc() and free() */
+#include <unistd.h>     /* getpagesize(), ftruncate(), and close() */
 
 struct mpool {
 	int    fd;
 	size_t psz, sz;
+	struct htab tab; /* last because of flexible array member */
 };
+
+#define MPOOL_NULL {-1, 0, 0, HTAB_NULL}
 
 static inline struct mpool *
 mkmpool(size_t sz)
@@ -35,9 +39,10 @@ mkmpool(size_t sz)
 	struct mpool *mp;
 	int fd, psz, err;
 
-	mp = malloc(sizeof(struct mpool));
+	mp = zalloc(sizeof(struct mpool));
 	if(!mp)
 		goto cleanup1;
+	mp->tab.count = HTAB_COUNT;
 
 	fd = memfd_create("mpool", 0);
 	if(fd == -1)

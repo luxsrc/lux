@@ -26,9 +26,18 @@
 #include <lux/parray.h>
 #include <sys/mman.h> /* mmap() and munmap() */
 
+struct mview_node {
+	struct htab_node super;
+	size_t off;
+	size_t length;
+};
+
 static inline void *
 mkmview(struct mpool *mp, size_t off, struct dope *dp)
 {
+	void *mv;
+	struct mview_node *node;
+
 	size_t n = pgetn(dp, 0);
 	size_t i, objsz, length;
 	for(i=0, objsz=-1, length=0; i < n; ++i) {
@@ -41,17 +50,27 @@ mkmview(struct mpool *mp, size_t off, struct dope *dp)
 
 	lux_assert(mp->sz >= off+length);
 
-	return mmap(NULL, length,
-	            PROT_READ | PROT_WRITE,
-	            MAP_SHARED,
-	            mp->fd, off);
+	node = malloc(sizeof(struct mview_node));
+	if(!node)
+		return NULL;
+	node->off    = off;
+	node->length = length;
+
+	mv = mmap(NULL, length,
+	          PROT_READ | PROT_WRITE,
+	          MAP_SHARED,
+	          mp->fd, off);
+
+	hadd(&mp->tab, (uintptr_t)mv, &node->super);
+	return mv;
 }
 
 static inline void
-rmmview(struct mpool *mp, void *v, size_t length)
+rmmview(struct mpool *mp, void *mv)
 {
-	(void)munmap(v, length);
-	(void)mp; /* silence unused variable warning */
+	struct mview_node *node = (struct mview_node *)hpop(&mp->tab, (uintptr_t)mv);
+	(void)munmap(mv, node->length);
+	free(node);
 }
 
 #endif /* _LUX_MVIEW_H_ */

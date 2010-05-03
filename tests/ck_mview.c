@@ -54,8 +54,8 @@ main()
 	printf("v2: \"%s\"\n", v2);
 	lux_assert(!strcmp(v1, v2));
 
-	rmmview(mp, v1, 16);
-	rmmview(mp, v2, 16);
+	rmmview(mp, v1);
+	rmmview(mp, v2);
 
 	rmmpool(mp);
 	pfree(dp);
