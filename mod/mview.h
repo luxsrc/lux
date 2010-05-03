@@ -24,7 +24,7 @@
 #include <lux/dope.h>
 #include <lux/mpool.h>
 #include <lux/parray.h>
-#include <unistd.h>
+#include <sys/mman.h> /* mmap() and munmap() */
 
 static inline void *
 mkmview(struct mpool *mp, size_t off, struct dope *dp)

@@ -21,8 +21,8 @@
 #define _LUX_MPOOL_H_
 
 #include <lux/memfd.h>
-#include <stdlib.h>
-#include <unistd.h>
+#include <stdlib.h> /* malloc() and free() */
+#include <unistd.h> /* getpagesize(), ftruncate(), and close() */
 
 struct mpool {
 	int    fd;
