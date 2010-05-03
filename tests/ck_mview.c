@@ -30,26 +30,35 @@
 #include <stdio.h>
 
 int
-main(int argc, char *argv[])
+main()
 {
-	size_t sz = argc > 1 ? atoi(argv[1]) : 5000;
+	char *v1, *v2;
 
-	struct mpool *mp = mkmpool(sz);
-	char *v1 = mkmview(mp, 0, 16);
-	char *v2 = mkmview(mp, 0, 16);
+	struct mpool *mp = mkmpool(64000);
+	struct dope  *dp = palloc(struct dope, 3);
 
-	(void)strcpy(v1, "testing");
+	size_t s = sizeof(double);
+	size_t n = 17;
+	size_t i;
+	for(i = 0; i < 3; ++i, s *= n)
+		dp[i] = pkdope(s, i, n);
+
+	v1 = mkmview(mp, 0, dp);
+	v2 = mkmview(mp, 0, dp);
 
 	printf("%p %p\n", v1, v2);
 	lux_assert(v1 != v2);
 
+	(void)strcpy(v1, "testing");
 	printf("v1: \"%s\"\n", v1);
 	printf("v2: \"%s\"\n", v2);
 	lux_assert(!strcmp(v1, v2));
 
 	rmmview(mp, v1, 16);
 	rmmview(mp, v2, 16);
+
 	rmmpool(mp);
+	pfree(dp);
 
 	return 0;
 }
