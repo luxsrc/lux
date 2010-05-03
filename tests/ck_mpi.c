@@ -22,6 +22,7 @@
 #endif
 
 #include <lux.h>
+#include <lux/assert.h>
 #include <lux/mpi.h>
 #include <stdio.h>
 
@@ -32,6 +33,7 @@ int main()
 	lux_setup();
 
 	mpi = lux_load("mpi", NULL);
+	lux_assert(mpi);
 
 	switch(mpi->thread_mode) {
 	case MPI_THREAD_SINGLE:     lux_print("single\n");     break;
