@@ -29,7 +29,7 @@
 struct mview_node {
 	struct htab_node super;
 	size_t off;
-	size_t length;
+	size_t sz;
 };
 
 static inline void *
@@ -39,24 +39,24 @@ mkmview(struct mpool *mp, size_t off, struct dope *dp)
 	struct mview_node *node;
 
 	size_t n = pgetn(dp, 0);
-	size_t i, objsz, length;
-	for(i=0, objsz=-1, length=0; i < n; ++i) {
+	size_t i, objsz, sz;
+	for(i=0, objsz=-1, sz=0; i < n; ++i) {
 		size_t s = dope_gets(dp+i);
 		size_t n = dope_getn(dp+i);
-		length  += s * (n-1);
+		sz  += s * (n-1);
 		objsz    = s < objsz ? s : objsz;
 	}
-	length += objsz;
+	sz += objsz;
 
-	lux_assert(mp->sz >= off+length);
+	lux_assert(mp->sz >= off+sz);
 
 	node = malloc(sizeof(struct mview_node));
 	if(!node)
 		return NULL;
-	node->off    = off;
-	node->length = length;
+	node->off = off;
+	node->sz  = sz;
 
-	mv = mmap(NULL, length,
+	mv = mmap(NULL, sz,
 	          PROT_READ | PROT_WRITE,
 	          MAP_SHARED,
 	          mp->fd, off);
@@ -69,7 +69,7 @@ static inline void
 rmmview(struct mpool *mp, void *mv)
 {
 	struct mview_node *node = (struct mview_node *)hpop(&mp->tab, (uintptr_t)mv);
-	(void)munmap(mv, node->length);
+	(void)munmap(mv, node->sz);
 	free(node);
 }
 
