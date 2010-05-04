@@ -72,7 +72,12 @@ main()
 
 	funcs.read = read;
 	f = fopencookie(&cookie, "w+", funcs);
+#if HAVE_FUNOPEN
 	lux_assert(f == NULL);
+#else
+	lux_assert(f != NULL);
+	fclose(f);
+#endif
 
 	funcs.write = write;
 	f = fopencookie(&cookie, "w+", funcs);
