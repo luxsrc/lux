@@ -65,7 +65,7 @@ write(void *c, const char *buf, size_t sz)
 int
 main()
 {
-	char out[1024] = "123";
+	char out[1024];
 	cookie_t cookie = {0};
 	cookie_io_functions_t funcs = {0};
 	FILE *f;
@@ -86,8 +86,9 @@ main()
 	fwrite("abc", 1, 4, f); fflush(f);
 	lux_assert(strcmp(cookie.data, "abc") == 0);
 
+	cookie.current = 0; /* reset position to head */
 	fread(out, 1, 4, f);
-	lux_assert(strcmp(out, "123") == 0);
+	lux_assert(strcmp(out, "abc") == 0);
 
 	lux_assert(fclose(f) == 0);
 
