@@ -21,13 +21,16 @@
 #define _LUX_DLFCN_H_
 
 #ifndef _GNU_SOURCE
-#define _GNU_SOURCE
-#define _GNU_SOURCE_BY_ME
+# define _GNU_SOURCE
+# define _GNU_SOURCE_BY_ME
 #endif
 #include <dlfcn.h>
-#ifdef  _GNU_SOURCE_BY_ME
-#undef  _GNU_SOURCE_BY_ME
-#undef  _GNU_SOURCE
+#ifdef _GNU_SOURCE_BY_ME
+# undef _GNU_SOURCE_BY_ME
+# undef _GNU_SOURCE
+# ifdef __USE_GNU
+#  undef __USE_GNU
+# endif
 #endif
 
 #ifndef HAVE_DLMOPEN /* define our own dlmopen() */

@@ -18,14 +18,13 @@
  * along with lux.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include <lux.h>
-#include <lux/assert.h>
 #include <lux/dlfcn.h>
 
-#if HAVE_STDDEF_H
-#include <stddef.h> /* for NULL */
+#if HAVE_DLMOPEN
+/* Use the system dlopen(); implement nothing */
 #else
-#include <stdlib.h> /* for NULL */
-#endif
+/* Implement dlopen() using dlopen() */
+#include <lux/assert.h>
 
 char *
 dlmopen(Lmid_t lmid, const char *name, int flags)
@@ -34,3 +33,5 @@ dlmopen(Lmid_t lmid, const char *name, int flags)
 	return dlopen(name, flags);
 	(void)lmid; /* silence unused parameter warning */
 }
+
+#endif
