@@ -1,6 +1,6 @@
 dnl Initialization for autoconf, automake, and libtool
 AC_PREREQ([2.63])
-AC_INIT([lux framework], [0.1], [ckchan@cfa.harvard.edu], [lux])
+AC_INIT([lux framework], [0.1.1], [ckchan@cfa.harvard.edu], [lux])
 AC_CONFIG_AUX_DIR([.build-aux])
 AC_CONFIG_MACRO_DIR([.build-m4])
 AC_CONFIG_SRCDIR([lux.hin])
