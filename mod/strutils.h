@@ -32,8 +32,9 @@ alnumcat(char *d, const char *s)
 	return d;
 }
 
+#define basename(x) _basename(x)
 static inline const char *
-basename(const char *s)
+_basename(const char *s)
 {
 	const char *h = s;
 	while(*h)
