@@ -63,15 +63,6 @@ if test "x$out" == "x"; then
 	echo "No output module is specified; use default \"$out\""
 fi
 
-# Split path into "$dir" and "$out"
-case "$out" in
-	*/*)	dir=$(dirname  "$out")
-		out=$(basename "$out")
-		;;
-	*)	dir="sim"
-		;;
-esac
-
 # Define module name by removing the ".la" extension; abort if module
 # name is invalid
 case "$out" in
@@ -128,18 +119,6 @@ mod_CPPFLAGS="-DLUX_MOD_NAME=${out%.la}"
 mod_LIBADD="${libdir}/libux.la"
 
 #==============================================================================
-# Clean up---we do not track timestamp of the dependencies so there is
-# no reason to keep the intermediate files
-function cleanup {
-	echo "Cleaning up intermediate files"
-	rm -rf .libs _libs
-	rm -f "$out"
-	rm -f *.$OBJEXT
-	rm -f *.lo
-}
-trap cleanup EXIT
-
-#==============================================================================
 # Compile the source file(s) to object(s)
 for s in "${src[@]}"; do
 	o="${s%c}lo"
@@ -179,9 +158,3 @@ if test $status -ne 0; then
 	echo "FAILED LINKING OBJECT FILE(S) TO \"$out\"; ABORT"
 	exit $status
 fi
-
-#==============================================================================
-# Install output module to "$dir"
-echo "Install \"$out\" to \"$dir\""
-mkdir -p "$PWD/$dir"
-${LIBTOOL} --mode=install ${INSTALL} "$out" "$PWD/$dir"
