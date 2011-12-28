@@ -20,12 +20,13 @@
 # along with lux.  If not, see <http://www.gnu.org/licenses/>.
 
 #==============================================================================
-# Seperate the argument list "$@" into input array "$ina" and output "$out"
+# Separate the argument list "$@" into input array "$ina", output
+# module "$mod", and installation directory "$dir"
 while test "$#" -gt 0; do
 	a="$1"
 	shift
 	case "$a" in
-		"-o")	out="$1"; shift;;
+		"-o")	mod="$1"; shift;;
 		"-i")	dir="$1"; shift;;
 		*)	ina+=("$a");;
 	esac
@@ -56,10 +57,10 @@ else
 	src=($(ls "${src[@]}" | sort | uniq))
 fi
 
-# Use default output name if "$out" is not specified
-if test "x$out" == "x"; then
-	out="mod.la"
-	echo "No output module is specified; use default \"$out\""
+# Use default output module name if "$mod" is not specified
+if test "x$mod" == "x"; then
+	mod="mod.la"
+	echo "No output module is specified; use default \"$mod\""
 fi
 
 # Use absolute path
@@ -70,9 +71,9 @@ fi
 
 # Define module name by removing the ".la" extension; abort if module
 # name is invalid
-case "$out" in
+case "$mod" in
 	*.la)	;;
-	*)	echo "Invalid output module \"$out\"; ABORT"
+	*)	echo "Invalid output module \"$mod\"; ABORT"
 		exit 1
 		;;
 esac
@@ -86,7 +87,7 @@ for i in "${!src[@]}"; do
 		echo   "\"${src[$i]}\""
 	fi
 done
-echo "Output module name: \"$out\""
+echo "Output module name: \"$mod\""
 echo "Install directory:  \"$dir\""
 
 #==============================================================================
@@ -121,7 +122,7 @@ LIBTOOL="${bindir}/lux-libtool"
 INSTALL="@INSTALL@"
 
 # Module specific part of the toolchain
-mod_CPPFLAGS="-DLUX_MOD_NAME=${out%.la}"
+mod_CPPFLAGS="-DLUX_MOD_NAME=${mod%.la}"
 mod_LIBADD="${libdir}/libux.la"
 
 #==============================================================================
@@ -152,21 +153,21 @@ for i in "${!obj[@]}"; do
 		printf "\"${obj[$i]}\""
 	fi
 done
-echo "to output module \"$out\""
+echo "to output module \"$mod\""
 
 ${LIBTOOL} --tag=CC --mode=link ${CCLD} \
 	${AM_CFLAGS} ${CFLAGS}          \
 	${AM_LDFLAGS} ${LDFLAGS}        \
 	${LIBS} ${DEFAULT_RPATH}        \
-	"${obj[@]}" ${mod_LIBADD} -o "$out"
+	"${obj[@]}" ${mod_LIBADD} -o "$mod"
 status=$?
 if test $status -ne 0; then
-	echo "FAILED LINKING OBJECT FILE(S) TO \"$out\"; ABORT"
+	echo "FAILED LINKING OBJECT FILE(S) TO \"$mod\"; ABORT"
 	exit $status
 fi
 
 #==============================================================================
 # Install output module to current directory
-echo "Install \"$out\" to \"$dir\""
+echo "Install \"$mod\" to \"$dir\""
 mkdir -p "$dir"
-${LIBTOOL} --mode=install ${INSTALL} "$out" "$dir"
+${LIBTOOL} --mode=install ${INSTALL} "$mod" "$dir"
