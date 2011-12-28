@@ -1,5 +1,25 @@
 #!/bin/sh
+#
+# Copyright (C) 2009,2011 Chi-kwan Chan
+# Copyright (C) 2009 Harvard-Smithsonian Center for Astrophysics
+# Copyright (C) 2011 Nordic Institute for Theoretical Physics
+#
+# This file is part of lux.
+#
+# lux is free software: you can redistribute it and/or modify it under
+# the terms of the GNU General Public License as published by the Free
+# Software Foundation, either version 3 of the License, or (at your
+# option) any later version.
+#
+# lux is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+# or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public
+# License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with lux.  If not, see <http://www.gnu.org/licenses/>.
 
+#==============================================================================
 # Seperate the argument list "$@" into input array "$ina" and output "$out"
 while test "$#" -gt 0; do
 	a="$1"
@@ -37,7 +57,7 @@ else
 	src=($(ls "${src[@]}" | sort | uniq))
 fi
 
-# Use default output name if "$out" is specified
+# Use default output name if "$out" is not specified
 if test "x$out" == "x"; then
 	out="mod.la"
 	echo "No output module is specified; use default \"$out\""
@@ -64,14 +84,15 @@ esac
 # Finally done parsing arguments; print a summary
 printf "Input source files: "
 for i in "${!src[@]}"; do
-	if test $i -lt $(expr "${#src}" - 1); then
+	if test $i -lt $(expr "${#src[@]}" - 1); then
 		printf "\"${src[$i]}\", "
 	else
 		echo   "\"${src[$i]}\""
 	fi
 done
-echo "Output module name: \"${out}\""
+echo "Output module name: \"$out\""
 
+#==============================================================================
 # Installation paths
 prefix="@prefix@"
 exec_prefix="@exec_prefix@"
@@ -106,6 +127,7 @@ INSTALL="@INSTALL@"
 mod_CPPFLAGS="-DLUX_MOD_NAME=${out%.la}"
 mod_LIBADD="${libdir}/libux.la"
 
+#==============================================================================
 # Clean up---we do not track timestamp of the dependencies so there is
 # no reason to keep the intermediate files
 function cleanup {
@@ -117,6 +139,7 @@ function cleanup {
 }
 trap cleanup EXIT
 
+#==============================================================================
 # Compile the source file(s) to object(s)
 for s in "${src[@]}"; do
 	o="${s%c}lo"
@@ -134,8 +157,9 @@ for s in "${src[@]}"; do
 	obj+=("$o")
 done
 
+#==============================================================================
 # Link object(s) to the output module
-printf "Link object ffile "
+printf "Link object file "
 for i in "${!obj[@]}"; do
 	if test $i -lt $(expr "${#obj}" - 1); then
 		printf "\"${obj[$i]}\", "
@@ -156,6 +180,7 @@ if test $status -ne 0; then
 	exit $status
 fi
 
+#==============================================================================
 # Install output module to "$dir"
 echo "Install \"$out\" to \"$dir\""
 mkdir -p "$PWD/$dir"
