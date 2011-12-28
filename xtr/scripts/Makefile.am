@@ -1,2 +1,2 @@
-bin_SCRIPTS    = lux-libtool lux-build
-DISTCLEANFILES = lux-libtool lux-build
+bin_SCRIPTS    = lux-libtool lux-build lux-install
+DISTCLEANFILES = lux-libtool lux-build lux-install
