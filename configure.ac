@@ -9,7 +9,7 @@ AM_INIT_AUTOMAKE([1.11.1 -Wall -Werror gnu nostdinc]) dnl cannot use gnits becau
 m4_ifdef([AM_PROG_AR], [AM_PROG_AR]) dnl AM_PROG_AR was introduced in automake-1.11.2
 
 LT_PREREQ([2.2.6b])
-LT_INIT([dlopen])
+LT_INIT([dlopen disable-static])
 
 dnl Check for programs and compiler characteristics
 AC_PROG_CPP
