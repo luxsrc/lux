@@ -21,7 +21,7 @@
 #define _LUX_LIBUX_H_
 
 #include <lux/dlfcn.h>
-#include <lux/dm/load.h>
+#include <lux/load.h>
 #include <lux/timer.h>
 #include <lux/vlog.h>
 

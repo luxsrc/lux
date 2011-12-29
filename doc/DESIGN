@@ -475,7 +475,7 @@ STRUCT AS TUPLE: like in many other programming languages, a function
   of returning (small) structure.  Returning multiple related
   variables as a structure can avoid unnecessary static variables and
   malloc()/free(), and can be a very good pattern if used carefully.
-  In fact, <lux/dm/dmod.h> is a good use case of it.
+  In fact, <lux/dmod.h> is a good use case of it.
 
 MEMORY ORDER and DOPE VECTOR: lux uses dope vector (instead of Iliffe
   vector) by default to describe multi-dimensional arrays.  To provide

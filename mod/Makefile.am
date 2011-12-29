@@ -24,16 +24,15 @@ pkginclude_HEADERS += dope.h htab.h libux.h mpool.h mview.h vlog.h
 
 #==============================================================================
 # Adaptive performance
-
 pkginclude_HEADERS += algo.h measure.h planner.h problem.h solver.h task.h ticks.h timer.h wisdom.h
 
-# Dynamic-module modules---in a subdirectory because not installed
-SUBDIRS             = dm
+# Dynamic-module
+pkginclude_HEADERS += dlib.h dltry.h dmod.h load.h
 
 #==============================================================================
 # Interfaces and implementations of dynamic modules
 pkginclude_HEADERS += job.h message.h resman.h
-SUBDIRS            += job
+SUBDIRS             = job
 
 # Dynamic modules
 pkginclude_HEADERS += mpi.h

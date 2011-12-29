@@ -18,7 +18,7 @@
  * along with lux.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include "api.h"
-#include <lux/dm/load.h>
+#include <lux/load.h>
 
 void *
 lux_load(const char *name, const void *opts)

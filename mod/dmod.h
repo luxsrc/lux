@@ -20,8 +20,8 @@
 #ifndef _LUX_DMOD_H_
 #define _LUX_DMOD_H_
 
-#include <lux/dm/dlib.h>
-#include <lux/dm/dltry.h>
+#include <lux/dlib.h>
+#include <lux/dltry.h>
 #include <lux/failed.h>
 #include <lux/lazybuf.h>
 #if HAVE_STDDEF_H

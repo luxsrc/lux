@@ -21,8 +21,8 @@
 #define _LUX_LOAD_H_
 
 #include <lux/dlfcn.h>
-#include <lux/dm/dlib.h>
-#include <lux/dm/dmod.h>
+#include <lux/dlib.h>
+#include <lux/dmod.h>
 #include <lux/failed.h>
 #include <lux/htab.h>
 #include <lux/strutils.h>
