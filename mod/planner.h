@@ -17,19 +17,26 @@
  * You should have received a copy of the GNU General Public License
  * along with lux.  If not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef _LUX_SOLVER_H_
-#define _LUX_SOLVER_H_
+#ifndef _LUX_PLANNER_H_
+#define _LUX_PLANNER_H_
 
-#include <lux/ap/problem.h>
-#include <lux/ap/task.h>
+#include <lux/problem.h>
+#include <lux/task.h>
+
+#define LUX_PLAN_DEFAULT    LUX_PLAN_MEASURE
+
+#define LUX_PLAN_ESTIMATE   0U
+#define LUX_PLAN_MEASURE    1U
+#define LUX_PLAN_PATIENT    2U
+#define LUX_PLAN_EXHAUSTIVE 3U
 
 /* Forward declaration */
-typedef struct LuxSsolver Lux_solver;
+typedef struct LuxSplanner Lux_planner;
 
-struct LuxSsolver {
-	/* A Lux_solver can solve a particular Lux_problem and return
-	   a <lux/vector.h> of pointers to Lux_task */
-	Lux_task **(*solve)(Lux_solver *, Lux_problem *);
+struct LuxSplanner {
+        /* A Lux_planner can plan for a particular Lux_problem and
+           return a single optimal plan */
+	Lux_task *(*plan)(Lux_planner *, Lux_problem *, unsigned);
 };
 
-#endif /* _LUX_SOLVER_H_ */
+#endif /* _LUX_PLANNER_H_ */

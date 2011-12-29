@@ -20,7 +20,7 @@
 #ifndef _LUX_TFORK_H_
 #define _LUX_TFORK_H_
 
-#include <lux/ap/task.h>
+#include <lux/task.h>
 #include <lux/thread.h>
 
 static void *

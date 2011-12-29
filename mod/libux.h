@@ -21,8 +21,8 @@
 #define _LUX_LIBUX_H_
 
 #include <lux/dlfcn.h>
-#include <lux/ap/timer.h>
 #include <lux/dm/load.h>
+#include <lux/timer.h>
 #include <lux/vlog.h>
 
 #include <unistd.h> /* for getcwd() and getenv() */

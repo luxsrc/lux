@@ -398,7 +398,7 @@ PLANNERS and TASKS: while planners and tasks are described above in
   It is straightforward to set up a simple simulation at compile time,
 
 	#include <lux/mhd.h> /* Lux_mhd is a subclass of Lux_task */
-	#include <lux/ap/task.h>
+	#include <lux/task.h>
 
 	Lux_mhd_cfg cfg; /* configuration of Lux_mhd */
 	Lux_task   *sim;
@@ -415,8 +415,8 @@ PLANNERS and TASKS: while planners and tasks are described above in
   For more complicated simulations, the configuration itself needs to
   be more dynamics.  Hence,
 
-	#include <lux/ap/problem.h>
-	#include <lux/ap/task.h>
+	#include <lux/problem.h>
+	#include <lux/task.h>
 
 	Lux_problem *cfg;
 	Lux_task    *sim;

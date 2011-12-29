@@ -2,8 +2,9 @@ AM_LDFLAGS = -no-undefined -export-dynamic -export-symbols-regex '^lux[A-Z_]' -m
 
 # Platform modules (create a portable platform)
 pkginclude_HEADERS  = atomic.h cond.h cookie.h dlfcn.h failed.h memfd.h mutex.h sem.h thread.h tpool.h
-SUBDIRS             = ap dm
+SUBDIRS             = dm
 
+#==============================================================================
 # Safety modules (for error checking/handling)
 pkginclude_HEADERS += assert.h aver.h check.h
 
@@ -17,13 +18,19 @@ pkginclude_HEADERS += hash.h obstack.h parafor.h strutils.h tfork.h
 pkginclude_HEADERS += counter.h list.h queue.h refcnt.h ring.h stack.h
 
 # Resource allocator (allocate other resource that need to be freed)
-pkginclude_HEADERS += alloca.h dynamic.h lazybuf.h parray.h resman.h zalloc.h
+pkginclude_HEADERS += alloca.h dynamic.h lazybuf.h parray.h zalloc.h
 
 # Hybrid modules (dynamically allocate their own resources)
 pkginclude_HEADERS += dope.h htab.h libux.h mpool.h mview.h vlog.h
 
+#==============================================================================
+# Adaptive performance
+
+pkginclude_HEADERS += algo.h measure.h planner.h problem.h solver.h task.h ticks.h timer.h wisdom.h
+
+#==============================================================================
 # Interfaces and implementations of dynamic modules
-pkginclude_HEADERS += job.h
+pkginclude_HEADERS += job.h message.h resman.h
 SUBDIRS            += job
 
 # Dynamic modules

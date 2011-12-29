@@ -20,11 +20,11 @@
 #ifndef _LUX_TPOOL_H_
 #define _LUX_TPOOL_H_
 
-#include <lux/ap/task.h>
 #include <lux/cond.h>
 #include <lux/dynamic.h>
 #include <lux/mutex.h>
 #include <lux/queue.h>
+#include <lux/task.h>
 #include <stdlib.h>
 
 struct tnode {

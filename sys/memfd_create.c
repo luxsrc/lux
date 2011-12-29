@@ -24,8 +24,8 @@
 /* Use the system memfd_create() in <sys/mman.h>; declare nothing */
 #else
 /* Implement memfd_create() using shm_open() */
-#include <lux/ap/ticks.h>
 #include <lux/assert.h>
+#include <lux/ticks.h>
 #include <stdio.h>
 
 #if HAVE_SYS_STAT_H
