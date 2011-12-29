@@ -21,23 +21,37 @@
 #define _LUX_MATCH_H_
 
 #include <string.h>
+#include <ctype.h>
+
+static inline const char *
+skipfnc(const char *a, int (*iscls)(int))
+{
+	while(iscls(*a))
+		++a;
+	return a;
+}
+
+static inline const char *
+skipstr(const char *a, const char *s)
+{
+	while(*s) {
+		if(*s != *a)
+			return NULL;
+		++s;
+		++a;
+	}
+	return a;
+}
 
 static inline const char *
 match(const char *sym, const char *arg)
 {
-	size_t i;
-
-	const size_t l = strlen(sym);
-	const size_t n = strlen(arg);
-
-	if(l + 1 > n || '=' != arg[l])
-		return NULL;
-
-	for(i = 0; i < l; ++i)
-		if(sym[i] != arg[i])
-			return NULL;
-
-	return arg + l + 1;
+	(void)((arg = skipfnc(arg, isspace)) &&
+	       (arg = skipstr(arg, sym    )) &&
+	       (arg = skipfnc(arg, isspace)) &&
+	       (arg = skipstr(arg, "="    )) &&
+	       (arg = skipfnc(arg, isspace)));
+	return arg;
 }
 
 #endif /* _LUX_MATCH_H_ */
