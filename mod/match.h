@@ -43,7 +43,7 @@ skipfnc(const char *a, int (*iscls)(int))
 static inline const char *
 skipstr(const char *a, const char *s)
 {
-	while(*s) {
+	while(*s && *s != ':') {
 		if(*s != *a)
 			return NULL;
 		++s;
@@ -53,7 +53,14 @@ skipstr(const char *a, const char *s)
 }
 
 static inline const char *
-match(const char *sym, const char *arg)
+next(const char *s)
+{
+	s = strchr(s, ':');
+	return s ? s + 1 : NULL;
+}
+
+static inline const char *
+matchone(const char *sym, const char *arg)
 {
 	(void)((arg = skipfnc(arg, isspace)) &&
 	       (arg = skipstr(arg, sym    )) &&
@@ -61,6 +68,17 @@ match(const char *sym, const char *arg)
 	       (arg = skipstr(arg, "="    )) &&
 	       (arg = skipfnc(arg, isspace)));
 	return arg;
+}
+
+static inline const char *
+match(const char *syms, const char *arg)
+{
+	do {
+		const char *a = matchone(syms, arg);
+		if(a)
+			return a;
+	} while((syms = next(syms)));
+	return NULL;
 }
 
 #endif /* _LUX_MATCH_H_ */
