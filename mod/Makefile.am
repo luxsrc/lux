@@ -2,7 +2,6 @@ AM_LDFLAGS = -no-undefined -export-dynamic -export-symbols-regex '^lux[A-Z_]' -m
 
 # Platform modules (create a portable platform)
 pkginclude_HEADERS  = atomic.h cond.h cookie.h dlfcn.h failed.h memfd.h mutex.h sem.h thread.h tpool.h
-SUBDIRS             = dm
 
 #==============================================================================
 # Safety modules (for error checking/handling)
@@ -27,6 +26,9 @@ pkginclude_HEADERS += dope.h htab.h libux.h mpool.h mview.h vlog.h
 # Adaptive performance
 
 pkginclude_HEADERS += algo.h measure.h planner.h problem.h solver.h task.h ticks.h timer.h wisdom.h
+
+# Dynamic-module modules---in a subdirectory because not installed
+SUBDIRS             = dm
 
 #==============================================================================
 # Interfaces and implementations of dynamic modules
