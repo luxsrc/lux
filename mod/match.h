@@ -21,7 +21,16 @@
 #define _LUX_MATCH_H_
 
 #include <string.h>
+#if HAVE_CTYPE_H
 #include <ctype.h>
+#else
+#include <string.h>
+static inline int
+isspace(int c)
+{
+	return c && strchr(" \t\n\v\f\r", c); /* '\0' is not white space */
+}
+#endif
 
 static inline const char *
 skipfnc(const char *a, int (*iscls)(int))
