@@ -36,10 +36,12 @@ out="${cfg}.h"
 printf "lux-confgen: \"${inp}\" -> \"${out}\"... "
 
 #==============================================================================
-# Define a c-struct
+# Define a c-struct; allocate and initialize the struct
 
 cat <<EOF > "${out}"
 /* ${out}.  Generated from ${cfg}.ptab by lux-codegen.  */
+
+#include <stdlib.h>
 
 struct ${cfg} {
 EOF
@@ -50,6 +52,28 @@ awk -F '\t' '{
 
 cat <<EOF >> "${out}"
 };
+
+static inline struct ${cfg} *
+mk${cfg}(void)
+{
+	struct ${cfg} *p = (struct ${cfg} *)malloc(sizeof(struct ${cfg}));
+	if(p) {
+EOF
+
+awk -F '\t' '{
+	printf "\t\tp->%s %s;\n", $2, $3;
+}' "${inp}" >> "${out}"
+
+cat <<EOF >> "${out}"
+	}
+	return p;
+}
+
+static inline void
+rm${cfg}(struct ${cfg} *p)
+{
+	free(p);
+}
 EOF
 
 printf "DONE\n"
