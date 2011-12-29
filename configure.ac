@@ -210,8 +210,8 @@ extern void  lux_unload(void *);
 dnl Output files
 AC_CONFIG_FILES(m4_esyscmd([find . -name 'Makefile.am' -type f | sed 's|\./\(.*\).am|\1|'    ]))
 AC_CONFIG_FILES(m4_esyscmd([find . -name '*.?*in'      -type f | sed 's|\./\(.*\)in|\1:\1in|']))
-AC_CONFIG_FILES([xtr/scripts/lux-build],   [chmod +x xtr/scripts/lux-build])
-AC_CONFIG_FILES([xtr/scripts/lux-install], [chmod +x xtr/scripts/lux-install])
+AC_CONFIG_FILES([tools/scripts/lux-build],   [chmod +x tools/scripts/lux-build])
+AC_CONFIG_FILES([tools/scripts/lux-install], [chmod +x tools/scripts/lux-install])
 AC_OUTPUT
 
 dnl Hacks: in terms of source and build paths, there are only two variables
@@ -226,9 +226,9 @@ if [[ ! -e lux ]]; then
 fi
 
 # Create our own copy of libtool for installation
-if [[ ! -e xtr/scripts/lux-libtool ]]; then
-	$LN_S ../../libtool xtr/scripts/lux-libtool
+if [[ ! -e tools/scripts/lux-libtool ]]; then
+	$LN_S ../../libtool tools/scripts/lux-libtool
 fi
 
-# Ugly hack so AX_REQUIRE_LUX, defined in "xtr/m4/lux.m4", can be used in other "configure.ac"
-$SED -i~ -e's|\(.*\)=|ax_lux_\1=|g' -e's|\${\(.*\)}|${ax_lux_\1}|g' xtr/m4/lux.m4 && rm -f xtr/m4/lux.m4~
+# Ugly hack so AX_REQUIRE_LUX, defined in "tools/m4/lux.m4", can be used in other "configure.ac"
+$SED -i~ -e's|\(.*\)=|ax_lux_\1=|g' -e's|\${\(.*\)}|${ax_lux_\1}|g' tools/m4/lux.m4 && rm -f tools/m4/lux.m4~

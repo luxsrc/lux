@@ -23,8 +23,8 @@ if [ "x$1" != "xclean" ]; then
 		touch NEWS ChangeLog # TODO: generate from git commit messages
 	fi
 	mkdir .build-{aux,m4}
-	# Use .m4 files in "xtr/m4/"
-	cp xtr/m4/*.m4 .build-m4
+	# Use .m4 files in "tools/m4/"
+	cp tools/m4/*.m4 .build-m4
 	# Paranoia: sometimes autoconf doesn't get things right the first time
 	for i in $([ "x$1" = "xfast" ] && seq 1 || seq 3); do
 		autoreconf --install --force --verbose
