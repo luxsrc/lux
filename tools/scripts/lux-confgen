@@ -49,7 +49,8 @@ struct ${cfg} {
 EOF
 
 awk -F '\t' '{
-	printf "\t%s\t%s;\t%s\n", $1, $2, $5;
+	split($2, a, ":");
+	printf "\t%s\t%s;\t%s\n", $1, a[1], $5;
 }' "${inp}" >> "${out}"
 
 cat <<EOF >> "${out}"
@@ -63,7 +64,8 @@ mk${cfg}(void)
 EOF
 
 awk -F '\t' '{
-	printf "\t\tp->%s %s;\n", $2, $3;
+	split($2, a, ":");
+	printf "\t\tp->%s %s;\n", a[1], $3;
 }' "${inp}" >> "${out}"
 
 cat <<EOF >> "${out}"
@@ -90,7 +92,8 @@ cf${cfg}(struct ${cfg} *p, const char *arg)
 EOF
 
 awk -F '\t' '{
-	printf "\tCONFIG(%s, \"%s\") %s\n", $2, $2, $4;
+	split($2, a, ":");
+	printf "\tCONFIG(%s, \"%s\") %s\n", a[1], $2, $4;
 }' "${inp}" >> "${out}"
 
 cat <<EOF >> "${out}"
