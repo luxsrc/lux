@@ -1,7 +1,11 @@
 AM_LDFLAGS = -no-undefined -export-dynamic -export-symbols-regex '^lux[A-Z_]' -module
 
-pkginclude_HEADERS  = assert.h aver.h atomic.h check.h cond.h cookie.h dlfcn.h failed.h memfd.h mutex.h sem.h thread.h tpool.h
+# Platform modules (create a portable platform)
+pkginclude_HEADERS  = atomic.h cond.h cookie.h dlfcn.h failed.h memfd.h mutex.h sem.h thread.h tpool.h
 SUBDIRS             = ap dm
+
+# Safety modules (for error checking/handling)
+pkginclude_HEADERS += assert.h aver.h check.h
 
 # Convenience static modules (typically for renaming stuffs)
 pkginclude_HEADERS += mangle.h numeric.h shorthand.h switch.h
