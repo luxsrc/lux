@@ -18,7 +18,21 @@
 # You should have received a copy of the GNU General Public License
 # along with lux.  If not, see <http://www.gnu.org/licenses/>.
 
+#==============================================================================
+# Print usage
+
 if test "$#" -eq 0 || test "x$1" == "x-h"; then
 	echo "usage: $0 input.ptab"
 	exit 0
 fi
+
+#==============================================================================
+# Parse input and output file names
+
+inp="${1}"
+cfg="${inp%.ptab}"
+out="${cfg}.h"
+
+printf "lux-confgen: \"${inp}\" -> \"${out}\"... "
+
+printf "DONE\n"
