@@ -35,4 +35,21 @@ out="${cfg}.h"
 
 printf "lux-confgen: \"${inp}\" -> \"${out}\"... "
 
+#==============================================================================
+# Define a c-struct
+
+cat <<EOF > "${out}"
+/* ${out}.  Generated from ${cfg}.ptab by lux-codegen.  */
+
+struct ${cfg} {
+EOF
+
+awk -F '\t' '{
+	printf "\t%s\t%s;\t%s\n", $1, $2, $5;
+}' "${inp}" >> "${out}"
+
+cat <<EOF >> "${out}"
+};
+EOF
+
 printf "DONE\n"
