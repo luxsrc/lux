@@ -5,8 +5,8 @@
 !*.?*in
 lux.h*
 
-!xtr/m4/*.m4
-xtr/m4/lux.m4
+!tools/m4/*.m4
+tools/m4/lux.m4
 
 conf*/
 conf*
