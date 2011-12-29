@@ -60,24 +60,20 @@ next(const char *s)
 }
 
 static inline const char *
-matchone(const char *sym, const char *arg)
+match(const char *sym, const char *arg)
 {
-	(void)((arg = skipfnc(arg, isspace)) &&
-	       (arg = skipstr(arg, sym    )) &&
-	       (arg = skipfnc(arg, isspace)) &&
-	       (arg = skipstr(arg, "="    )) &&
-	       (arg = skipfnc(arg, isspace)));
-	return arg;
-}
+	const char *a = arg;
+	if((a = skipfnc(a, isspace)) &&
+	   (a = skipstr(a, sym    )) &&
+	   (a = skipfnc(a, isspace)) &&
+	   (a = skipstr(a, "="    )) &&
+	   (a = skipfnc(a, isspace)))
+		return a;
 
-static inline const char *
-match(const char *syms, const char *arg)
-{
-	do {
-		const char *a = matchone(syms, arg);
-		if(a)
-			return a;
-	} while((syms = next(syms)));
+	sym = next(sym);
+	if(sym)
+		return match(sym, arg); /* recursion */
+
 	return NULL;
 }
 
