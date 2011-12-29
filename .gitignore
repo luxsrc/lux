@@ -3,6 +3,8 @@
 !*.[hc]
 !*.a[cm]
 !*.?*in
+
+!lux*
 lux.h*
 
 !tools/m4/*.m4
