@@ -36,11 +36,13 @@ out="${cfg}.h"
 printf "lux-confgen: \"${inp}\" -> \"${out}\"... "
 
 #==============================================================================
-# Define a c-struct; allocate and initialize the struct
+# Define a c-struct; allocate, initialize, and configure the struct
 
 cat <<EOF > "${out}"
 /* ${out}.  Generated from ${cfg}.ptab by lux-codegen.  */
 
+#include <lux/config.h>
+#include <lux/failed.h>
 #include <stdlib.h>
 
 struct ${cfg} {
@@ -73,6 +75,33 @@ static inline void
 rm${cfg}(struct ${cfg} *p)
 {
 	free(p);
+}
+
+static inline int
+cf${cfg}(struct ${cfg} *p, const char *arg)
+{
+	const char *val = NULL;
+	char *rem;
+
+	int fsv = failed;
+	failed  = 0;
+
+	SWITCH {
+EOF
+
+awk -F '\t' '{
+	printf "\tCONFIG(%s, \"%s\") %s\n", $2, $2, $4;
+}' "${inp}" >> "${out}"
+
+cat <<EOF >> "${out}"
+	}
+
+	if(!val || failed)
+		return 1;
+	else {
+		failed = fsv; /* restore previous failure code */
+		return 0;
+	}
 }
 EOF
 
