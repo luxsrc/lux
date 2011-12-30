@@ -75,7 +75,8 @@ while test "$#" -gt 0; do
 	shift
 	case "$a" in
 		"-h" | "--help")	help;;
-		"-i")	dir="$1"; shift;;
+		"-i")	dir="$1";      shift;;
+		"+i")	dir="$dir/$1"; shift;;
 		*)	ina+=("$a");;
 	esac
 done
