@@ -33,7 +33,7 @@ inp="${1}"
 cfg="${inp%.ptab}"
 out="${cfg}.h"
 
-printf "lux-confgen: \"${inp}\" -> \"${out}\"... "
+printf "lux-optgen: \"${inp}\" -> \"${out}\"... "
 
 #==============================================================================
 # Define a c-struct; allocate, initialize, and configure the struct
