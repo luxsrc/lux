@@ -29,17 +29,17 @@ fi
 #==============================================================================
 # Parse input and output file names
 
-inp="${1}"
-cfg="${inp%.opts}"
-out="${cfg}.h"
+in="${1}"
+opts="${in%.opts}"
+out="${opts}.h"
 
-printf "lux-confgen: \"${inp}\" -> \"${out}\"... "
+printf "lux-confgen: \"${in}\" -> \"${out}\"... "
 
 #==============================================================================
 # Define a c-struct; allocate, initialize, and configure the struct
 
 cat <<EOF > "${out}"
-/* ${out}.  Generated from ${cfg}.opts by lux-optgen.  */
+/* ${out}.  Generated from ${opts}.opts by lux-optgen.  */
 
 #include <lux/failed.h>
 #include <lux/match.h>
@@ -48,32 +48,32 @@ cat <<EOF > "${out}"
 
 #define CONFIG(v, s) CASE((val = match(s, arg))) p->v
 
-struct ${cfg} {
+struct ${opts} {
 EOF
 
 awk -F '\t' '!/^($|[:space:]*#)/{
 	split($2, a, ":");
 	printf "\t%s\t%s;\t%s\n", $1, a[1], $5;
-}' "${inp}" >> "${out}"
+}' "${in}" >> "${out}"
 
 cat <<EOF >> "${out}"
 };
 
 static inline void
-${cfg}_init(struct ${cfg} *p)
+${opts}_init(struct ${opts} *p)
 {
 EOF
 
 awk -F '\t' '!/^($|[:space:]*#)/{
 	split($2, a, ":");
 	printf "\tp->%s %s;\n", a[1], $3;
-}' "${inp}" >> "${out}"
+}' "${in}" >> "${out}"
 
 cat <<EOF >> "${out}"
 }
 
 static inline int
-${cfg}_config(struct ${cfg} *p, const char *arg)
+${opts}_config(struct ${opts} *p, const char *arg)
 {
 	const char *val = NULL;
 	char *rem;
@@ -87,7 +87,7 @@ EOF
 awk -F '\t' '!/^($|[:space:]*#)/{
 	split($2, a, ":");
 	printf "\tCONFIG(%s, \"%s\") %s\n", a[1], $2, $4;
-}' "${inp}" >> "${out}"
+}' "${in}" >> "${out}"
 
 cat <<EOF >> "${out}"
 	}
