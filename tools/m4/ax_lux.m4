@@ -45,15 +45,8 @@
 #   version as well.
 
 AC_DEFUN([AX_LUX], [
-AC_REQUIRE([AC_PROG_CPP])
-AC_REQUIRE([AC_PROG_CC_STDC])
-
-AC_C_TYPEOF
-AC_C_CONST
-AC_C_INLINE
-AC_C_RESTRICT
-
 AC_CHECK_PROGS(LUX, lux)
+
 AC_SUBST(LUX)
 
 if test x = x"$LUX"; then
