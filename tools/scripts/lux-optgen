@@ -33,17 +33,20 @@ inp="${1}"
 cfg="${inp%.ptab}"
 out="${cfg}.h"
 
-printf "lux-optgen: \"${inp}\" -> \"${out}\"... "
+printf "lux-confgen: \"${inp}\" -> \"${out}\"... "
 
 #==============================================================================
 # Define a c-struct; allocate, initialize, and configure the struct
 
 cat <<EOF > "${out}"
-/* ${out}.  Generated from ${cfg}.ptab by lux-codegen.  */
+/* ${out}.  Generated from ${cfg}.ptab by lux-optgen.  */
 
-#include <lux/config.h>
 #include <lux/failed.h>
+#include <lux/match.h>
+#include <lux/switch.h>
 #include <stdlib.h>
+
+#define CONFIG(v, s) CASE((val = match(s, arg))) p->v
 
 struct ${cfg} {
 EOF
