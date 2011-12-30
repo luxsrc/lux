@@ -22,7 +22,7 @@
 # Print usage
 
 if test "$#" -eq 0 || test "x$1" == "x-h"; then
-	echo "usage: $0 input.ptab"
+	echo "usage: $0 input.otab"
 	exit 0
 fi
 
@@ -30,7 +30,7 @@ fi
 # Parse input and output file names
 
 inp="${1}"
-cfg="${inp%.ptab}"
+cfg="${inp%.otab}"
 out="${cfg}.h"
 
 printf "lux-confgen: \"${inp}\" -> \"${out}\"... "
@@ -39,7 +39,7 @@ printf "lux-confgen: \"${inp}\" -> \"${out}\"... "
 # Define a c-struct; allocate, initialize, and configure the struct
 
 cat <<EOF > "${out}"
-/* ${out}.  Generated from ${cfg}.ptab by lux-optgen.  */
+/* ${out}.  Generated from ${cfg}.otab by lux-optgen.  */
 
 #include <lux/failed.h>
 #include <lux/match.h>
