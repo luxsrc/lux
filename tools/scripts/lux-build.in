@@ -47,6 +47,9 @@ EOF
 }
 
 #==============================================================================
+# Set default installation directory
+dir="$PWD"
+
 # Separate the argument list "$@" into input array "$ina", output
 # module "$mod", and installation directory "$dir"
 while test "$#" -gt 0; do
@@ -54,8 +57,9 @@ while test "$#" -gt 0; do
 	shift
 	case "$a" in
 		"-h" | "--help")	help;;
-		"-o")	mod="$1"; shift;;
-		"-i")	dir="$1"; shift;;
+		"-o")	mod="$1";      shift;;
+		"-i")	dir="$1";      shift;;
+		"+i")	dir="$dir/$1"; shift;;
 		*)	ina+=("$a");;
 	esac
 done
@@ -93,9 +97,7 @@ if test "x$mod" == "x"; then
 	echo "No output module is specified; use default \"$mod\""
 fi
 
-# Use absolute path; note that if "$dir" is not set, the current
-# directory is used; this is handy in staging compiled module for
-# development
+# Use absolute path
 if test "x${dir::1}" != "x/"; then
 	dir="$PWD/$dir"
 	echo "Directory is not absolute path, prepend current directory"
