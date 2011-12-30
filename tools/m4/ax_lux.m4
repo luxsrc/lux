@@ -53,17 +53,7 @@ AC_C_CONST
 AC_C_INLINE
 AC_C_RESTRICT
 
-if which lux > /dev/null; then
-	LUX=`which lux`
-else
-	for f in /{usr/,opt/}{,local/,local/lux/}bin/lux; do
-		if test -f $f; then
-			LUX="$f"
-			break
-		fi
-	done
-fi
-
+AC_CHECK_PROGS(LUX, lux)
 AC_SUBST(LUX)
 
 if test x = x"$LUX"; then
