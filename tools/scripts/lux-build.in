@@ -19,6 +19,33 @@
 # You should have received a copy of the GNU General Public License
 # along with lux.  If not, see <http://www.gnu.org/licenses/>.
 
+function help {
+	cat <<EOF
+usage: ${0} INPUT1.c INPUT2.c ... [-o OUTPUT/MOD.la] [-i INSTALL/DIR/]
+
+Build and stage/install a lux module with lux's settings:
+
+  prefix="@prefix@"
+  exec_prefix="@exec_prefix@"
+  bindir="@bindir@"
+  includedir="@includedir@"
+  libdir="@libdir@"
+
+  CC="@CC@"
+  LIBS="@LIBS@"
+  OBJEXT="@OBJEXT@"
+
+  CPPFLAGS="@CPPFLAGS@"
+  CFLAGS="@CFLAGS@"
+  LDFLAGS="@LDFLAGS@"
+
+  AM_CPPFLAGS=""
+  AM_CFLAGS=""
+  AM_LDFLAGS="-no-undefined -export-dynamic -module"
+EOF
+	exit 0
+}
+
 #==============================================================================
 # Separate the argument list "$@" into input array "$ina", output
 # module "$mod", and installation directory "$dir"
@@ -26,6 +53,7 @@ while test "$#" -gt 0; do
 	a="$1"
 	shift
 	case "$a" in
+		"-h" | "--help")	help;;
 		"-o")	mod="$1"; shift;;
 		"-i")	dir="$1"; shift;;
 		*)	ina+=("$a");;
@@ -51,7 +79,9 @@ done
 
 # Obtain a sorted list of unique input file(s); exit if no input file
 if test ${#src} -eq 0; then
-	echo "No input source file is specified; EXIT"
+	cat <<EOF
+No input source file is specified; run \`${0} --help\` for help; EXIT
+EOF
 	exit 0
 else
 	src=($(ls "${src[@]}" | sort | uniq))
@@ -63,7 +93,9 @@ if test "x$mod" == "x"; then
 	echo "No output module is specified; use default \"$mod\""
 fi
 
-# Use absolute path
+# Use absolute path; note that if "$dir" is not set, the current
+# directory is used; this is handy in staging compiled module for
+# development
 if test "x${dir::1}" != "x/"; then
 	dir="$PWD/$dir"
 	echo "Directory is not absolute path, prepend current directory"
@@ -167,7 +199,7 @@ if test $status -ne 0; then
 fi
 
 #==============================================================================
-# Install output module to current directory
+# Stage/install output module to target directory
 echo "Install \"$mod\" to \"$dir\""
 mkdir -p "$dir"
 ${LIBTOOL} --mode=install ${INSTALL} "$mod" "$dir"
