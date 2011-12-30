@@ -158,6 +158,13 @@ if test "$ok" = "yes"; then
 fi
 AM_CONDITIONAL(USING_SINGLE, test "$ok" = "yes")
 
+dnl Make MPI a configure option (default disabled)
+AC_ARG_ENABLE(mpi, [AC_HELP_STRING([--enable-mpi],[compile lux with mpi module])], ok=$enableval, ok=no)
+if test "$ok" = "yes"; then
+	AC_DEFINE(LUX_MPI, [1], [Define to 1 if MPI is enabled.])
+fi
+AM_CONDITIONAL(USING_MPI, test "$ok" = "yes")
+
 AH_BOTTOM([/*===========================================================================*/
 
 #ifndef countof

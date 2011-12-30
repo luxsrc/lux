@@ -35,10 +35,14 @@ pkginclude_HEADERS += job.h message.h resman.h
 SUBDIRS             = job
 
 # Dynamic modules
-pkginclude_HEADERS += mpi.h
-pkglib_LTLIBRARIES  = mpi.la
+pkginclude_HEADERS +=
+pkglib_LTLIBRARIES  =
 
+if USING_MPI
+pkginclude_HEADERS += mpi.h
+pkglib_LTLIBRARIES += mpi.la
 mpi_la_CPPFLAGS = -I$(top_builddir) -DLUX_MOD_NAME=mpi
 mpi_la_SOURCES  = mpi.h mangle.h mutex.h mpi.c
 mpi_la_CFLAGS   = $(PTHREAD_CFLAGS)
 mpi_la_LIBADD   = $(PTHREAD_LIBS) $(MPILIBS) ../api/c/libux.la
+endif
