@@ -1,9 +1,9 @@
-# AX_REQUIRE_LUX
+# AX_LUX
 # --------------
 #
 # SYNOPSIS
 #
-#   AX_REQUIRE_LUX
+#   AX_LUX([ACTION-IF-FOUND[, ACTION-IF-NOT-FOUND]])
 #
 # DESCRIPTION
 #
@@ -44,8 +44,7 @@
 #   extend this special exception to the GPL to apply to your modified
 #   version as well.
 
-AC_DEFUN([AX_REQUIRE_LUX],
-[
+AC_DEFUN([AX_LUX], [
 AC_REQUIRE([AC_PROG_CPP])
 AC_REQUIRE([AC_PROG_CC_STDC])
 
@@ -65,10 +64,13 @@ else
 	done
 fi
 
-if test -n "$LUX"; then
-	AC_MSG_RESULT([`lux` found; its full path is "$LUX"])
-	AC_SUBST([LUX], [$LUX])
+AC_SUBST(LUX)
+
+if test x = x"$LUX"; then
+	$2
+	:
 else
-	AC_MSG_ERROR([`lux` not found])
+        ifelse([$1],,[AC_DEFINE(HAVE_LUX,1,[Define if you have the `lux` library.])],[$1])
+	:
 fi
-])# AX_REQUIRE_LUX
+])dnl AX_LUX
