@@ -41,7 +41,7 @@ LTLINK    = $(LIBTOOL) --tag=CC $(AM_LTFLAGS) $(LTFLAGS) --mode=link    $(CCLD) 
 #------------------------------------------------------------------------------
 # Module specific part of the toolchain
 mod_SOURCE   = mod.c
-mod_LIBADD   = ../api/libux.la -ldl
+mod_LIBADD   = ../api/c/libux.la -ldl
 mod_CPPFLAGS = -DLUX_MOD_NAME=mod
 mod_OBJECT   = mod.lo
 mod_TARGET   = mod.la
