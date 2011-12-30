@@ -1,2 +1,3 @@
-bin_SCRIPTS    = lux-libtool lux-build lux-install lux-optgen
-DISTCLEANFILES = lux-libtool lux-build lux-install
+dist_bin_SCRIPTS = lux-optgen
+bin_SCRIPTS      = lux-libtool lux-build lux-install
+DISTCLEANFILES   = $(bin_SCRIPTS)
