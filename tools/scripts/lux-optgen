@@ -99,6 +99,20 @@ cat <<EOF >> "${out}"
 		return 0;
 	}
 }
+
+static inline struct ${opts} *
+mk${opts}(void)
+{
+	struct ${opts} *p = malloc(sizeof(struct ${opts}));
+	${opts}_init(p);
+	return p;
+}
+
+static inline void
+rm${opts}(struct ${opts} *p)
+{
+	free(p);
+}
 EOF
 
 printf "DONE\n"
