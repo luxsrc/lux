@@ -4,11 +4,8 @@
 !*.a[cm]
 !*.?*in
 
-!lux*
-lux.h*
-
 !tools/m4/*.m4
-tools/m4/lux.m4
+lux.h*
 
 conf*/
 conf*

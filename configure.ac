@@ -27,7 +27,6 @@ AC_C_INLINE
 AC_C_RESTRICT
 
 AC_PROG_LN_S
-AC_PROG_SED
 
 dnl Check for headers
 AC_HEADER_TIME
@@ -229,6 +228,3 @@ fi
 if [[ ! -e tools/scripts/lux-libtool ]]; then
 	$LN_S ../../libtool tools/scripts/lux-libtool
 fi
-
-# Ugly hack so AX_REQUIRE_LUX, defined in "tools/m4/lux.m4", can be used in other "configure.ac"
-$SED -i~ -e's|\(.*\)=|ax_lux_\1=|g' -e's|\${\(.*\)}|${ax_lux_\1}|g' tools/m4/lux.m4 && rm -f tools/m4/lux.m4~
