@@ -19,58 +19,15 @@
 # You should have received a copy of the GNU General Public License
 # along with lux.  If not, see <http://www.gnu.org/licenses/>.
 
-#==============================================================================
-# Separate the argument list "$@" into input module array "$ina" and
-# installation directory "$dir"
-while test "$#" -gt 0; do
-	a="$1"
-	shift
-	case "$a" in
-		"-i")	dir="$1"; shift;;
-		*)	ina+=("$a");;
-	esac
-done
+function help {
+	cat <<EOF
+usage: ${0} MOD1.la MOD2.la ... [-i INSTALL/DIR/]
 
-# Place all "*.la" files to "$mod"; abort if any file does not exist
-# or has unknown extension
-for i in "${ina[@]}"; do
-	if test -f "$i"; then
-		case "$i" in
-			*.la)	mod+=("$i");;
-			*)	echo "Invalid module \"$i\"; ABORT"
-				exit 1
-				;;
-		esac
-	else
-		echo "Input module \"$i\" not found; ABORT"
-		exit 1
-	fi
-done
-
-# Obtain a sorted list of unique input file(s); exit if no input file
-if test ${#mod} -eq 0; then
-	echo "No module is specified; EXIT"
+Install lux modules to a target location.  If no target is given, the
+modules are installed to the default location: "@libdir@/lux".
+EOF
 	exit 0
-else
-	mod=($(ls "${mod[@]}" | sort | uniq))
-fi
-
-# Use absolute path
-if test "x${dir::1}" != "x/"; then
-	dir="$PWD/$dir"
-	echo "Directory is not absolute path, prepend current directory"
-fi
-
-# Finally done parsing arguments; print a summary
-printf "Input module name: "
-for i in "${!mod[@]}"; do
-	if test $i -lt $(expr "${#mod[@]}" - 1); then
-		printf "\"${mod[$i]}\", "
-	else
-		echo   "\"${mod[$i]}\""
-	fi
-done
-echo "Install directory: \"$dir\""
+}
 
 #==============================================================================
 # Installation paths
@@ -108,7 +65,66 @@ mod_CPPFLAGS="-DLUX_MOD_NAME=${out%.la}"
 mod_LIBADD="${libdir}/libux.la"
 
 #==============================================================================
-# Install output module to current directory
+# Set default installation directory
+dir="$libdir/lux"
+
+# Separate the argument list "$@" into input module array "$ina" and
+# installation directory "$dir"
+while test "$#" -gt 0; do
+	a="$1"
+	shift
+	case "$a" in
+		"-h" | "--help")	help;;
+		"-i")	dir="$1"; shift;;
+		*)	ina+=("$a");;
+	esac
+done
+
+# Place all "*.la" files to "$mod"; abort if any file does not exist
+# or has unknown extension
+for i in "${ina[@]}"; do
+	if test -f "$i"; then
+		case "$i" in
+			*.la)	mod+=("$i");;
+			*)	echo "Invalid module \"$i\"; ABORT"
+				exit 1
+				;;
+		esac
+	else
+		echo "Input module \"$i\" not found; ABORT"
+		exit 1
+	fi
+done
+
+# Obtain a sorted list of unique input file(s); exit if no input file
+if test ${#mod} -eq 0; then
+	cat <<EOF
+No mode is specified; run \`${0} --help\` for help; EXIT
+EOF
+	exit 0
+else
+	mod=($(ls "${mod[@]}" | sort | uniq))
+fi
+
+# Use absolute path
+if test "x${dir::1}" != "x/"; then
+	dir="$PWD/$dir"
+	echo "Directory is not absolute path, prepend current directory"
+fi
+
+# Finally done parsing arguments; print a summary
+printf "Input module name: "
+for i in "${!mod[@]}"; do
+	if test $i -lt $(expr "${#mod[@]}" - 1); then
+		printf "\"${mod[$i]}\", "
+	else
+		echo   "\"${mod[$i]}\""
+	fi
+done
+echo "Install directory: \"$dir\""
+
+#==============================================================================
+# Stage/install output module to target directory
 mkdir -p "$dir"
 
 for m in "${mod[@]}"; do
