@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env bash
 #
 # Copyright (C) 2009,2011 Chi-kwan Chan
 # Copyright (C) 2009 Harvard-Smithsonian Center for Astrophysics
@@ -19,14 +19,41 @@
 # You should have received a copy of the GNU General Public License
 # along with lux.  If not, see <http://www.gnu.org/licenses/>.
 
+function help {
+	cat <<EOF
+usage: ${0} MOD1.la MOD2.la ... [-i INSTALL/DIR/]
+
+Install lux modules to a target location.  If no target is given, the
+modules are installed to the default location: "@libdir@/lux".
+EOF
+	exit 0
+}
+
 #==============================================================================
+# Installation paths
+prefix="@prefix@"
+exec_prefix="@exec_prefix@"
+bindir="@bindir@"
+includedir="@includedir@"
+libdir="@libdir@"
+
+# Helper programs
+LIBTOOL="${bindir}/lux-libtool"
+INSTALL="@INSTALL@"
+
+#==============================================================================
+# Set default installation directory
+dir="$libdir/lux"
+
 # Separate the argument list "$@" into input module array "$ina" and
 # installation directory "$dir"
 while test "$#" -gt 0; do
 	a="$1"
 	shift
 	case "$a" in
-		"-i")	dir="$1"; shift;;
+		"-h" | "--help")	help;;
+		"-i")	dir="$1";      shift;;
+		"+i")	dir="$dir/$1"; shift;;
 		*)	ina+=("$a");;
 	esac
 done
@@ -48,8 +75,10 @@ for i in "${ina[@]}"; do
 done
 
 # Obtain a sorted list of unique input file(s); exit if no input file
-if test ${#mod} -eq 0; then
-	echo "No module is specified; EXIT"
+if test ${#mod[@]} -eq 0; then
+	cat <<EOF
+No mode is specified; run \`${0} --help\` for help; EXIT
+EOF
 	exit 0
 else
 	mod=($(ls "${mod[@]}" | sort | uniq))
@@ -73,42 +102,7 @@ done
 echo "Install directory: \"$dir\""
 
 #==============================================================================
-# Installation paths
-prefix="@prefix@"
-exec_prefix="@exec_prefix@"
-bindir="@bindir@"
-includedir="@includedir@"
-libdir="@libdir@"
-
-# Compiler and standard flags
-CC="@CC@"
-CCLD="${CC}"
-DEFS="-DHAVE_CONFIG_H"
-DEFAULT_INCLUDES="-I. -I${includedir}"
-LIBS="@LIBS@"
-DEFAULT_RPATH="-rpath ${libdir}/lux"
-OBJEXT="@OBJEXT@"
-
-# Passed in by configure
-CPPFLAGS="@CPPFLAGS@"
-CFLAGS="@CFLAGS@"
-LDFLAGS="@LDFLAGS@"
-
-# Set in Makefile.am
-AM_CPPFLAGS=""
-AM_CFLAGS=""
-AM_LDFLAGS="-no-undefined -export-dynamic -module"
-
-# Helper programs
-LIBTOOL="${bindir}/lux-libtool"
-INSTALL="@INSTALL@"
-
-# Module specific part of the toolchain
-mod_CPPFLAGS="-DLUX_MOD_NAME=${out%.la}"
-mod_LIBADD="${libdir}/libux.la"
-
-#==============================================================================
-# Install output module to current directory
+# Stage/install output module to target directory
 mkdir -p "$dir"
 
 for m in "${mod[@]}"; do

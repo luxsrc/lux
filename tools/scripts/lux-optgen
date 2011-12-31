@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env bash
 #
 # Copyright (C) 2011 Chi-kwan Chan
 # Copyright (C) 2011 Nordic Institute for Theoretical Physics
@@ -22,24 +22,27 @@
 # Print usage
 
 if test "$#" -eq 0 || test "x$1" == "x-h"; then
-	echo "usage: $0 input.otab"
+	echo "usage: $0 input.opts"
 	exit 0
 fi
 
 #==============================================================================
 # Parse input and output file names
 
-inp="${1}"
-cfg="${inp%.otab}"
-out="${cfg}.h"
+opts="${1%.opts}" # always remove extension
+in="${opts}.opts" # ensure ".opts" extension for input
+out="${opts}.h"   # output file name
 
-printf "lux-confgen: \"${inp}\" -> \"${out}\"... "
+printf "lux-confgen: \"${in}\" -> \"${out}\"... "
 
 #==============================================================================
 # Define a c-struct; allocate, initialize, and configure the struct
 
 cat <<EOF > "${out}"
-/* ${out}.  Generated from ${cfg}.otab by lux-optgen.  */
+/* ${out}.  Generated from ${opts}.opts by lux-optgen.  */
+
+#ifndef _${opts^^}_H_
+#define _${opts^^}_H_ 1
 
 #include <lux/failed.h>
 #include <lux/match.h>
@@ -48,42 +51,32 @@ cat <<EOF > "${out}"
 
 #define CONFIG(v, s) CASE((val = match(s, arg))) p->v
 
-struct ${cfg} {
+struct ${opts} {
 EOF
 
-awk -F '\t' '{
+awk -F '\t' '!/^($|[:space:]*#)/{
 	split($2, a, ":");
 	printf "\t%s\t%s;\t%s\n", $1, a[1], $5;
-}' "${inp}" >> "${out}"
+}' "${in}" >> "${out}"
 
 cat <<EOF >> "${out}"
 };
 
-static inline struct ${cfg} *
-mk${cfg}(void)
+static inline void
+${opts}_init(struct ${opts} *p)
 {
-	struct ${cfg} *p = (struct ${cfg} *)malloc(sizeof(struct ${cfg}));
-	if(p) {
 EOF
 
-awk -F '\t' '{
+awk -F '\t' '!/^($|[:space:]*#)/{
 	split($2, a, ":");
-	printf "\t\tp->%s %s;\n", a[1], $3;
-}' "${inp}" >> "${out}"
+	printf "\tp->%s %s;\n", a[1], $3;
+}' "${in}" >> "${out}"
 
 cat <<EOF >> "${out}"
-	}
-	return p;
-}
-
-static inline void
-rm${cfg}(struct ${cfg} *p)
-{
-	free(p);
 }
 
 static inline int
-cf${cfg}(struct ${cfg} *p, const char *arg)
+${opts}_config(struct ${opts} *p, const char *arg)
 {
 	const char *val = NULL;
 	char *rem;
@@ -94,10 +87,10 @@ cf${cfg}(struct ${cfg} *p, const char *arg)
 	SWITCH {
 EOF
 
-awk -F '\t' '{
+awk -F '\t' '!/^($|[:space:]*#)/{
 	split($2, a, ":");
 	printf "\tCONFIG(%s, \"%s\") %s\n", a[1], $2, $4;
-}' "${inp}" >> "${out}"
+}' "${in}" >> "${out}"
 
 cat <<EOF >> "${out}"
 	}
@@ -109,6 +102,24 @@ cat <<EOF >> "${out}"
 		return 0;
 	}
 }
+
+static inline struct ${opts} *
+mk${opts}(void)
+{
+	struct ${opts} *p = malloc(sizeof(struct ${opts}));
+	${opts}_init(p);
+	return p;
+}
+
+static inline void
+rm${opts}(struct ${opts} *p)
+{
+	free(p);
+}
+
+#undef CONFIG
+
+#endif /* _${opts^^}_H_ */
 EOF
 
 printf "DONE\n"

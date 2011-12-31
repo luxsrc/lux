@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env bash
 #
 # Copyright (C) 2009,2011 Chi-kwan Chan
 # Copyright (C) 2009 Harvard-Smithsonian Center for Astrophysics
@@ -19,15 +19,47 @@
 # You should have received a copy of the GNU General Public License
 # along with lux.  If not, see <http://www.gnu.org/licenses/>.
 
+function help {
+	cat <<EOF
+usage: ${0} INPUT1.c INPUT2.c ... [-o OUTPUT/MOD.la] [-i INSTALL/DIR/]
+
+Build and stage/install a lux module with lux's settings:
+
+  prefix="@prefix@"
+  exec_prefix="@exec_prefix@"
+  bindir="@bindir@"
+  includedir="@includedir@"
+  libdir="@libdir@"
+
+  CC="@CC@"
+  LIBS="@LIBS@"
+  OBJEXT="@OBJEXT@"
+
+  CPPFLAGS="@CPPFLAGS@"
+  CFLAGS="@CFLAGS@"
+  LDFLAGS="@LDFLAGS@"
+
+  AM_CPPFLAGS=""
+  AM_CFLAGS=""
+  AM_LDFLAGS="-no-undefined -export-dynamic -module"
+EOF
+	exit 0
+}
+
 #==============================================================================
+# Set default installation directory
+dir="$PWD"
+
 # Separate the argument list "$@" into input array "$ina", output
 # module "$mod", and installation directory "$dir"
 while test "$#" -gt 0; do
 	a="$1"
 	shift
 	case "$a" in
-		"-o")	mod="$1"; shift;;
-		"-i")	dir="$1"; shift;;
+		"-h" | "--help")	help;;
+		"-o")	mod="$1";      shift;;
+		"-i")	dir="$1";      shift;;
+		"+i")	dir="$dir/$1"; shift;;
 		*)	ina+=("$a");;
 	esac
 done
@@ -39,19 +71,26 @@ for i in "${ina[@]}"; do
 		case "$i" in
 			*.c)	src+=("$i");;
 			*.h)	echo "\"$i\" is a header file; SKIP";;
-			*)	echo "Invalid input module \"$i\"; ABORT"
+			*)	echo "Invalid input file \"$i\"; ABORT"
 				exit 1
 				;;
 		esac
 	else
-		echo "Input file \"$i\" not found; ABORT"
-		exit 1
+		case "$i" in
+			-I*)	cpp+=("$i");;
+			-[Ll]*)	ld+=("$i");;
+			*)	echo "Input flag \"$i\"; ABORT"
+				exit 1
+				;;
+		esac
 	fi
 done
 
 # Obtain a sorted list of unique input file(s); exit if no input file
-if test ${#src} -eq 0; then
-	echo "No input source file is specified; EXIT"
+if test ${#src[@]} -eq 0; then
+	cat <<EOF
+No input source file is specified; run \`${0} --help\` for help; EXIT
+EOF
 	exit 0
 else
 	src=($(ls "${src[@]}" | sort | uniq))
@@ -87,6 +126,8 @@ for i in "${!src[@]}"; do
 		echo   "\"${src[$i]}\""
 	fi
 done
+echo "Inline CPP flags: \"${cpp[@]}\""
+echo "Inline LD  flags: \"${ld[@]}\""
 echo "Output module name: \"$mod\""
 echo "Install directory:  \"$dir\""
 
@@ -134,7 +175,8 @@ for s in "${src[@]}"; do
 		${DEFS} ${DEFAULT_INCLUDES}         \
 		${AM_CPPFLAGS} ${CPPFLAGS}          \
 		${AM_CFLAGS} ${CFLAGS}              \
-		"$s" ${mod_CPPFLAGS} -o "$o"
+		${mod_CPPFLAGS} ${cpp[@]}           \
+		"$s" -o "$o"
 	status=$?
 	if test $status -ne 0; then
 		echo "FAILED COMPILING \"$s\" TO \"$o\"; ABORT"
@@ -159,7 +201,8 @@ ${LIBTOOL} --tag=CC --mode=link ${CCLD} \
 	${AM_CFLAGS} ${CFLAGS}          \
 	${AM_LDFLAGS} ${LDFLAGS}        \
 	${LIBS} ${DEFAULT_RPATH}        \
-	"${obj[@]}" ${mod_LIBADD} -o "$mod"
+	${mod_LIBADD} ${ld[@]}          \
+	"${obj[@]}" -o "$mod"
 status=$?
 if test $status -ne 0; then
 	echo "FAILED LINKING OBJECT FILE(S) TO \"$mod\"; ABORT"
@@ -167,7 +210,7 @@ if test $status -ne 0; then
 fi
 
 #==============================================================================
-# Install output module to current directory
+# Stage/install output module to target directory
 echo "Install \"$mod\" to \"$dir\""
 mkdir -p "$dir"
 ${LIBTOOL} --mode=install ${INSTALL} "$mod" "$dir"
