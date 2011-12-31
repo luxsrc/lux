@@ -31,7 +31,7 @@ pkginclude_HEADERS += dlib.h dltry.h dmod.h load.h
 
 #==============================================================================
 # Interfaces and implementations of dynamic modules
-pkginclude_HEADERS += job.h message.h resman.h
+pkginclude_HEADERS += job.h message.h resource.h
 SUBDIRS             = job
 
 # Dynamic modules

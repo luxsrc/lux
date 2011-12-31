@@ -17,8 +17,8 @@
  * You should have received a copy of the GNU General Public License
  * along with lux.  If not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef _LUX_RESMAN_H_
-#define _LUX_RESMAN_H_
+#ifndef _LUX_RESOURCE_H_
+#define _LUX_RESOURCE_H_
 
 #include <lux/ap/message.h>
 #include <lux/ap/task.h>
@@ -28,16 +28,16 @@
 #include <stdlib.h> /* for size_t */
 #endif
 
-typedef struct LuxSresman Lux_resman;
+typedef struct LuxSresource Lux_resource;
 
-struct LuxSresman {
-	void *(*mk)(Lux_resman *, size_t, int);
-	void  (*rm)(Lux_resman *, void *);
+struct LuxSresource {
+	void *(*mk)(Lux_resource *, size_t, int);
+	void  (*rm)(Lux_resource *, void *);
 
-	Lux_message *(*submit)(Lux_resman *, Lux_task *, Lux_message **);
-	void (*wait)(Lux_resman *, Lux_message **);
+	Lux_message *(*submit)(Lux_resource *, Lux_task *, Lux_message **);
+	void (*wait)(Lux_resource *, Lux_message **);
 };
 
-#define LUX_RESMAN_INIT {NULL, NULL, NULL, NULL}
+#define LUX_RESOURCE_INIT {NULL, NULL, NULL, NULL}
 
-#endif /* _LUX_RESMAN_H_ */
+#endif /* _LUX_RESOURCE_H_ */
