@@ -17,7 +17,7 @@ find . -name 'Makefile.in' -type f -exec rm {} \;
 
 if [ "x$1" != "xclean" ]; then
 	if [ -d .git ]; then
-		git rev-parse HEAD > .version
+		git describe --tags | sed 's/^v//' > .version
 		printf 'Author(s) of lux:\n\n' >  AUTHORS
 		git shortlog -nse  | cut -c7-  >> AUTHORS
 		touch NEWS ChangeLog # TODO: generate from git commit messages
