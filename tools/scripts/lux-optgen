@@ -117,6 +117,8 @@ rm${opts}(struct ${opts} *p)
 	free(p);
 }
 
+#undef CONFIG
+
 #endif /* _${opts^^}_H_ */
 EOF
 
