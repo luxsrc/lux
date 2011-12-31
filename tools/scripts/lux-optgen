@@ -41,6 +41,9 @@ printf "lux-confgen: \"${in}\" -> \"${out}\"... "
 cat <<EOF > "${out}"
 /* ${out}.  Generated from ${opts}.opts by lux-optgen.  */
 
+#ifndef _${opts^^}_H_
+#define _${opts^^}_H_ 1
+
 #include <lux/failed.h>
 #include <lux/match.h>
 #include <lux/switch.h>
@@ -113,6 +116,8 @@ rm${opts}(struct ${opts} *p)
 {
 	free(p);
 }
+
+#endif /* _${opts^^}_H_ */
 EOF
 
 printf "DONE\n"
