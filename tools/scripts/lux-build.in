@@ -87,7 +87,7 @@ for i in "${ina[@]}"; do
 done
 
 # Obtain a sorted list of unique input file(s); exit if no input file
-if test ${#src} -eq 0; then
+if test ${#src[@]} -eq 0; then
 	cat <<EOF
 No input source file is specified; run \`${0} --help\` for help; EXIT
 EOF

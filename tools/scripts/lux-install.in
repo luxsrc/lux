@@ -75,7 +75,7 @@ for i in "${ina[@]}"; do
 done
 
 # Obtain a sorted list of unique input file(s); exit if no input file
-if test ${#mod} -eq 0; then
+if test ${#mod[@]} -eq 0; then
 	cat <<EOF
 No mode is specified; run \`${0} --help\` for help; EXIT
 EOF
