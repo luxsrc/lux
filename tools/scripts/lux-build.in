@@ -71,13 +71,17 @@ for i in "${ina[@]}"; do
 		case "$i" in
 			*.c)	src+=("$i");;
 			*.h)	echo "\"$i\" is a header file; SKIP";;
-			*)	echo "Invalid input module \"$i\"; ABORT"
+			*)	echo "Invalid input file \"$i\"; ABORT"
 				exit 1
 				;;
 		esac
 	else
-		echo "Input file \"$i\" not found; ABORT"
-		exit 1
+		case "$i" in
+			-I*)	cpp+=("$i");;
+			*)	echo "Input flag \"$i\"; ABORT"
+				exit 1
+				;;
+		esac
 	fi
 done
 
@@ -121,6 +125,7 @@ for i in "${!src[@]}"; do
 		echo   "\"${src[$i]}\""
 	fi
 done
+echo "Inline CPP flags: \"${cpp[@]}\""
 echo "Output module name: \"$mod\""
 echo "Install directory:  \"$dir\""
 
@@ -168,7 +173,8 @@ for s in "${src[@]}"; do
 		${DEFS} ${DEFAULT_INCLUDES}         \
 		${AM_CPPFLAGS} ${CPPFLAGS}          \
 		${AM_CFLAGS} ${CFLAGS}              \
-		"$s" ${mod_CPPFLAGS} -o "$o"
+		${mod_CPPFLAGS} ${cpp[@]}           \
+		"$s" -o "$o"
 	status=$?
 	if test $status -ne 0; then
 		echo "FAILED COMPILING \"$s\" TO \"$o\"; ABORT"
