@@ -22,14 +22,22 @@
 
 #include <lux/ap/message.h>
 #include <lux/ap/task.h>
+#if HAVE_STDDEF_H
+#include <stddef.h> /* for size_t */
+#else
+#include <stdlib.h> /* for size_t */
+#endif
 
 typedef struct LuxSresman Lux_resman;
 
 struct LuxSresman {
+	void *(*mk)(Lux_resman *, size_t, int);
+	void  (*rm)(Lux_resman *, void *);
+
 	Lux_message *(*submit)(Lux_resman *, Lux_task *, Lux_message **);
 	void (*wait)(Lux_resman *, Lux_message **);
 };
 
-#define LUX_RESMAN_INIT {NULL, NULL}
+#define LUX_RESMAN_INIT {NULL, NULL, NULL, NULL}
 
 #endif /* _LUX_RESMAN_H_ */
