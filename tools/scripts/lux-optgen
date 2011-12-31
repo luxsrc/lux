@@ -29,9 +29,9 @@ fi
 #==============================================================================
 # Parse input and output file names
 
-in="${1}"
-opts="${in%.opts}"
-out="${opts}.h"
+opts="${1%.opts}" # always remove extension
+in="${opts}.opts" # ensure ".opts" extension for input
+out="${opts}.h"   # output file name
 
 printf "lux-confgen: \"${in}\" -> \"${out}\"... "
 
