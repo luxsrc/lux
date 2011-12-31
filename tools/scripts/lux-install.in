@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env bash
 #
 # Copyright (C) 2009,2011 Chi-kwan Chan
 # Copyright (C) 2009 Harvard-Smithsonian Center for Astrophysics
