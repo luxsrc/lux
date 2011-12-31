@@ -78,6 +78,7 @@ for i in "${ina[@]}"; do
 	else
 		case "$i" in
 			-I*)	cpp+=("$i");;
+			-[Ll]*)	ld+=("$i");;
 			*)	echo "Input flag \"$i\"; ABORT"
 				exit 1
 				;;
@@ -126,6 +127,7 @@ for i in "${!src[@]}"; do
 	fi
 done
 echo "Inline CPP flags: \"${cpp[@]}\""
+echo "Inline LD  flags: \"${ld[@]}\""
 echo "Output module name: \"$mod\""
 echo "Install directory:  \"$dir\""
 
@@ -199,7 +201,8 @@ ${LIBTOOL} --tag=CC --mode=link ${CCLD} \
 	${AM_CFLAGS} ${CFLAGS}          \
 	${AM_LDFLAGS} ${LDFLAGS}        \
 	${LIBS} ${DEFAULT_RPATH}        \
-	"${obj[@]}" ${mod_LIBADD} -o "$mod"
+	${mod_LIBADD} ${ld[@]}          \
+	"${obj[@]}" -o "$mod"
 status=$?
 if test $status -ne 0; then
 	echo "FAILED LINKING OBJECT FILE(S) TO \"$mod\"; ABORT"
