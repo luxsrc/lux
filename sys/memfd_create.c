@@ -44,8 +44,8 @@ memfd_create(const char *name, unsigned flags)
 	lux_assert(flags == 0); /* do not accept any flag */
 
 	for(i = 0; i < 8; ++i) {
-		ticks t = getticks();
-		char  uniq[128]; /* 64-bit integer has at most 20 digits */
+		ticks_t t = getticks();
+		char    uniq[128]; /* 64-bit integer has at most 20 digits */
 		(void)snprintf(uniq, sizeof(uniq), "/lux-%s-%u",
 		                                   name, (unsigned)t);
 		fd = shm_open(uniq, O_RDWR|O_CREAT|O_EXCL|O_NOFOLLOW,

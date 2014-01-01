@@ -45,7 +45,7 @@
 static inline double
 measure_ave(Lux_task *task, unsigned n)
 {
-	ticks t0, t1;
+	ticks_t t0, t1;
 	unsigned i;
 
 	t0 = getticks();
