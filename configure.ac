@@ -5,8 +5,8 @@ AC_CONFIG_AUX_DIR([.build-aux])
 AC_CONFIG_MACRO_DIR([.build-m4])
 AC_CONFIG_SRCDIR([lux.hin])
 
-AM_INIT_AUTOMAKE([1.11.1 -Wall -Werror gnu nostdinc]) dnl cannot use gnits because of version number and the missing "THANKS" file
-m4_ifdef([AM_PROG_AR], [AM_PROG_AR]) dnl AM_PROG_AR was introduced in automake-1.11.2
+AM_INIT_AUTOMAKE([1.11.6 -Wall -Werror gnu nostdinc]) dnl cannot use gnits because of version number and the missing "THANKS" file
+AM_PROG_AR
 
 LT_PREREQ([2.2.6b])
 LT_INIT([dlopen disable-static])
