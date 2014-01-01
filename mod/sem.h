@@ -29,10 +29,10 @@ typedef struct {
 	volatile int super;
 	mutex_t m;
 	cond_t  c;
-} sem;
+} sem_t;
 
 static inline void
-sem_post(sem *s)
+sem_post(sem_t *s)
 {
 	mutex_lock(&s->m);
 	++s->super;
@@ -41,7 +41,7 @@ sem_post(sem *s)
 }
 
 static inline void
-sem_wait(sem *s)
+sem_wait(sem_t *s)
 {
 	mutex_lock(&s->m);
 	while(s->super <= 0)
