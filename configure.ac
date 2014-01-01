@@ -8,7 +8,7 @@ AC_CONFIG_SRCDIR([lux.hin])
 AM_INIT_AUTOMAKE([1.11.6 -Wall -Werror gnu nostdinc]) dnl cannot use gnits because of version number and the missing "THANKS" file
 AM_PROG_AR
 
-LT_PREREQ([2.2.6b])
+LT_PREREQ([2.2.10])
 LT_INIT([dlopen disable-static])
 
 dnl Check for programs and compiler characteristics
