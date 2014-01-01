@@ -20,7 +20,15 @@ if [ "x$1" != "xclean" ]; then
 		git describe --tags | sed 's/^v//' > .version
 		printf 'Author(s) of lux:\n\n' >  AUTHORS
 		git shortlog -nse  | cut -c7-  >> AUTHORS
-		touch NEWS ChangeLog # TODO: generate from git commit messages
+		touch ChangeLog # TODO: generate from git commit messages
+
+		# Generate NEWS from git commit messages
+		printf 'lux framework NEWS\n\n' > NEWS
+		for t in $(git tag -l | tail -r); do
+			T=$(echo "$t" | sed 's/^v//')
+			h="* Noteworthy changes in release ${T}"
+			git show -s --format="${h} (%ad)%n%n%b" --date=short $t
+		done >> NEWS
 	fi
 	mkdir .build-{aux,m4}
 	# Use .m4 files in "tools/m4/"
