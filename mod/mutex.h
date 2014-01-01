@@ -24,24 +24,26 @@
 
 #define MUTEX_NULL PTHREAD_MUTEX_INITIALIZER
 
-typedef pthread_mutex_t mutex_t;
+typedef struct {
+	pthread_mutex_t m;
+} mutex_t;
 
 static inline int
-mutex_lock(mutex_t *l)
+mutex_lock(mutex_t *m)
 {
-	return pthread_mutex_lock(l);
+	return pthread_mutex_lock(&m->m);
 }
 
 static inline int
-mutex_trylock(mutex_t *l)
+mutex_trylock(mutex_t *m)
 {
-	return pthread_mutex_trylock(l);
+	return pthread_mutex_trylock(&m->m);
 }
 
 static inline int
-mutex_unlock(mutex_t *l)
+mutex_unlock(mutex_t *m)
 {
-	return pthread_mutex_unlock(l);
+	return pthread_mutex_unlock(&m->m);
 }
 
 #endif /* _LUX_MUTEX_H_ */

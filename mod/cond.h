@@ -24,24 +24,26 @@
 
 #define COND_NULL PTHREAD_COND_INITIALIZER
 
-typedef pthread_cond_t cond_t;
+typedef struct {
+	pthread_cond_t c;
+} cond_t;
 
 static inline int
 cond_broadcast(cond_t *c)
 {
-	return pthread_cond_broadcast(c);
+	return pthread_cond_broadcast(&c->c);
 }
 
 static inline int
 cond_signal(cond_t *c)
 {
-	return pthread_cond_signal(c);
+	return pthread_cond_signal(&c->c);
 }
 
 static inline int
 cond_wait(cond_t *restrict c, mutex_t *restrict m)
 {
-	return pthread_cond_wait(c, m);
+	return pthread_cond_wait(&c->c, &m->m);
 }
 
 #endif /* _LUX_COND_H_ */
