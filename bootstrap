@@ -18,7 +18,7 @@ find . -name 'Makefile.in' -type f -exec rm {} \;
 if [ "x$1" != "xclean" ]; then
 	if [ -d .git ]; then
 		# Generate .version from git tags
-		git describe --tags | sed 's/^v//' > .version
+		git describe --tags --dirty | sed 's/^v//' > .version
 
 		# Generate AUTHORS from git log
 		printf 'Author(s) of lux:\n\n' >  AUTHORS
