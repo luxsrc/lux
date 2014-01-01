@@ -23,31 +23,31 @@
 #define ATOMIC_NULL {0}
 
 typedef struct {
-	int v; /* it is usually safe to assume int is atomic */
+	int i; /* it is usually safe to assume int is atomic */
 } atomic_t;
 
 static inline void
-atomic_set(atomic_t *a, int v)
+atomic_set(atomic_t *a, int i)
 {
-	a->v = v;
+	a->i = i;
 }
 
 static inline int
 atomic_get(atomic_t *a)
 {
-	return a->v;
+	return a->i;
 }
 
 static inline int
-atomic_add(atomic_t *a, int v)
+atomic_add(atomic_t *a, int i)
 {
-	return __sync_add_and_fetch(&a->v, v);
+	return __sync_add_and_fetch(&a->i, i);
 }
 
 static inline int
-atomic_sub(atomic_t *a, int v)
+atomic_sub(atomic_t *a, int i)
 {
-	return __sync_sub_and_fetch(&a->v, v);
+	return __sync_sub_and_fetch(&a->i, i);
 }
 
 #endif /* _LUX_ATOMIC_H_ */
