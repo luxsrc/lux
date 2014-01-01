@@ -63,17 +63,17 @@ measure(Lux_task *task)
 
 	unsigned n;
 	for(n = 1; n; n *= 2) {
-		timestamp T0 = gettimestamp();
+		timestamp_t t0 = gettimestamp();
 
 		unsigned i;
 		for(i = 0; i < N_REPEAT; ++i) {
-			double    dt = measure_ave(task, n);
-			timestamp T1 = gettimestamp();
+			double      dt = measure_ave(task, n);
+			timestamp_t t1 = gettimestamp();
 			if(dt < 0) /* unlikely: tick counter wraps around */
 				break;
 			if(dt_min > dt)
 				dt_min = dt;
-			if(elapsed_time(T1, T0) > TIME_LIM)
+			if(elapsed_time(t1, t0) > TIME_LIM)
 				break;
 		}
 

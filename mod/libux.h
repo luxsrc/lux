@@ -38,7 +38,7 @@
 
 struct libux {
 #if HAVE_TIMESTAMP
-	timestamp t0;
+	timestamp_t t0;
 #endif
 	struct vlog vlog;
 	struct load load;

@@ -32,13 +32,13 @@
 
 #define HAVE_TIMESTAMP 1
 
-typedef struct timeval timestamp;
+typedef struct timeval timestamp_t;
 #define TIMESTAMP_NULL {0, 0}
 
-static inline timestamp
+static inline timestamp_t
 gettimestamp(void)
 {
-	timestamp t;
+	timestamp_t t;
 #if HAVE_GETTIMEOFDAY
 	(void)gettimeofday(&t, NULL);
 #else
@@ -48,16 +48,16 @@ gettimestamp(void)
 }
 
 static inline double
-elapsed_time(timestamp t1, timestamp t0)
+elapsed_time(timestamp_t t1, timestamp_t t0)
 {
 	return ((double)(t1.tv_sec  - t0.tv_sec ) +
 	        (double)(t1.tv_usec - t0.tv_usec) * 1.0e-6);
 }
 
 static inline double
-elapsed_since(timestamp t0)
+elapsed_since(timestamp_t t0)
 {
-	timestamp t1 = gettimestamp();
+	timestamp_t t1 = gettimestamp();
 	return elapsed_time(t1, t0);
 }
 
