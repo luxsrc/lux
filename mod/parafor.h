@@ -36,7 +36,7 @@ struct paratask {
 	size_t l;
 	size_t u;
 	#if LUX_THREAD
-	thread tid;
+	thread_t t;
 	#endif
 };
 
@@ -86,8 +86,8 @@ parafor(size_t n, size_t nthread,
 
 		#if LUX_THREAD
 		if(i < nthread-1)
-			t->tid = mkthread(_execdrv, t,
-			                  THREAD_JOINABLE | THREAD_SYSTEM);
+			t->t = mkthread(_execdrv, t,
+			                THREAD_JOINABLE | THREAD_SYSTEM);
 		else
 		#endif
 			(void)_execdrv(t); /* do the job ourself */
@@ -95,7 +95,7 @@ parafor(size_t n, size_t nthread,
 
 	#if LUX_THREAD
 	for(i = 0; i < nthread-1; ++i) /* sync */
-		(void)thread_join(task[i].tid);
+		(void)thread_join(task[i].t);
 	#endif
 }
 

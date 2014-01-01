@@ -24,21 +24,21 @@
 
 typedef struct {
 	pthread_t id;
-} thread;
+} thread_t;
 
 #define THREAD_JOINABLE (1U << 0)
 #define THREAD_DETACHED (1U << 1)
-#define THREAD_STATE   (THREAD_JOINABLE | THREAD_DETACHED)
+#define THREAD_STATE    (THREAD_JOINABLE | THREAD_DETACHED)
 
 #define THREAD_SYSTEM   (1U << 2)
 #define THREAD_PROCESS  (1U << 3)
 #define THREAD_SCOPE    (THREAD_SYSTEM | THREAD_PROCESS)
 
-static inline thread
+static inline thread_t
 mkthread(void *(*pro)(void *), void *arg, unsigned flags)
 {
 	pthread_attr_t attr;
-	thread t;
+	thread_t t;
 
 	(void)pthread_attr_init(&attr);
 	if(flags & THREAD_STATE)
@@ -67,7 +67,7 @@ thread_exit(void *status)
 }
 
 static inline void *
-thread_join(thread t)
+thread_join(thread_t t)
 {
 	void *status;
 	(void)pthread_join(t.id, &status);
@@ -75,7 +75,7 @@ thread_join(thread t)
 }
 
 static inline void
-rmthread(thread t)
+rmthread(thread_t t)
 {
 	(void)pthread_cancel(t.id);
 }
