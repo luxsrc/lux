@@ -39,7 +39,7 @@ cond_signal(cond_t *c)
 }
 
 static inline int
-cond_wait(cond_t *restrict c, mutex *restrict m)
+cond_wait(cond_t *restrict c, mutex_t *restrict m)
 {
 	return pthread_cond_wait(c, m);
 }

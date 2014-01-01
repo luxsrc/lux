@@ -34,8 +34,8 @@ struct tnode {
 
 struct tpool {
 	struct queue_head super;
-	mutex lock;
-	cond_t done;
+	mutex_t lock;
+	cond_t  done;
 	volatile size_t njob;
 	volatile size_t nactive;
 	volatile size_t nthread;
@@ -78,8 +78,8 @@ mktpool(size_t nthread)
 {
 	struct tpool *q = malloc(sizeof(struct tpool));
 	q->super   = localof(struct queue_head, QUEUE_HEAD_INIT(&q->super));
-	q->lock    = localof(mutex, MUTEX_NULL);
-	q->done    = localof(cond_t, COND_NULL);
+	q->lock    = localof(mutex_t, MUTEX_NULL);
+	q->done    = localof(cond_t,  COND_NULL);
  	q->njob    = 0;
 	q->nactive = 0;
 	q->nthread = nthread;

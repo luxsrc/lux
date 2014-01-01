@@ -41,8 +41,8 @@
  * Writing thread safe code using atomic operation here is tricky.
  * Given that loading and unloading MPI module are not performance
  * critical, we use mutex lock here to keep things simple.  */
-static mutex lock  = MUTEX_NULL;
-static int   count = 0;
+static mutex_t lock  = MUTEX_NULL;
+static int     count = 0;
 
 void *
 LUX_MKMOD(const void *opts)

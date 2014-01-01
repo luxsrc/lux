@@ -24,22 +24,22 @@
 
 #define MUTEX_NULL PTHREAD_MUTEX_INITIALIZER
 
-typedef pthread_mutex_t mutex;
+typedef pthread_mutex_t mutex_t;
 
 static inline int
-mutex_lock(mutex *l)
+mutex_lock(mutex_t *l)
 {
 	return pthread_mutex_lock(l);
 }
 
 static inline int
-mutex_trylock(mutex *l)
+mutex_trylock(mutex_t *l)
 {
 	return pthread_mutex_trylock(l);
 }
 
 static inline int
-mutex_unlock(mutex *l)
+mutex_unlock(mutex_t *l)
 {
 	return pthread_mutex_unlock(l);
 }
