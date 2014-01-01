@@ -25,7 +25,7 @@
 #define COUNTER_NULL {ATOMIC_NULL}
 
 struct counter {
-	atomic v;
+	atomic_t v;
 };
 
 static inline void

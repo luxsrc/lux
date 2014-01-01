@@ -24,28 +24,28 @@
 
 typedef struct {
 	int v; /* it is usually safe to assume int is atomic */
-} atomic;
+} atomic_t;
 
 static inline void
-atomic_set(atomic *a, int v)
+atomic_set(atomic_t *a, int v)
 {
 	a->v = v;
 }
 
 static inline int
-atomic_get(atomic *a)
+atomic_get(atomic_t *a)
 {
 	return a->v;
 }
 
 static inline int
-atomic_add(atomic *a, int v)
+atomic_add(atomic_t *a, int v)
 {
 	return __sync_add_and_fetch(&a->v, v);
 }
 
 static inline int
-atomic_sub(atomic *a, int v)
+atomic_sub(atomic_t *a, int v)
 {
 	return __sync_sub_and_fetch(&a->v, v);
 }
