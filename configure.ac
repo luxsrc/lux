@@ -214,8 +214,8 @@ extern void  lux_unload(void *);
 #endif /* _LUX_H_ */])
 
 dnl Output files
-AC_CONFIG_FILES(m4_esyscmd([find . -name 'Makefile.am' -type f | sed 's|\./\(.*\).am|\1|'    ]))
-AC_CONFIG_FILES(m4_esyscmd([find . -name '*.?*in'      -type f | sed 's|\./\(.*\)in|\1:\1in|']))
+AC_CONFIG_FILES(m4_esyscmd([find . -name 'Makefile.am'                 -type f | sed 's|\./\(.*\).am|\1|'    ]))
+AC_CONFIG_FILES(m4_esyscmd([find . -name '*.?*in' -not -name 'lux.hin' -type f | sed 's|\./\(.*\)in|\1:\1in|']))
 AC_CONFIG_FILES([tools/scripts/lux-build],   [chmod +x tools/scripts/lux-build])
 AC_CONFIG_FILES([tools/scripts/lux-install], [chmod +x tools/scripts/lux-install])
 AC_OUTPUT
