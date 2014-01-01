@@ -17,18 +17,26 @@ find . -name 'Makefile.in' -type f -exec rm {} \;
 
 if [ "x$1" != "xclean" ]; then
 	if [ -d .git ]; then
+		# Generate .version from git tags
 		git describe --tags | sed 's/^v//' > .version
+
+		# Generate AUTHORS from git log
 		printf 'Author(s) of lux:\n\n' >  AUTHORS
 		git shortlog -nse  | cut -c7-  >> AUTHORS
-		touch ChangeLog # TODO: generate from git commit messages
 
 		# Generate NEWS from git commit messages
 		printf 'lux framework NEWS\n\n' > NEWS
 		for t in $(git tag -l | tail -r); do
 			T=$(echo "$t" | sed 's/^v//')
 			h="* Noteworthy changes in release ${T}"
-			git show -s --format="${h} (%ad)%n%n%b" --date=short $t
+			git show -s --format="${h} (%ad)%n%n%b" \
+				--date=short "${t}"
 		done >> NEWS
+
+		# Generate ChangeLog from git commit messages
+		printf 'lux framework Change Log\n\n' > ChangeLog
+		git log --format='%ad    %an <%ae>%n%n%w(76,4,8)* %B' \
+			--date=short >> ChangeLog
 	fi
 	mkdir .build-{aux,m4}
 	# Use .m4 files in "tools/m4/"
