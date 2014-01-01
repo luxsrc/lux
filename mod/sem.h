@@ -28,7 +28,7 @@
 typedef struct {
 	volatile int super;
 	mutex m;
-	cond  c;
+	cond_t c;
 } sem;
 
 static inline void

@@ -24,22 +24,22 @@
 
 #define COND_NULL PTHREAD_COND_INITIALIZER
 
-typedef pthread_cond_t cond;
+typedef pthread_cond_t cond_t;
 
 static inline int
-cond_broadcast(cond *c)
+cond_broadcast(cond_t *c)
 {
 	return pthread_cond_broadcast(c);
 }
 
 static inline int
-cond_signal(cond *c)
+cond_signal(cond_t *c)
 {
 	return pthread_cond_signal(c);
 }
 
 static inline int
-cond_wait(cond *restrict c, mutex *restrict m)
+cond_wait(cond_t *restrict c, mutex *restrict m)
 {
 	return pthread_cond_wait(c, m);
 }
