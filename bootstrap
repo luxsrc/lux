@@ -36,7 +36,12 @@ if [ "x$1" != "xclean" ]; then
 		# Generate ChangeLog from git commit messages
 		printf 'lux framework Change Log\n\n' > ChangeLog
 		git log --format='%ad    %an <%ae>%n%n%w(76,4,8)* %B' \
-			--date=short >> ChangeLog
+			--date=short |\
+		awk '
+		/^[0-9]{4}-[0-9]{2}-[0-9]{2}.*<.*@.*>$/ {
+			if(h!=$0) { h=$0 } else { getline; next }
+		}
+		{ print $0 }' >> ChangeLog
 	fi
 	mkdir .build-{aux,m4}
 	# Use .m4 files in "tools/m4/"
