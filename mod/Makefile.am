@@ -5,7 +5,7 @@ AM_LDFLAGS  = -no-undefined -export-dynamic -export-symbols-regex '^lux[A-Z_]' -
 # Platform modules (provide a consistent platform)
 pkginclude_HEADERS  = cookie.h dlfcn.h failed.h memfd.h
 
-# Core types (build other modules based on these)
+# Core types (for other modules to build on, types are postfixed with "_t")
 pkginclude_HEADERS += atomic.h cond.h mutex.h sem.h thread.h ticks.h timer.h
 
 # Safety modules (for error checking/handling)
