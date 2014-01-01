@@ -1,5 +1,5 @@
 dnl Initialization for autoconf, automake, and libtool
-AC_PREREQ([2.63])
+AC_PREREQ([2.64])
 AC_INIT([lux framework], m4_esyscmd([tr -d '\n' < .version]), [chanc@email.arizona.edu], [lux], [http://luxsrc.org/])
 AC_CONFIG_AUX_DIR([.build-aux])
 AC_CONFIG_MACRO_DIR([.build-m4])
