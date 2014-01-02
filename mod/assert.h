@@ -31,12 +31,14 @@
 #define LUX_ASSERT_FAILURE 0
 #endif
 
-#if LUX_ASSERTION
-#define lux_assert(E) do {	                                              \
+#define lux_always_assert(E) do {	                                      \
 	if((E) == LUX_ASSERT_FAILURE)                                         \
 		lux_fatal("lux_assert(" #E ") failed on line %d in \"%s\"\n", \
 		          __LINE__, __FILE__);                                \
 } while(0)
+
+#if LUX_ASSERTION
+#define lux_assert(E) lux_always_assert(E)
 #else
 #define lux_assert(E) /* do nothing */
 #endif
