@@ -1,9 +1,9 @@
 AM_CPPFLAGS = -I$(top_builddir)
 
-check_PROGRAMS = ck_atomic ck_cookie ck_dope ck_lazybuf ck_mpool ck_mview ck_parray ck_parafor ck_queue ck_ring ck_stack ck_tpool
+check_PROGRAMS = ck_atomic_parafor ck_cookie ck_dope ck_lazybuf ck_mpool ck_mview ck_parray ck_queue ck_ring ck_stack ck_tpool
 
-ck_atomic_SOURCES = ck_atomic.c ../mod/atomic.h
-ck_atomic_LDADD   = ../api/c/libux.la
+ck_atomic_parafor_SOURCES = ck_atomic_parafor.c ../mod/atomic.h ../mod/parafor.h
+ck_atomic_parafor_LDADD   = ../api/c/libux.la
 
 ck_cookie_SOURCES = ck_cookie.c ../mod/cookie.h
 ck_cookie_LDADD   = ../api/c/libux.la
@@ -22,9 +22,6 @@ ck_mview_LDADD   = ../api/c/libux.la
 
 ck_parray_SOURCES = ck_parray.c ../mod/parray.h
 ck_parray_LDADD   = ../api/c/libux.la
-
-ck_parafor_SOURCES = ck_parafor.c ../mod/parafor.h
-ck_parafor_LDADD   = ../api/c/libux.la
 
 ck_queue_SOURCES = ck_queue.c ../mod/queue.h
 ck_queue_LDADD   = ../api/c/libux.la
