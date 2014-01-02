@@ -43,22 +43,4 @@ _basename(const char *s)
 	return s;
 }
 
-static inline const char *
-match(const char *sym, const char *arg)
-{
-	size_t i;
-
-	const size_t l = strlen(sym);
-	const size_t n = strlen(arg);
-
-	if(l + 1 > n || '=' != arg[l])
-		return NULL;
-
-	for(i = 0; i < l; ++i)
-		if(sym[i] != arg[i])
-			return NULL;
-
-	return arg + l + 1;
-}
-
 #endif /* _LUX_STRUTILS_H_ */
