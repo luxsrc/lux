@@ -41,7 +41,7 @@ memfd_create(const char *name, unsigned flags)
 {
 	int fd, i;
 
-	lux_assert(flags == 0); /* do not accept any flag */
+	lux_always_assert(flags == 0); /* do not accept any flag */
 
 	for(i = 0; i < 8; ++i) {
 		ticks t = getticks();
