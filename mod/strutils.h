@@ -23,6 +23,13 @@
 #include <ctype.h>
 #include <string.h>
 
+typedef struct {
+	size_t l;
+	char  *s;
+} pstr_t; /* pascal string */
+
+#define pstr(s) {sizeof(s)-1, s}
+
 static inline char *
 alnumcat(char *d, const char *s)
 {
