@@ -31,7 +31,9 @@
 void
 func(size_t n, size_t i, void *data)
 {
-	atomic_add(data, i);
+	size_t j;
+	for(j = 0; j < 100000; ++j)
+		atomic_add(data, i);
 	(void)n; /* silence unused variable warning */
 }
 
@@ -42,7 +44,7 @@ main()
 	for(i = 0; i < 32; ++i) {
 		atomic_t atomic = ATOMIC_NULL;
 		parafor(16, 15, func, (void *)&atomic);
-		lux_assert(atomic_get(&atomic) == 120);
+		lux_assert(atomic_get(&atomic) == 12000000);
 	}
 	return 0;
 }
