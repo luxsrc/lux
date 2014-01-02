@@ -25,6 +25,7 @@
 #include <lux/mutex.h>
 #include <lux/queue.h>
 #include <lux/task.h>
+#include <lux/thread.h>
 #include <stdlib.h>
 
 struct tnode {

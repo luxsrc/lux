@@ -17,16 +17,14 @@
  * You should have received a copy of the GNU General Public License
  * along with lux.  If not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef LUX_ASSERTION
-#define LUX_ASSERTION 1
-#endif
-
 #include <lux.h>
 #include <lux/assert.h>
 #include <lux/ticks.h>
 #include <lux/timer.h>
 #include <stdio.h>
 #include <unistd.h>
+
+#define A(E) lux_always_assert(E)
 
 int
 main()
@@ -47,6 +45,8 @@ main()
 	printf("dtimestamps: %g\n", dT);
 	printf("dticks     : %g\n", dt);
 	printf("ticks/sec  : %g\n", dt/dT);
+
+	/* TODO: use A() to check for errors at runtime */
 
 	return 0;
 }

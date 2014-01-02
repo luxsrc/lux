@@ -17,10 +17,6 @@
  * You should have received a copy of the GNU General Public License
  * along with lux.  If not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef LUX_ASSERTION
-#define LUX_ASSERTION 1
-#endif
-
 #include <lux.h>
 #include <lux/assert.h>
 #include <lux/dope.h>
@@ -29,6 +25,8 @@
 #include <unistd.h>
 #include <string.h>
 #include <stdio.h>
+
+#define A(E) lux_always_assert(E)
 
 #define ALIGN 256
 #define N1 5
@@ -47,12 +45,12 @@ main()
 	v2 = mkmview(mp, 0, dp);
 
 	printf("%p %p\n", v1, v2);
-	lux_assert(v1 != v2);
+	A(v1 != v2);
 
 	(void)strcpy(v1, "testing");
 	printf("v1: \"%s\"\n", v1);
 	printf("v2: \"%s\"\n", v2);
-	lux_assert(!strcmp(v1, v2));
+	A(!strcmp(v1, v2));
 
 	rmmview(mp, v1);
 	rmmview(mp, v2);

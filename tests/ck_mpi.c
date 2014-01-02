@@ -17,14 +17,12 @@
  * You should have received a copy of the GNU General Public License
  * along with lux.  If not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef LUX_ASSERTION
-#define LUX_ASSERTION 1
-#endif
-
 #include <lux.h>
 #include <lux/assert.h>
 #include <lux/mpi.h>
 #include <stdio.h>
+
+#define A(E) lux_always_assert(E)
 
 int main()
 {
@@ -33,7 +31,7 @@ int main()
 	lux_setup();
 
 	mpi = lux_load("../mod/.libs/mpi", NULL);
-	lux_assert(mpi);
+	A(mpi);
 
 	switch(mpi->thread_mode) {
 	case MPI_THREAD_SINGLE:     lux_print("single\n");     break;

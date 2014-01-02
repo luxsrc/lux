@@ -17,16 +17,14 @@
  * You should have received a copy of the GNU General Public License
  * along with lux.  If not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef LUX_ASSERTION
-#define LUX_ASSERTION 1
-#endif
-
 #include <lux.h>
 #include <lux/assert.h>
 #include <lux/dynamic.h>
 #include <lux/queue.h>
 #include <stdlib.h>
 #include <stdio.h>
+
+#define A(E) lux_always_assert(E)
 
 struct node {
 	struct slist_node super;
@@ -55,7 +53,7 @@ main()
 		struct node *s = (struct node *)dequeue(h);
 		if(s) {
 			printf("%d ", s->value);
-			lux_assert(s->value == i+offset);
+			A(s->value == i+offset);
 			free(s);
 		} else
 			printf("empty\n");
@@ -68,7 +66,7 @@ main()
 		struct node *s = (struct node *)dequeue(h);
 		if(s) {
 			printf("%d ", s->value);
-			lux_assert(s->value == i+offset);
+			A(s->value == i+offset);
 			free(s);
 		} else
 			printf("empty\n");

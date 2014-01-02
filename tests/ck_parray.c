@@ -17,13 +17,11 @@
  * You should have received a copy of the GNU General Public License
  * along with lux.  If not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef LUX_ASSERTION
-#define LUX_ASSERTION 1
-#endif
-
 #include <lux.h>
 #include <lux/assert.h>
 #include <lux/parray.h>
+
+#define A(E) lux_always_assert(E)
 
 int
 main()
@@ -36,15 +34,15 @@ main()
 	size_t i;
 
 	a = pallocdn(struct xyz, 6, n);
-	lux_assert(a && pgetd(a) == 6);
+	A(a && pgetd(a) == 6);
 	for(i = 0; i < pgetd(a); ++i)
-		lux_assert(pgetn(a, i) == n[i]);
+		A(pgetn(a, i) == n[i]);
 	pfree(a);
 
 	a = palloc(struct xyz, 20, 21, 22, 23, 24, 25);
-	lux_assert(a && pgetd(a) == 6);
+	A(a && pgetd(a) == 6);
 	for(i = 0; i < pgetd(a); ++i)
-		lux_assert(pgetn(a, i) == n[i] + 10);
+		A(pgetn(a, i) == n[i] + 10);
 	pfree(a);
 
 	return 0;

@@ -17,16 +17,13 @@
  * You should have received a copy of the GNU General Public License
  * along with lux.  If not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef LUX_ASSERTION
-#define LUX_ASSERTION 1
-#endif
-
 #include <lux.h>
-#include <lux/thread.h>
+#include <lux/assert.h>
 #include <lux/tpool.h>
 #include <stdio.h>
-#include <stddef.h>
 #include <unistd.h>
+
+#define A(E) lux_always_assert(E)
 
 struct task {
 	Lux_task super;
@@ -62,6 +59,8 @@ main()
 
 	rmtpool(q);
 	free(t);
+
+	/* TODO: use A() to check for errors at runtime */
 
 	return 0;
 }

@@ -17,16 +17,14 @@
  * You should have received a copy of the GNU General Public License
  * along with lux.  If not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef LUX_ASSERTION
-#define LUX_ASSERTION 1
-#endif
-
 #include <lux.h>
 #include <lux/assert.h>
 #include <lux/mpool.h>
 #include <stdlib.h>
 #include <unistd.h>
 #include <stdio.h>
+
+#define A(E) lux_always_assert(E)
 
 static inline size_t
 roundup(size_t sz, size_t psz)
@@ -43,7 +41,7 @@ main(int argc, char *argv[])
 	struct mpool *mp = mkmpool(sz);
 
 	printf("memory pool size: %zu -> %zu\n", sz, mp->sz);
-	lux_assert(mp->sz == roundup(sz, psz));
+	A(mp->sz == roundup(sz, psz));
 
 	rmmpool(mp);
 

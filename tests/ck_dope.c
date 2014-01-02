@@ -17,15 +17,13 @@
  * You should have received a copy of the GNU General Public License
  * along with lux.  If not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef LUX_ASSERTION
-#define LUX_ASSERTION 1
-#endif
-
 #include <lux.h>
 #include <lux/assert.h>
 #include <lux/dope.h>
 #include <lux/parray.h>
 #include <stdio.h>
+
+#define A(E) lux_always_assert(E)
 
 #define ALIGN 256
 #define N1 5
@@ -38,19 +36,19 @@ main()
 	struct dope *dp = mkdope(double [5], ALIGN, N1, N2, N3);
 
 	printf("dim: %zu\n", pgetd(dp));
-	lux_assert(pgetd(dp) == 1);
+	A(pgetd(dp) == 1);
 
 	printf("shape: %zu %zu %zu\n",
 	       dope_getn(dp+0), dope_getn(dp+1), dope_getn(dp+2));
-	lux_assert(dope_getn(dp+0) == N1);
-	lux_assert(dope_getn(dp+1) == N2);
-	lux_assert(dope_getn(dp+2) == N3);
+	A(dope_getn(dp+0) == N1);
+	A(dope_getn(dp+1) == N2);
+	A(dope_getn(dp+2) == N3);
 
 	printf("strides: %zu %zu %zu\n",
 	       dope_gets(dp+0), dope_gets(dp+1), dope_gets(dp+2));
-	lux_assert(dope_gets(dp+0) == sizeof(double [5]));
-	lux_assert(dope_gets(dp+1) == ALIGN);
-	lux_assert(dope_gets(dp+2) == ALIGN * N2);
+	A(dope_gets(dp+0) == sizeof(double [5]));
+	A(dope_gets(dp+1) == ALIGN);
+	A(dope_gets(dp+2) == ALIGN * N2);
 
 	rmdope(dp);
 	return 0;

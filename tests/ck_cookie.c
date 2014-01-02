@@ -17,15 +17,13 @@
  * You should have received a copy of the GNU General Public License
  * along with lux.  If not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef LUX_ASSERTION
-#define LUX_ASSERTION 1
-#endif
-
 #include <lux.h>
 #include <lux/assert.h>
 #include <lux/cookie.h>
 #include <stdio.h>
 #include <string.h>
+
+#define A(E) lux_always_assert(E)
 
 typedef struct {
 	size_t current, count;
@@ -73,29 +71,29 @@ main()
 	funcs.read = read;
 	f = fopencookie(&cookie, "w+", funcs);
 #if HAVE_FUNOPEN
-	lux_assert(f == NULL);
+	A(f == NULL);
 	printf("Succeeded skipping read-only stream %p\n", f);
 #else
-	lux_assert(f != NULL);
+	A(f != NULL);
 	printf("Succeeded opening read-only stream %p\n", f);
 	fclose(f);
 #endif
 
 	funcs.write = write;
 	f = fopencookie(&cookie, "w+", funcs);
-	lux_assert(f != NULL);
+	A(f != NULL);
 	printf("Succeeded opening read-write stream %p\n", f);
 
 	fwrite("abc", 1, 4, f); fflush(f);
-	lux_assert(strcmp(cookie.data, "abc") == 0);
+	A(strcmp(cookie.data, "abc") == 0);
 	printf("Succeeded printing string \"%s\" to stream %p\n", cookie.data, f);
 
 	cookie.current = 0; /* reset position to head */
 	fread(out, 1, 4, f);
-	lux_assert(strcmp(out, "abc") == 0);
+	A(strcmp(out, "abc") == 0);
 	printf("Succeeded reading string \"%s\" from stream %p\n", out, f);
 
-	lux_assert(fclose(f) == 0);
+	A(fclose(f) == 0);
 	printf("Succeeded closing stream %p\n", f);
 
 	return 0;

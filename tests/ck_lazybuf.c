@@ -17,14 +17,12 @@
  * You should have received a copy of the GNU General Public License
  * along with lux.  If not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef LUX_ASSERTION
-#define LUX_ASSERTION 1
-#endif
-
 #include <lux.h>
 #include <lux/assert.h>
 #include <lux/lazybuf.h>
 #include <string.h>
+
+#define A(E) lux_always_assert(E)
 
 int
 main()
@@ -33,19 +31,19 @@ main()
 	char *buf = lazybuf;
 
 	buf = strcpy(lzmalloc(64), "lux");
-	lux_assert(buf == lazybuf && !strcmp(buf, "lux"));
+	A(buf == lazybuf && !strcmp(buf, "lux"));
 
 	buf = lzrealloc(buf, 128);
-	lux_assert(buf == lazybuf && !strcmp(buf, "lux"));
+	A(buf == lazybuf && !strcmp(buf, "lux"));
 
 	buf = lzrealloc(buf, 256);
-	lux_assert(buf == lazybuf && !strcmp(buf, "lux"));
+	A(buf == lazybuf && !strcmp(buf, "lux"));
 
 	buf = lzrealloc(buf, 512);
-	lux_assert(buf != lazybuf && !strcmp(buf, "lux"));
+	A(buf != lazybuf && !strcmp(buf, "lux"));
 
 	buf = lzrealloc(buf, 1024);
-	lux_assert(buf != lazybuf && !strcmp(buf, "lux"));
+	A(buf != lazybuf && !strcmp(buf, "lux"));
 
 	lzfree(buf);
 	return 0;

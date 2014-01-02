@@ -18,15 +18,13 @@
  * You should have received a copy of the GNU General Public License
  * along with lux.  If not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef LUX_ASSERTION
-#define LUX_ASSERTION 1
-#endif
-
 #include <lux.h>
-#include <lux/atomic.h>
 #include <lux/assert.h>
+#include <lux/atomic.h>
 #include <lux/parafor.h>
 #include <stdio.h>
+
+#define A(E) lux_always_assert(E)
 
 void
 func(size_t n, size_t i, void *data)
@@ -44,7 +42,7 @@ main()
 	for(i = 0; i < 32; ++i) {
 		atomic_t atomic = ATOMIC_NULL;
 		parafor(16, 15, func, (void *)&atomic);
-		lux_assert(atomic_get(&atomic) == 12000000);
+		A(atomic_get(&atomic) == 12000000);
 	}
 	return 0;
 }
