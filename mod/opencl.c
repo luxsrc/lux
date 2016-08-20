@@ -87,30 +87,25 @@ lsdev(unsigned iplf)
 static FILE *
 ftryopen(const char *name)
 {
-	char   buf[1024];
-	FILE  *f = NULL;
+	const char *fmt[] = {
+		"%s",
+		"%s.cl",
+		LUX_MOD_PATH "/%s",
+		LUX_MOD_PATH "/%s.cl"
+	};
 
-	if(!f) {
-		sprintf(buf, "%s", name);
+	size_t i;
+	for(i = 0; i < countof(fmt); ++i) {
+		FILE *f;
+		char  buf[1024];
+		sprintf(buf, fmt[i], name);
 		f = fopen(buf, "r");
+		if(f) {
+			lux_print("Loaded kernel \"%s\"\n", buf);
+			return f;
+		}
 	}
-	if(!f) {
-		sprintf(buf, "%s.cl", name);
-		f = fopen(buf, "r");
-	}
-	if(!f) {
-		sprintf(buf, LUX_MOD_PATH "/%s", name);
-		f = fopen(buf, "r");
-	}
-	if(!f) {
-		sprintf(buf, LUX_MOD_PATH "/%s.cl", name);
-		f = fopen(buf, "r");
-	}
-	if(!f)
-		return NULL;
-
-	lux_print("Loaded kernel \"%s\"\n", buf);
-	return f;
+	return NULL;
 }
 
 static const char *
