@@ -22,10 +22,44 @@
 #include <stdlib.h> /* for malloc(), free(), and NULL */
 #include "opencl.h"
 
+#define COUNT_MAX 16
+
+static int
+lsplf(void)
+{
+	cl_platform_id p[COUNT_MAX];
+	cl_uint        n, i;
+
+	(void)clGetPlatformIDs(COUNT_MAX, p, &n);
+
+	lux_print("%d platform%s found:\n", n, n > 1 ? "s are" : " is");
+	for(i = 0; i < n; ++i) {
+		char buf[1024];
+
+		(void)clGetPlatformInfo(p[i], CL_PLATFORM_NAME,
+		                        sizeof(buf), buf, NULL);
+		lux_print("\t%d. %s ", i, buf);
+
+		(void)clGetPlatformInfo(p[i], CL_PLATFORM_VENDOR,
+		                        sizeof(buf), buf, NULL);
+		lux_print("by %s: ", buf);
+
+		(void)clGetPlatformInfo(p[i], CL_PLATFORM_VERSION,
+		                        sizeof(buf), buf, NULL);
+		lux_print("%s\n", buf);
+	}
+
+	return EXIT_SUCCESS;
+}
+
 void *
 LUX_MKMOD(const void *opts)
 {
 	Lux_opencl *ego;
+
+	lux_print("\nGetting OpenCL platforms... ");
+	lsplf();
+	lux_print("\n");
 
 	ego = (Lux_opencl *)malloc(sizeof(Lux_opencl));
 	if(ego) {
