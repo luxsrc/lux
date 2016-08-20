@@ -188,7 +188,11 @@ mkkern(cl_context context, cl_device_id device,
 void *
 LUX_MKMOD(const struct LuxOopencl *opts)
 {
-	Lux_opencl *ego;
+	Lux_opencl  *ego = NULL;
+	cl_context   ctx;
+	cl_device_id dev[COUNT_MAX];
+	size_t       i, ndev;
+	cl_int       err;
 
 	struct LuxOopencl def = OPENCL_NULL;
 	if(!opts)
@@ -200,35 +204,45 @@ LUX_MKMOD(const struct LuxOopencl *opts)
 	lsdev(opts->iplf);
 	lux_print("\n");
 
-	ego = (Lux_opencl *)malloc(sizeof(Lux_opencl));
-	if(ego) {
-		cl_int err;
-		ego->super  = clCreateContextFromType
-			(NULL, opts->devtype, NULL, NULL, &err);
-		ego->mkkern = mkkern;
-		if(err)
-			goto cleanup;
-		else {
-			cl_device_id d[COUNT_MAX];
-			size_t i, sz;
-			err = clGetContextInfo
-				(ego->super, CL_CONTEXT_DEVICES,
-				 sizeof(d), d, &sz);
-			if(err)
-				goto cleanup;
-			sz /= sizeof(cl_device_id);
-			lux_print("OpenCL context %p contains device%s %u",
-			          ego->super,
-			          sz > 1 ? "s" : "",
-			          (unsigned)d[0]);
-			for(i = 1; i < sz; ++i)
-				lux_print(", %u", (unsigned)d[i]);
-			lux_print("\n");
-		}
+	ctx = clCreateContextFromType(NULL, opts->devtype, NULL, NULL, &err);
+	if(!ctx || err)
+		return NULL;
+
+	err = clGetContextInfo(ctx, CL_CONTEXT_DEVICES, sizeof(dev), dev, &ndev);
+	if(err)
+		goto cleanup1;
+
+	ndev /= sizeof(cl_device_id);
+	lux_print("OpenCL context %p contains device%s %p",
+	          ctx, ndev > 1 ? "s" : "", dev[0]);
+	for(i = 1; i < ndev; ++i)
+		lux_print(", %p", dev[i]);
+	lux_print("\n");
+
+	ego = (Lux_opencl *)malloc(sizeof(Lux_opencl) +
+	                           (ndev-1) * sizeof(cl_command_queue));
+	if(!ego)
+		goto cleanup1;
+
+	ego->super  = ctx;
+	ego->mkkern = mkkern;
+	ego->nqueue = ndev;
+	for(i = 0; i < ndev; ++i) {
+		cl_command_queue q = clCreateCommandQueue(ctx, dev[i], 0, &err);
+		if(!q || err)
+			goto cleanup2;
+		ego->queue[i] = q;
 	}
 	return ego;
 
- cleanup:
+ cleanup2:
+	while(i--) {
+		err = clReleaseCommandQueue(ego->queue[i]);
+		/* TODO: check error */
+	}
+ cleanup1:
+	err = clReleaseContext(ctx);
+	/* TODO: check error */
 	free(ego);
 	return NULL;
 }
@@ -236,7 +250,13 @@ LUX_MKMOD(const struct LuxOopencl *opts)
 void
 LUX_RMMOD(void *ego)
 {
-	cl_int err = clReleaseContext(((Lux_opencl *)ego)->super);
-	if(!err)
-		free(ego);
+	cl_int err;
+	size_t i = ((Lux_opencl *)ego)->nqueue;
+	while(i--) {
+		err = clReleaseCommandQueue(((Lux_opencl *)ego)->queue[i]);
+		/* TODO: check error */
+	}
+	err = clReleaseContext(((Lux_opencl *)ego)->super);
+	/* TODO: check error */
+	free(ego);
 }
