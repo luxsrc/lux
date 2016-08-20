@@ -24,9 +24,14 @@
 
 typedef whole    W;
 typedef integer  Z;
+
+typedef fast     Rf;
 typedef real     R;
-typedef xreal    Rx;
+typedef extended Rx;
+
 typedef rational Q;
+
+typedef fcomplex Cf;
 typedef complex  C;
 typedef xcomplex Cx;
 

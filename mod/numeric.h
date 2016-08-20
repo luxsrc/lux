@@ -30,15 +30,18 @@ typedef int       integer;
 #endif
 
 #ifdef LUX_SINGLE
+typedef float  fast; /* "fast" real number */
 typedef float  real;
 #else
+typedef double fast; /* "fast" real number */
 typedef double real;
 #endif
+typedef double extended; /* real numbers with possibly extra precision */
 
-typedef double xreal; /* real numbers with possibly extra precision */
+typedef struct {integer  n, m;} rational;
 
-typedef struct {integer n, m;} rational;
-typedef struct {real    r, i;} complex;
-typedef struct {xreal   r, i;} xcomplex;
+typedef struct {fast     r, i;} fcomplex;
+typedef struct {real     r, i;}  complex;
+typedef struct {extended r, i;} xcomplex;
 
 #endif /* _LUX_NUMERIC_H_ */
