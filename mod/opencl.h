@@ -32,4 +32,10 @@ struct LuxSopencl {
 	cl_context super;
 };
 
+struct LuxOopencl {
+	unsigned iplf;
+};
+
+#define OPENCL_NULL {0}
+
 #endif /* _LUX_OPENCL_H_ */
