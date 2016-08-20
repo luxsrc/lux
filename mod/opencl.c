@@ -84,12 +84,9 @@ lsdev(unsigned iplf)
 	return EXIT_SUCCESS;
 }
 
-static const char *
-getsrc(const char *name)
+static FILE *
+ftryopen(const char *name)
 {
-	size_t sz;
-	char  *src;
-
 	char   buf[1024];
 	FILE  *f = NULL;
 
@@ -111,18 +108,38 @@ getsrc(const char *name)
 	}
 	if(!f)
 		return NULL;
-	else
-		lux_print("Loaded kernel \"%s\"\n", buf);
+
+	lux_print("Loaded kernel \"%s\"\n", buf);
+	return f;
+}
+
+static const char *
+freadall(FILE *f)
+{
+	size_t l;
+	char  *s;
 
 	fseek(f, 0, SEEK_END);
-	sz = ftell(f);
+	l = ftell(f);
 	fseek(f, 0, SEEK_SET);
 
-	src = malloc(sz+1);
-	fread(src, sz, 1, f);
-	src[sz] = '\0';
-	fclose(f);
-	return src;
+	s = malloc(l+1);
+	fread(s, l, 1, f);
+	s[l] = '\0';
+
+	return s;
+}
+
+static const char *
+getsrc(const char *name)
+{
+	FILE *f = ftryopen(name);
+	if(f) {
+		const char *s = freadall(f);
+		fclose(f);
+		return s;
+	}
+	return NULL;
 }
 
 static cl_kernel *
