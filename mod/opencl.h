@@ -30,8 +30,10 @@ typedef struct LuxSopencl Lux_opencl;
 
 struct LuxSopencl {
 	cl_context super;
-	cl_kernel *(*mkkern)(cl_context, cl_device_id,
-	                     const char **, const char **, const char *);
+
+	cl_kernel *(*mkkern)(cl_context, cl_device_id, const char **, const char **, const char *);
+	void       (*rmkern)(cl_kernel);
+
 	size_t nqueue;
 	cl_command_queue queue[1]; /* flexible array element */
 };

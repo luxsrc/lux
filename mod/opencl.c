@@ -197,6 +197,12 @@ mkkern(cl_context context, cl_device_id device,
 	return kernels;
 }
 
+static void
+rmkern(cl_kernel k)
+{
+	(void)clReleaseKernel(k);
+}
+
 void *
 LUX_MKMOD(const struct LuxOopencl *opts)
 {
@@ -238,6 +244,7 @@ LUX_MKMOD(const struct LuxOopencl *opts)
 
 	ego->super  = ctx;
 	ego->mkkern = mkkern;
+	ego->rmkern = rmkern;
 	ego->nqueue = ndev;
 	for(i = 0; i < ndev; ++i) {
 		cl_command_queue q = clCreateCommandQueue(ctx, dev[i], 0, &err);
