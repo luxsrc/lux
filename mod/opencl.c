@@ -104,6 +104,23 @@ LUX_MKMOD(const struct LuxOopencl *opts)
 			(NULL, opts->devtype, NULL, NULL, &err);
 		if(err)
 			goto cleanup;
+		else {
+			cl_device_id d[COUNT_MAX];
+			size_t i, sz;
+			err = clGetContextInfo
+				(ego->super, CL_CONTEXT_DEVICES,
+				 sizeof(d), d, &sz);
+			if(err)
+				goto cleanup;
+			sz /= sizeof(cl_device_id);
+			lux_print("OpenCL context %p contains device%s %u",
+			          ego->super,
+			          sz > 1 ? "s" : "",
+			          (unsigned)d[0]);
+			for(i = 1; i < sz; ++i)
+				lux_print(", %u", (unsigned)d[i]);
+			lux_print("\n");
+		}
 	}
 	return ego;
 
