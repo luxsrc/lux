@@ -40,7 +40,7 @@ pkginclude_HEADERS += numeric.h shorthand.h
 
 #==============================================================================
 # Interfaces and implementations of dynamic modules
-pkginclude_HEADERS += job.h message.h resource.h
+pkginclude_HEADERS += job.h opencl.h message.h resource.h
 SUBDIRS             = job
 pkglib_LTLIBRARIES  =
 
