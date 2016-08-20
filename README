@@ -1,1 +1,52 @@
-lux: a scientific computation framework
+lux: a high performance scientific computation framework
+--------------------------------------------------------
+
+  lux is a software framework that helps people develop portable high
+  performance scientific computation software.  It is designed around
+  a simple but powerful module architecture.  Everything in lux is
+  implemented as a module.  The lux core library, libux, provides
+  basic functions to access modules/plug-ins and to construct,
+  configure, and run scientific computation jobs.
+
+FOR USERS: for people we are interested in using lux to build their
+  own software, please download a distribution tarballs, e.g.,
+  lux-0.2.tar.gz, from GitHub's release page:
+
+	https://github.com/luxsrc/lux/releases
+
+  These tarballs were created by using `make distcheck` and passed all
+  built-in checks in lux.  Users can simply follow the standard
+
+	./configure && make && make install
+
+  chain to configure, build, and install lux just like any other
+  standard GNU packages.  Details installation instructions can be
+  found in the "INSTALL" file that comes with the tarball.
+
+  If any of the "AUTHORS", "ChangeLog", "INSTALL", "NEWS", or
+  "configure" files is missing, then it is very likely that you
+  obtained lux by using git.  In such a case, please redownload a
+  distribution tarballs as described above, or use autotools to
+  bootstrap the package as describe below.
+
+FOR DEVELOPERS: for people we are interested in contributing to lux,
+  please fork the lux's git repository on GitHub:
+
+	https://github.com/luxsrc/lux
+
+  work on your fork, and then create pull request to merge your
+  changes back to the main repository.
+
+  lux's git repository only tracks human generate source codes.
+  Automatically generated files such as "AUTHORS", "ChangeLog",
+  "INSTALL", "NEWS", and "configure" are not tracked.  Therefore, it
+  must be first bootstrapped before it can be used.
+
+  Bootstrapping requires autoconf 2.64+, automake 1.11.6+, and libtool
+  2.2.10+.  Once these autotools are available on the system,
+
+	./bootstrap
+
+  would run autotools through lux and generate the "configure" file.
+  You may then use the standard `./configure && make && make install`
+  chain to configure, build, and install lux as described above.
