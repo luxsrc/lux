@@ -17,19 +17,38 @@
  * You should have received a copy of the GNU General Public License
  * along with lux.  If not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef _LUX_OPENCL_H_
-#define _LUX_OPENCL_H_
+#include <lux.h>
+#include <lux/mangle.h>
+#include <stdlib.h> /* for malloc(), free(), and NULL */
+#include "opencl.h"
 
-#if SUPPORT_FRAMEWORK
-#include <OpenCL/opencl.h>
-#else
-#include <CL/opencl.h>
-#endif
+void *
+LUX_MKMOD(const void *opts)
+{
+	Lux_opencl *ego;
 
-typedef struct LuxSopencl Lux_opencl;
+	ego = (Lux_opencl *)malloc(sizeof(Lux_opencl));
+	if(ego) {
+		cl_int err;
+		ego->super = clCreateContextFromType(NULL,
+		                                     CL_DEVICE_TYPE_DEFAULT,
+		                                     NULL, NULL, &err);
+		if(err)
+			goto cleanup;
+	}
+	return ego;
 
-struct LuxSopencl {
-	cl_context super;
-};
+ cleanup:
+	free(ego);
+	return NULL;
 
-#endif /* _LUX_OPENCL_H_ */
+	(void)opts; /* silence unused parameter warning */
+}
+
+void
+LUX_RMMOD(void *ego)
+{
+	cl_int err = clReleaseContext(((Lux_opencl *)ego)->super);
+	if(!err)
+		free(ego);
+}
