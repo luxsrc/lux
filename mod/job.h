@@ -23,7 +23,9 @@
 typedef struct LuxSjob Lux_job;
 
 struct LuxSjob {
+	const char *version;
 	const char *banner;
+	const char **helps;
 	int (*conf)(Lux_job *, const char *restrict);
 	int (*init)(Lux_job *);
 	int (*exec)(Lux_job *);
