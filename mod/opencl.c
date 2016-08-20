@@ -52,6 +52,36 @@ lsplf(void)
 	return EXIT_SUCCESS;
 }
 
+static int
+lsdev(unsigned ip)
+{
+	cl_platform_id p[COUNT_MAX];
+	cl_device_id   d[COUNT_MAX];
+	cl_uint        n, i;
+
+	(void)clGetPlatformIDs(COUNT_MAX, p, NULL);
+	(void)clGetDeviceIDs(p[ip], CL_DEVICE_TYPE_ALL, COUNT_MAX, d, &n);
+
+	lux_print("%d device%s found:\n", n, n > 1 ? "s are" : " is");
+	for(i = 0; i < n; ++i) {
+		char buf[1024];
+
+		(void)clGetDeviceInfo(d[i], CL_DEVICE_NAME,
+		                      sizeof(buf), buf, NULL);
+		lux_print("\t%d. %s ", i, buf);
+
+		(void)clGetDeviceInfo(d[i], CL_DEVICE_VENDOR,
+		                      sizeof(buf), buf, NULL);
+		lux_print("by %s: ", buf);
+
+		(void)clGetDeviceInfo(d[i], CL_DRIVER_VERSION,
+		                      sizeof(buf), buf, NULL);
+		lux_print("%s\n", buf);
+	}
+
+	return EXIT_SUCCESS;
+}
+
 void *
 LUX_MKMOD(const void *opts)
 {
@@ -59,6 +89,8 @@ LUX_MKMOD(const void *opts)
 
 	lux_print("\nGetting OpenCL platforms... ");
 	lsplf();
+	lux_print("\nGetting OpenCL devices... ");
+	lsdev(0);
 	lux_print("\n");
 
 	ego = (Lux_opencl *)malloc(sizeof(Lux_opencl));
