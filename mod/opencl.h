@@ -30,6 +30,8 @@ typedef struct LuxSopencl Lux_opencl;
 
 struct LuxSopencl {
 	cl_context super;
+	cl_kernel *(*mkkern)(cl_context, cl_device_id,
+	                     const char **, const char **, const char *);
 };
 
 struct LuxOopencl {

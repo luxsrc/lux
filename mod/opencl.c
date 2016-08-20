@@ -20,6 +20,8 @@
 #include <lux.h>
 #include <lux/mangle.h>
 #include <stdlib.h> /* for malloc(), free(), and NULL */
+#include <stdio.h>  /* for sprintf() etc */
+#include <string.h> /* for strlen() */
 #include "opencl.h"
 
 #define COUNT_MAX 16
@@ -82,6 +84,107 @@ lsdev(unsigned iplf)
 	return EXIT_SUCCESS;
 }
 
+static const char *
+getsrc(const char *name)
+{
+	size_t sz;
+	char  *src;
+
+	char   buf[1024];
+	FILE  *f = NULL;
+
+	if(!f) {
+		sprintf(buf, "%s", name);
+		f = fopen(buf, "r");
+	}
+	if(!f) {
+		sprintf(buf, "%s.cl", name);
+		f = fopen(buf, "r");
+	}
+	if(!f) {
+		sprintf(buf, LUX_MOD_PATH "/%s", name);
+		f = fopen(buf, "r");
+	}
+	if(!f) {
+		sprintf(buf, LUX_MOD_PATH "/%s.cl", name);
+		f = fopen(buf, "r");
+	}
+	if(!f)
+		return NULL;
+	else
+		lux_print("Loaded kernel \"%s\"\n", buf);
+
+	fseek(f, 0, SEEK_END);
+	sz = ftell(f);
+	fseek(f, 0, SEEK_SET);
+
+	src = malloc(sz+1);
+	fread(src, sz, 1, f);
+	src[sz] = '\0';
+	fclose(f);
+	return src;
+}
+
+static cl_kernel *
+mkkern(cl_context context, cl_device_id device,
+       const char **src,
+       const char **name,
+       const char  *flags)
+{
+	cl_int     err;
+	cl_uint    n, i;
+	cl_program program;
+	cl_kernel *kernels;
+
+	for(n = 0; src[n]; ++n) {
+		if(strlen(src[n]) < 64) {/* UGLY HACK */
+			const char *s = getsrc(src[n]);
+			if(!s) {
+				lux_error("Failed to load source\n");
+				exit(1);
+			}
+			src[n] = s;
+		}
+	}
+
+	program = clCreateProgramWithSource(context, n, src, NULL, &err);
+	if(!program) {
+		lux_error("Failed to create program\n");
+		exit(1);
+	}
+	err = clBuildProgram(program, 1, &device, flags, NULL, NULL);
+	if(err != CL_SUCCESS) {
+		size_t len;
+		char   buf[10240];
+		lux_error("Failed to build program\n");
+		clGetProgramBuildInfo(program, device, CL_PROGRAM_BUILD_LOG,
+		                      sizeof(buf), buf, &len);
+		lux_error("%s\n", buf);
+		exit(1);
+	}
+
+	n = 0;
+	while(name[n])
+		++n;
+
+	kernels = (cl_kernel *)malloc(sizeof(cl_kernel) * (n+1));
+	for(i = 0; i < n; ++i) {
+		kernels[i] = clCreateKernel(program, name[i], &err);
+		if (!kernels[i] || err != CL_SUCCESS) {
+			lux_error("Failed to create compute kernel \"%s\"\n",
+			          name[i]);
+			exit(1);
+		}
+	}
+	kernels[i] = NULL;
+
+	lux_print("%u kernel%s created:\n", n, n > 1 ? "s" : "");
+	for(i = 0; i < n; ++i)
+		lux_print("\t%u. \"%s\"\n", i, name[i]);
+
+	return kernels;
+}
+
 void *
 LUX_MKMOD(const struct LuxOopencl *opts)
 {
@@ -100,8 +203,9 @@ LUX_MKMOD(const struct LuxOopencl *opts)
 	ego = (Lux_opencl *)malloc(sizeof(Lux_opencl));
 	if(ego) {
 		cl_int err;
-		ego->super = clCreateContextFromType
+		ego->super  = clCreateContextFromType
 			(NULL, opts->devtype, NULL, NULL, &err);
+		ego->mkkern = mkkern;
 		if(err)
 			goto cleanup;
 		else {
