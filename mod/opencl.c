@@ -203,6 +203,18 @@ rmkern(cl_kernel k)
 	(void)clReleaseKernel(k);
 }
 
+static cl_mem
+mk(cl_context context, unsigned flags, size_t sz)
+{
+	return clCreateBuffer(context, flags, sz, NULL, NULL);
+}
+
+static void
+rm(cl_mem buf)
+{
+	(void)clReleaseMemObject(buf);
+}
+
 void *
 LUX_MKMOD(const struct LuxOopencl *opts)
 {
@@ -243,6 +255,8 @@ LUX_MKMOD(const struct LuxOopencl *opts)
 		goto cleanup1;
 
 	ego->super  = ctx;
+	ego->mk     = mk;
+	ego->rm     = rm;
 	ego->mkkern = mkkern;
 	ego->rmkern = rmkern;
 	ego->nqueue = ndev;
