@@ -64,6 +64,7 @@ for i in "${ina[@]}"; do
 	if test -f "$i"; then
 		case "$i" in
 			*.la)	mod+=("$i");;
+			*.cl)	mod+=("$i");;
 			*)	echo "Invalid module \"$i\"; ABORT"
 				exit 1
 				;;
