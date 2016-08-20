@@ -20,12 +20,14 @@
 #ifndef _LUX_SHORTHAND_H_
 #define _LUX_SHORTHAND_H_
 
-typedef Lux_whole    W;
-typedef Lux_int      Z;
-typedef Lux_real     R;
-typedef Lux_xreal    RR;
-typedef Lux_rational Q;
-typedef Lux_complex  C;
-typedef Lux_xcomplex CC;
+#include <lux/numeric.h>
+
+typedef whole    W;
+typedef integer  Z;
+typedef real     R;
+typedef xreal    Rx;
+typedef rational Q;
+typedef complex  C;
+typedef xcomplex Cx;
 
 #endif /* _LUX_SHORTHAND_H_ */

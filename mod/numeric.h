@@ -22,24 +22,23 @@
 
 #if HAVE_STDDEF_H
 #include <stddef.h> /* for size_t and ptrdiff_t */
-
-typedef size_t    Lux_whole;
-typedef ptrdiff_t Lux_int;
+typedef size_t    whole;
+typedef ptrdiff_t integer;
 #else
-typedef unsigned  Lux_whole;
-typedef int       Lux_int;
+typedef unsigned  whole;
+typedef int       integer;
 #endif
 
 #ifdef LUX_SINGLE
-typedef float  Lux_real;
+typedef float  real;
 #else
-typedef double Lux_real;
+typedef double real;
 #endif
 
-typedef double Lux_xreal; /* real numbers with possibly extra precision */
+typedef double xreal; /* real numbers with possibly extra precision */
 
-typedef struct {Lux_int   n, m;} Lux_rational;
-typedef struct {Lux_real  r, i;} Lux_complex;
-typedef struct {Lux_xreal r, i;} Lux_xcomplex;
+typedef struct {integer n, m;} rational;
+typedef struct {real    r, i;} complex;
+typedef struct {xreal   r, i;} xcomplex;
 
 #endif /* _LUX_NUMERIC_H_ */
