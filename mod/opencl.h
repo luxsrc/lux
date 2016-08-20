@@ -34,8 +34,9 @@ struct LuxSopencl {
 
 struct LuxOopencl {
 	unsigned iplf;
+	cl_device_type devtype;
 };
 
-#define OPENCL_NULL {0}
+#define OPENCL_NULL {0, CL_DEVICE_TYPE_DEFAULT}
 
 #endif /* _LUX_OPENCL_H_ */

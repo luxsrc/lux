@@ -100,9 +100,8 @@ LUX_MKMOD(const struct LuxOopencl *opts)
 	ego = (Lux_opencl *)malloc(sizeof(Lux_opencl));
 	if(ego) {
 		cl_int err;
-		ego->super = clCreateContextFromType(NULL,
-		                                     CL_DEVICE_TYPE_DEFAULT,
-		                                     NULL, NULL, &err);
+		ego->super = clCreateContextFromType
+			(NULL, opts->devtype, NULL, NULL, &err);
 		if(err)
 			goto cleanup;
 	}
