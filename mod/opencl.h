@@ -32,6 +32,9 @@ struct LuxSopencl {
 	cl_context super;
 	cl_program program;
 
+	int (*lsplf)(Lux_opencl *);
+	int (*lsdev)(Lux_opencl *, unsigned);
+
 	cl_kernel (*mkkern)(Lux_opencl *, const char *);
 	void      (*rmkern)(Lux_opencl *, cl_kernel);
 

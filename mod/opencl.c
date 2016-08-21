@@ -27,7 +27,7 @@
 #define COUNT_MAX 16
 
 static int
-lsplf(void)
+lsplf(Lux_opencl *ego)
 {
 	cl_platform_id p[COUNT_MAX];
 	cl_uint        n, i;
@@ -52,10 +52,12 @@ lsplf(void)
 	}
 
 	return EXIT_SUCCESS;
+
+	(void)ego; /* silence unused variable warning */
 }
 
 static int
-lsdev(unsigned iplf)
+lsdev(Lux_opencl *ego, unsigned iplf)
 {
 	cl_platform_id p[COUNT_MAX];
 	cl_device_id   d[COUNT_MAX];
@@ -82,6 +84,8 @@ lsdev(unsigned iplf)
 	}
 
 	return EXIT_SUCCESS;
+
+	(void)ego; /* silence unused variable warning */
 }
 
 static FILE *
@@ -184,9 +188,9 @@ LUX_MKMOD(const struct LuxOopencl *opts)
 		opts = &def;
 
 	lux_print("\nGetting OpenCL platforms... ");
-	lsplf();
+	lsplf(NULL);
 	lux_print("\nGetting OpenCL devices from platform %u... ", opts->iplf);
-	lsdev(opts->iplf);
+	lsdev(NULL, opts->iplf);
 	lux_print("\n");
 
 	ctx = clCreateContextFromType(NULL, opts->devtype, NULL, NULL, &err);
@@ -242,6 +246,8 @@ LUX_MKMOD(const struct LuxOopencl *opts)
 	ego->program = pro;
 	ego->mk      = mk;
 	ego->rm      = rm;
+	ego->lsplf   = lsplf;
+	ego->lsdev   = lsdev;
 	ego->mkkern  = mkkern;
 	ego->rmkern  = rmkern;
 	ego->nqueue  = ndev;
