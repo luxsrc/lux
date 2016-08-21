@@ -33,7 +33,7 @@ struct LuxSopencl {
 	cl_program program;
 
 	cl_kernel (*mkkern)(Lux_opencl *, const char *);
-	void      (*rmkern)(cl_kernel);
+	void      (*rmkern)(Lux_opencl *, cl_kernel);
 
 	cl_mem (*mk)(cl_context, unsigned, size_t);
 	void   (*rm)(cl_mem);

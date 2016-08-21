@@ -150,9 +150,10 @@ mkkern(Lux_opencl *ego, const char *name)
 }
 
 static void
-rmkern(cl_kernel k)
+rmkern(Lux_opencl *ego, cl_kernel k)
 {
 	(void)clReleaseKernel(k);
+	(void)ego; /* silence unused variable warning */
 }
 
 static cl_mem
