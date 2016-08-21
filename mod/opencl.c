@@ -182,6 +182,14 @@ munmap(Lux_opencl *ego, cl_mem buf, void *host)
 	                              0, NULL, NULL);
 }
 
+static void
+set(Lux_opencl *ego, cl_kernel kern,
+    size_t i, size_t sz, void *arg)
+{
+	clSetKernelArg(kern, i, sz, arg);
+	(void)ego; /* silence unused variable warning */
+}
+
 static double
 exec(Lux_opencl *ego, cl_kernel kern,
      size_t dim, const size_t *gsz, const size_t *bsz)
@@ -279,6 +287,7 @@ LUX_MKMOD(const struct LuxOopencl *opts)
 	ego->rm      = rm;
 	ego->mmap    = mmap;
 	ego->munmap  = munmap;
+	ego->set     = set;
 	ego->exec    = exec;
 	ego->nqueue  = ndev;
 	for(i = 0; i < ndev; ++i) {

@@ -41,6 +41,7 @@ struct LuxSopencl {
 	void  *(*mmap  )(Lux_opencl *, cl_mem, size_t);
 	void   (*munmap)(Lux_opencl *, cl_mem, void *);
 
+	void   (*set )(Lux_opencl *, cl_kernel, size_t, size_t, void *);
 	double (*exec)(Lux_opencl *, cl_kernel,
 	               size_t, const size_t *, const size_t *);
 
