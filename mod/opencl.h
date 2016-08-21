@@ -35,8 +35,8 @@ struct LuxSopencl {
 	cl_kernel (*mkkern)(Lux_opencl *, const char *);
 	void      (*rmkern)(Lux_opencl *, cl_kernel);
 
-	cl_mem (*mk)(cl_context, unsigned, size_t);
-	void   (*rm)(cl_mem);
+	cl_mem (*mk)(Lux_opencl *, unsigned, size_t);
+	void   (*rm)(Lux_opencl *, cl_mem);
 
 	size_t nqueue;
 	cl_command_queue queue[1]; /* flexible array element */

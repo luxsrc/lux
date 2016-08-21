@@ -157,15 +157,16 @@ rmkern(Lux_opencl *ego, cl_kernel k)
 }
 
 static cl_mem
-mk(cl_context context, unsigned flags, size_t sz)
+mk(Lux_opencl *ego, unsigned flags, size_t sz)
 {
-	return clCreateBuffer(context, flags, sz, NULL, NULL);
+	return clCreateBuffer(ego->super, flags, sz, NULL, NULL);
 }
 
 static void
-rm(cl_mem buf)
+rm(Lux_opencl *ego, cl_mem buf)
 {
 	(void)clReleaseMemObject(buf);
+	(void)ego; /* silence unused variable warning */
 }
 
 void *
