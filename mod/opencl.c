@@ -167,6 +167,21 @@ rm(cl_mem buf)
 	(void)clReleaseMemObject(buf);
 }
 
+static void *
+mmap(Lux_opencl *ego, cl_mem buf, size_t sz)
+{
+	return clEnqueueMapBuffer(ego->que, buf,
+	                          CL_TRUE, CL_MAP_READ, 0, sz,
+	                          0, NULL, NULL, NULL);
+}
+
+static void
+munmap(Lux_opencl *ego, cl_mem buf, void *host)
+{
+	(void)clEnqueueUnmapMemObject(ego->que, buf, host,
+	                              0, NULL, NULL);
+}
+
 static double
 exec(Lux_opencl *ego, cl_kernel kern,
      size_t dim, const size_t *gsz, const size_t *bsz)
@@ -262,6 +277,8 @@ LUX_MKMOD(const struct LuxOopencl *opts)
 	ego->rmkern  = rmkern;
 	ego->mk      = mk;
 	ego->rm      = rm;
+	ego->mmap    = mmap;
+	ego->munmap  = munmap;
 	ego->exec    = exec;
 	ego->nqueue  = ndev;
 	for(i = 0; i < ndev; ++i) {
