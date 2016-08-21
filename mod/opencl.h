@@ -50,6 +50,6 @@ struct LuxOopencl {
 	const char **src;
 };
 
-#define OPENCL_NULL {0, CL_DEVICE_TYPE_DEFAULT, NULL, NULL}
+#define OPENCL_NULL {0, CL_DEVICE_TYPE_ALL, NULL, NULL}
 
 #endif /* _LUX_OPENCL_H_ */
