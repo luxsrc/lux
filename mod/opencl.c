@@ -168,26 +168,24 @@ rm(cl_mem buf)
 }
 
 static double
-exec(Lux_opencl *ego,
-     cl_command_queue que, cl_kernel kern,
+exec(Lux_opencl *ego, cl_kernel kern,
      size_t dim, const size_t *gsz, const size_t *bsz)
 {
 	cl_event event;
 	cl_ulong t0, t1;
 
-	clEnqueueNDRangeKernel(que, kern, dim, NULL, gsz,  bsz,
-	                                       0,    NULL, &event);
+	/* TODO: automatic load balancing across devices */
+	clEnqueueNDRangeKernel(ego->queue[0], kern,
+	                       dim, NULL, gsz,  bsz, 0, NULL, &event);
 	clWaitForEvents(1, &event);
 
-	clFinish(que);
+	clFinish(ego->queue[0]);
 	clGetEventProfilingInfo(event, CL_PROFILING_COMMAND_START,
 	                        sizeof(t0), &t0, NULL);
 	clGetEventProfilingInfo(event, CL_PROFILING_COMMAND_END,
 	                        sizeof(t1), &t1, NULL);
 
 	return (double)(t1 - t0);
-
-	(void)ego; /* silence unused variable warning */
 }
 
 void *
