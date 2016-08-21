@@ -30,9 +30,10 @@ typedef struct LuxSopencl Lux_opencl;
 
 struct LuxSopencl {
 	cl_context super;
+	cl_program program;
 
-	cl_kernel *(*mkkern)(cl_context, cl_device_id, const char **, const char **, const char *);
-	void       (*rmkern)(cl_kernel);
+	cl_kernel (*mkkern)(Lux_opencl *, const char *);
+	void      (*rmkern)(cl_kernel);
 
 	cl_mem (*mk)(cl_context, unsigned, size_t);
 	void   (*rm)(cl_mem);
@@ -44,8 +45,11 @@ struct LuxSopencl {
 struct LuxOopencl {
 	unsigned iplf;
 	cl_device_type devtype;
+
+	const char  *flags;
+	const char **src;
 };
 
-#define OPENCL_NULL {0, CL_DEVICE_TYPE_DEFAULT}
+#define OPENCL_NULL {0, CL_DEVICE_TYPE_DEFAULT, NULL, NULL}
 
 #endif /* _LUX_OPENCL_H_ */

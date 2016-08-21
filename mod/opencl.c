@@ -137,64 +137,16 @@ getsrc(const char *name)
 	return NULL;
 }
 
-static cl_kernel *
-mkkern(cl_context context, cl_device_id device,
-       const char **src,
-       const char **name,
-       const char  *flags)
+static cl_kernel
+mkkern(Lux_opencl *ego, const char *name)
 {
-	cl_int     err;
-	cl_uint    n, i;
-	cl_program program;
-	cl_kernel *kernels;
-
-	for(n = 0; src[n]; ++n) {
-		if(strlen(src[n]) < 64) {/* UGLY HACK */
-			const char *s = getsrc(src[n]);
-			if(!s) {
-				lux_error("Failed to load source\n");
-				exit(1);
-			}
-			src[n] = s;
-		}
-	}
-
-	program = clCreateProgramWithSource(context, n, src, NULL, &err);
-	if(!program) {
-		lux_error("Failed to create program\n");
+	cl_int    err;
+	cl_kernel k = clCreateKernel(ego->program, name, &err);
+	if(!k || err != CL_SUCCESS) {
+		lux_error("Failed to obtain compute kernel \"%s\"\n", name);
 		exit(1);
 	}
-	err = clBuildProgram(program, 1, &device, flags, NULL, NULL);
-	if(err != CL_SUCCESS) {
-		size_t len;
-		char   buf[10240];
-		lux_error("Failed to build program\n");
-		clGetProgramBuildInfo(program, device, CL_PROGRAM_BUILD_LOG,
-		                      sizeof(buf), buf, &len);
-		lux_error("%s\n", buf);
-		exit(1);
-	}
-
-	n = 0;
-	while(name[n])
-		++n;
-
-	kernels = (cl_kernel *)malloc(sizeof(cl_kernel) * (n+1));
-	for(i = 0; i < n; ++i) {
-		kernels[i] = clCreateKernel(program, name[i], &err);
-		if (!kernels[i] || err != CL_SUCCESS) {
-			lux_error("Failed to create compute kernel \"%s\"\n",
-			          name[i]);
-			exit(1);
-		}
-	}
-	kernels[i] = NULL;
-
-	lux_print("%u kernel%s created:\n", n, n > 1 ? "s" : "");
-	for(i = 0; i < n; ++i)
-		lux_print("\t%u. \"%s\"\n", i, name[i]);
-
-	return kernels;
+	return k;
 }
 
 static void
@@ -220,6 +172,7 @@ LUX_MKMOD(const struct LuxOopencl *opts)
 {
 	Lux_opencl  *ego = NULL;
 	cl_context   ctx;
+	cl_program   pro;
 	cl_device_id dev[COUNT_MAX];
 	size_t       i, ndev;
 	cl_int       err;
@@ -254,12 +207,42 @@ LUX_MKMOD(const struct LuxOopencl *opts)
 	if(!ego)
 		goto cleanup1;
 
-	ego->super  = ctx;
-	ego->mk     = mk;
-	ego->rm     = rm;
-	ego->mkkern = mkkern;
-	ego->rmkern = rmkern;
-	ego->nqueue = ndev;
+	for(i = 0; opts->src[i]; ++i) {
+		if(strlen(opts->src[i]) < 64) { /* UGLY HACK */
+			const char *s = getsrc(opts->src[i]);
+			if(!s) {
+				lux_error("Failed to load source\n");
+				exit(1);
+			}
+			opts->src[i] = s;
+		}
+	}
+	pro = clCreateProgramWithSource(ctx, i, opts->src, NULL, &err);
+	if(!pro || err) {
+		lux_error("Failed to create program\n");
+		exit(1);
+	}
+
+	err = clBuildProgram(pro, ndev, dev, opts->flags, NULL, NULL);
+	if(err != CL_SUCCESS) {
+		lux_error("Failed to build program\n");
+		for(i = 0; i < ndev; ++i) {
+			size_t len;
+			char   buf[10240];
+			clGetProgramBuildInfo(pro, dev[i], CL_PROGRAM_BUILD_LOG,
+			                      sizeof(buf), buf, &len);
+			lux_error("%s\n", buf);
+		}
+		exit(1);
+	}
+
+	ego->super   = ctx;
+	ego->program = pro;
+	ego->mk      = mk;
+	ego->rm      = rm;
+	ego->mkkern  = mkkern;
+	ego->rmkern  = rmkern;
+	ego->nqueue  = ndev;
 	for(i = 0; i < ndev; ++i) {
 		cl_command_queue q = clCreateCommandQueue(ctx, dev[i], 0, &err);
 		if(!q || err)
