@@ -179,7 +179,6 @@ exec(Lux_opencl *ego, cl_kernel kern,
 	                       dim, NULL, gsz,  bsz, 0, NULL, &event);
 	clWaitForEvents(1, &event);
 
-	clFinish(ego->queue[0]);
 	clGetEventProfilingInfo(event, CL_PROFILING_COMMAND_START,
 	                        sizeof(t0), &t0, NULL);
 	clGetEventProfilingInfo(event, CL_PROFILING_COMMAND_END,
