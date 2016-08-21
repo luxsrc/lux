@@ -167,6 +167,29 @@ rm(cl_mem buf)
 	(void)clReleaseMemObject(buf);
 }
 
+static double
+exec(Lux_opencl *ego,
+     cl_command_queue que, cl_kernel kern,
+     size_t dim, const size_t *gsz, const size_t *bsz)
+{
+	cl_event event;
+	cl_ulong t0, t1;
+
+	clEnqueueNDRangeKernel(que, kern, dim, NULL, gsz,  bsz,
+	                                       0,    NULL, &event);
+	clWaitForEvents(1, &event);
+
+	clFinish(que);
+	clGetEventProfilingInfo(event, CL_PROFILING_COMMAND_START,
+	                        sizeof(t0), &t0, NULL);
+	clGetEventProfilingInfo(event, CL_PROFILING_COMMAND_END,
+	                        sizeof(t1), &t1, NULL);
+
+	return (double)(t1 - t0);
+
+	(void)ego; /* silence unused variable warning */
+}
+
 void *
 LUX_MKMOD(const struct LuxOopencl *opts)
 {
@@ -238,10 +261,11 @@ LUX_MKMOD(const struct LuxOopencl *opts)
 
 	ego->super   = ctx;
 	ego->program = pro;
-	ego->mk      = mk;
-	ego->rm      = rm;
 	ego->mkkern  = mkkern;
 	ego->rmkern  = rmkern;
+	ego->mk      = mk;
+	ego->rm      = rm;
+	ego->exec    = exec;
 	ego->nqueue  = ndev;
 	for(i = 0; i < ndev; ++i) {
 		cl_command_queue q = clCreateCommandQueue(ctx, dev[i], 0, &err);
