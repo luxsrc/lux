@@ -40,18 +40,22 @@ struct LuxSopencl {
 
 	double (*exec)(Lux_opencl *, cl_kernel,
 	               size_t, const size_t *, const size_t *);
+
+	cl_command_queue que; /* default queue on default device */
+
 	size_t nqueue;
 	cl_command_queue queue[1]; /* flexible array element */
 };
 
 struct LuxOopencl {
 	unsigned iplf;
+	unsigned idev;
 	cl_device_type devtype;
 
 	const char  *flags;
 	const char **src;
 };
 
-#define OPENCL_NULL {0, CL_DEVICE_TYPE_DEFAULT, NULL, NULL}
+#define OPENCL_NULL {0, 0, CL_DEVICE_TYPE_DEFAULT, NULL, NULL}
 
 #endif /* _LUX_OPENCL_H_ */
