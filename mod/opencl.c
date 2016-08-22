@@ -52,9 +52,24 @@ typedef union {
 #define DEV_COUNT 32 /* 5 bits */
 
 const char preamble_fmt[] = "\
-typedef %s fast;\n\
-typedef %s real;\n\
-typedef %s extended;\n\
+typedef %s   fast;\n\
+typedef %s2  fast2;\n\
+typedef %s4  fast4;\n\
+typedef %s8  fast8;\n\
+typedef %s16 fast16;\n\
+\n\
+typedef %s   real;\n\
+typedef %s2  real2;\n\
+typedef %s4  real4;\n\
+typedef %s8  real8;\n\
+typedef %s16 real16;\n\
+\n\
+typedef %s   extended;\n\
+typedef %s2  extended2;\n\
+typedef %s4  extended4;\n\
+typedef %s8  extended8;\n\
+typedef %s16 extended16;\n\
+\n\
 ";
 
 static const char *
@@ -378,11 +393,15 @@ LUX_MKMOD(const struct LuxOopencl *opts)
 	EGO->fastsz     = sizeof(float);
 	EGO->realsz     = opts->realsz;
 	EGO->extendedsz = sizeof(double);
-
-	snprintf(buf, sizeof(buf), preamble_fmt,
-	         prectoreal(EGO->fastsz),
-	         prectoreal(EGO->realsz),
-	         prectoreal(EGO->extendedsz));
+	{
+		const char *fn = prectoreal(EGO->fastsz);
+		const char *rn = prectoreal(EGO->realsz);
+		const char *xn = prectoreal(EGO->extendedsz);
+		snprintf(buf, sizeof(buf), preamble_fmt,
+		         fn, fn, fn, fn, fn,
+		         rn, rn, rn, rn, rn,
+		         xn, xn, xn, xn, xn);
+	}
 
 	path = dlfname(opts->base ? opts->base : (void *)LUX_MKMOD);
 	for(i = 0; opts->src[i]; ++i) {
