@@ -26,31 +26,27 @@
 #include <CL/opencl.h>
 #endif
 
+#define PLF_COUNT 8  /* 3 bits */
+#define DEV_COUNT 32 /* 5 bits */
+
 typedef struct LuxSopencl Lux_opencl;
 
 struct LuxSopencl {
-	cl_context super;
-	cl_program program;
-
-	int (*lsplf)(Lux_opencl *);
-	int (*lsdev)(Lux_opencl *, unsigned);
+	int       (*lsplf)(Lux_opencl *);
+	int       (*lsdev)(Lux_opencl *, unsigned);
 
 	cl_kernel (*mkkern)(Lux_opencl *, const char *);
 	void      (*rmkern)(Lux_opencl *, cl_kernel);
 
-	cl_mem (*mk)(Lux_opencl *, unsigned, size_t);
-	void   (*rm)(Lux_opencl *, cl_mem);
-
-	size_t nqueue;
-	cl_command_queue queue[1]; /* flexible array element */
+	cl_mem    (*mk)(Lux_opencl *, unsigned, size_t);
+	void      (*rm)(Lux_opencl *, cl_mem);
 };
 
 struct LuxOopencl {
-	unsigned iplf;
+	unsigned       iplf;
 	cl_device_type devtype;
-
-	const char  *flags;
-	const char **src;
+	const char    *flags;
+	const char   **src;
 };
 
 #define OPENCL_NULL {0, CL_DEVICE_TYPE_ALL, NULL, NULL}
