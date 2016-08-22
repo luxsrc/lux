@@ -327,19 +327,23 @@ LUX_MKMOD(const struct LuxOopencl *opts)
 		exit(1);
 	}
 
-	ego->super   = ctx;
-	ego->program = pro;
-	ego->lsplf   = lsplf;
-	ego->lsdev   = lsdev;
-	ego->mkkern  = mkkern;
-	ego->rmkern  = rmkern;
-	ego->mk      = mk;
-	ego->rm      = rm;
-	ego->mmap    = mmap;
-	ego->munmap  = munmap;
-	ego->set     = set;
-	ego->exec    = exec;
-	ego->nqueue  = ndev;
+	ego->super      = ctx;
+	ego->program    = pro;
+	ego->lsplf      = lsplf;
+	ego->lsdev      = lsdev;
+	ego->mkkern     = mkkern;
+	ego->rmkern     = rmkern;
+	ego->mk         = mk;
+	ego->rm         = rm;
+	ego->mmap       = mmap;
+	ego->munmap     = munmap;
+	ego->set        = set;
+	ego->exec       = exec;
+	ego->integersz  = sizeof(cl_int);
+	ego->fastsz     = sizeof(float);
+	ego->realsz     = opts->realsz;
+	ego->extendedsz = sizeof(double);
+	ego->nqueue     = ndev;
 	for(i = 0; i < ndev; ++i) {
 		cl_command_queue q = clCreateCommandQueue(ctx, dev[i], 0, &err);
 		if(!q || err)

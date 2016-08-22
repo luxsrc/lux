@@ -25,6 +25,8 @@
 #else
 #include <CL/opencl.h>
 #endif
+
+#include <lux/numeric.h>
 #include <lux/switch.h>
 
 typedef struct LuxSopencl Lux_opencl;
@@ -51,6 +53,11 @@ struct LuxSopencl {
 
 	cl_command_queue que; /* default queue on default device */
 
+	size_t integersz;
+	size_t fastsz;
+	size_t realsz;
+	size_t extendedsz;
+
 	size_t nqueue;
 	cl_command_queue queue[1]; /* flexible array element */
 };
@@ -61,12 +68,13 @@ struct LuxOopencl {
 	unsigned iplf;
 	unsigned idev;
 	cl_device_type devtype;
+	size_t         realsz;
 
 	const char  *flags;
 	const char **src;
 };
 
-#define OPENCL_NULL {NULL, 0, 0, CL_DEVICE_TYPE_ALL, NULL, NULL}
+#define OPENCL_NULL {NULL, 0, 0, CL_DEVICE_TYPE_ALL, sizeof(float), NULL, NULL}
 
 static inline cl_device_type
 strtotype(const char *str)
