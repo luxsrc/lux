@@ -47,9 +47,12 @@ struct LuxSopencl {
 	void  *(*mmap  )(Lux_opencl *, cl_mem, size_t);
 	void   (*munmap)(Lux_opencl *, cl_mem, void *);
 
-	void   (*set )(Lux_opencl *, cl_kernel, size_t, size_t, void *);
-	double (*exec)(Lux_opencl *, cl_kernel,
-	               size_t, const size_t *, const size_t *);
+	void      (*set )(Lux_opencl *, cl_kernel, size_t, size_t, void *);
+	void      (*setM)(Lux_opencl *, cl_kernel, size_t, cl_mem);
+	void      (*setW)(Lux_opencl *, cl_kernel, size_t, whole);
+	void      (*setZ)(Lux_opencl *, cl_kernel, size_t, integer);
+	void      (*setR)(Lux_opencl *, cl_kernel, size_t, real);
+	double    (*exec)(Lux_opencl *, cl_kernel, size_t, const size_t *, const size_t *);
 
 	cl_command_queue que; /* default queue on default device */
 

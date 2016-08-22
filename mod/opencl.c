@@ -27,6 +27,12 @@
 
 #define COUNT_MAX 16
 
+typedef union {
+	cl_half   h;
+	cl_float  f;
+	cl_double d;
+} cl_real;
+
 static cl_platform_id
 lsplf(Lux_opencl *ego, unsigned iplf)
 {
@@ -222,11 +228,43 @@ munmap(Lux_opencl *ego, cl_mem buf, void *host)
 }
 
 static void
-set(Lux_opencl *ego, cl_kernel kern,
-    size_t i, size_t sz, void *arg)
+set(Lux_opencl *ego, cl_kernel kern, size_t i, size_t sz, void *arg)
 {
 	clSetKernelArg(kern, i, sz, arg);
 	(void)ego; /* silence unused variable warning */
+}
+
+static void
+setM(Lux_opencl *ego, cl_kernel kern, size_t i, cl_mem m)
+{
+	clSetKernelArg(kern, i, sizeof(cl_mem), &m);
+	(void)ego; /* silence unused variable warning */
+}
+
+static void
+setW(Lux_opencl *ego, cl_kernel kern, size_t i, whole w)
+{
+	cl_uint clw = w;
+	clSetKernelArg(kern, i, ego->integersz, &clw);
+}
+
+static void
+setZ(Lux_opencl *ego, cl_kernel kern, size_t i, integer z)
+{
+	cl_int clz = z;
+	clSetKernelArg(kern, i, ego->integersz, &clz);
+}
+
+static void
+setR(Lux_opencl *ego, cl_kernel kern, size_t i, real r)
+{
+	cl_real clr;
+	switch(ego->realsz) {
+	case 2: clr.h = r; break;
+	case 4: clr.f = r; break;
+	case 8: clr.d = r; break;
+	}
+	clSetKernelArg(kern, i, ego->realsz, &clr);
 }
 
 static double
@@ -338,6 +376,10 @@ LUX_MKMOD(const struct LuxOopencl *opts)
 	ego->mmap       = mmap;
 	ego->munmap     = munmap;
 	ego->set        = set;
+	ego->setM       = setM;
+	ego->setW       = setW;
+	ego->setZ       = setZ;
+	ego->setR       = setR;
 	ego->exec       = exec;
 	ego->integersz  = sizeof(cl_int);
 	ego->fastsz     = sizeof(float);
