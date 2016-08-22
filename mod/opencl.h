@@ -25,6 +25,7 @@
 #else
 #include <CL/opencl.h>
 #endif
+#include <lux/switch.h>
 
 typedef struct LuxSopencl Lux_opencl;
 
@@ -66,5 +67,17 @@ struct LuxOopencl {
 };
 
 #define OPENCL_NULL {NULL, 0, 0, CL_DEVICE_TYPE_ALL, NULL, NULL}
+
+static inline cl_device_type
+strtotype(const char *str)
+{
+	SWITCH {
+	CASE(str[0] == 'c') return CL_DEVICE_TYPE_CPU;
+	CASE(str[0] == 'g') return CL_DEVICE_TYPE_GPU;
+	CASE(str[0] == 'a') return CL_DEVICE_TYPE_ACCELERATOR;
+	CASE(str[0] == 'o') return CL_DEVICE_TYPE_CUSTOM;
+	DEFAULT             return CL_DEVICE_TYPE_DEFAULT;
+	}
+}
 
 #endif /* _LUX_OPENCL_H_ */
