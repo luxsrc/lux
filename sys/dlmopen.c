@@ -21,9 +21,9 @@
 #include <lux/dlfcn.h>
 
 #if HAVE_DLMOPEN
-/* Use the system dlopen(); implement nothing */
+/* Use the system dlmopen(); implement nothing */
 #else
-/* Implement dlopen() using dlopen() */
+/* Implement dlmopen() using dlopen() */
 #include <lux/assert.h>
 
 char *
