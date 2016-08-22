@@ -20,25 +20,55 @@
 #ifndef _LUX_NUMERIC_H_
 #define _LUX_NUMERIC_H_
 /*
- * In C, the different floating point types, i.e., float, double, and
- * long double, almost always have fixed size.  They are 32-bit,
- * 64-bit, and 80-bit, respecitvely.  The different integer types,
- * i.e., short, int, and long, have lengths that are platform
- * dependent.
+ * In order to be portable and to support a wide range of hardware at
+ * the same time, C primitive types can be classified into two
+ * categories to accommodate two different meanings of "portability".
  *
- * In OpenCL, both floating point and integer types have fixed size.
- * They are:
+ * In one category, the types are platform independent.  When a
+ * developer use a type in this category, the behaviors of the type is
+ * expect to be the same across platform.  If a platform does not have
+ * a particular feature, the type is simply missing.  Floating point
+ * types in C fall in this category.  `float` and `double` are 32-bit
+ * and 64-bit on almost all platforms, respectively.  `half` and `long
+ * double`, if available, are 16-bit and (often) 80-bit, although they
+ * may simply be missing if the platform do not support them.
+ * "Portable" here means that, if a developer write a code once and
+ * the code compiles, he or she knows how it would behave the same
+ * across platform.  However, the developer is responsible to check if
+ * a type is available in the first place, and use additional checks
+ * (mostly with macros) to make the code would compile.
  *
- *  API Type	Kernel	Size
- *  cl_char	char	8-bit
- *  cl_short	short	16-bit
- *  cl_int	int	32-bit
- *  cl_long	long	64-bit
+ * In the other category, the types are known that they can be
+ * different on different platforms.  Nevertheless, the same types
+ * always exist across platform so the code can be written once and
+ * compile everyone.  Integer types such as `int` and `long` fall into
+ * this category.
  *
- *  cl_half	half	16-bit
- *  cl_float	float	32-bit
- *  cl_double	double	64-bit (optional)
+ * In OpenCL, both floating point and integer types have fixed size
+ * across platform and `cl_double` is optional.  The details are
+ * listed here:
  *
+ *  C Type       OpenCL Type  C Size   OpenCL Size
+ *
+ *  char         cl_char      ~8-bit   =8-bit
+ *  short        cl_short     >16-bit  =16-bit
+ *  int          cl_int       >16-bit  =32-bit
+ *  long         cl_long      >32-bit  =64-bit
+ *  long long    ---          >64-bit  ---
+ *
+ *  ---          cl_half      =16-bit  =16-bit
+ *  float        cl_float     =32-bit  =32-bit
+ *  double       cl_double    =64-bit  =64-bit
+ *  long double  ---          ~80-bit  ---
+ *
+ * While this helps OpenCL kernels to behave consistently once they
+ * compile, it limits the number of devices that the same kernel can
+ * compile on.
+ *
+ * To overcome this, lux defines a class of `real` types that can be
+ * redefined at *runtime*.  lux can then measure the performance of
+ * these different redefinition and provide the most sensible
+ * configuration to the user.
  */
 
 #if HAVE_STDDEF_H
