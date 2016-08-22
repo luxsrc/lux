@@ -52,14 +52,16 @@ struct LuxSopencl {
 };
 
 struct LuxOopencl {
+	void *base;
+
 	unsigned iplf;
 	unsigned idev;
 	cl_device_type devtype;
-	const char    *flags;
-	const char    *path;
-	const char   **src;
+
+	const char  *flags;
+	const char **src;
 };
 
-#define OPENCL_NULL {0, 0, CL_DEVICE_TYPE_DEFAULT, NULL, NULL, NULL}
+#define OPENCL_NULL {NULL, 0, 0, CL_DEVICE_TYPE_DEFAULT, NULL, NULL}
 
 #endif /* _LUX_OPENCL_H_ */

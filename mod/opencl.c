@@ -18,6 +18,7 @@
  * along with lux.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include <lux.h>
+#include <lux/dlfcn.h>
 #include <lux/mangle.h>
 #include <stdlib.h> /* for malloc(), free(), and NULL */
 #include <stdio.h>  /* for sprintf() etc */
@@ -250,6 +251,7 @@ LUX_MKMOD(const struct LuxOopencl *opts)
 	cl_context ctx;
 	cl_program pro;
 
+	const char *path;
 	cl_context_properties plf[] = {CL_CONTEXT_PLATFORM,
 	                               (cl_context_properties)NULL,
 	                               (cl_context_properties)NULL};
@@ -287,9 +289,10 @@ LUX_MKMOD(const struct LuxOopencl *opts)
 	if(!ego)
 		goto cleanup1;
 
+	path = dlfname(opts->base ? opts->base : (void *)LUX_MKMOD);
 	for(i = 0; opts->src[i]; ++i) {
 		if(strlen(opts->src[i]) < 64) { /* UGLY HACK */
-			const char *s = getsrc(opts->path, opts->src[i]);
+			const char *s = getsrc(path, opts->src[i]);
 			if(!s) {
 				lux_error("Failed to load source\n");
 				exit(1);
