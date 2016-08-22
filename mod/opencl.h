@@ -27,7 +27,6 @@
 #endif
 
 #include <lux/numeric.h>
-#include <lux/switch.h>
 
 typedef struct LuxSopencl Lux_opencl;
 
@@ -82,24 +81,24 @@ struct LuxOopencl {
 static inline cl_device_type
 strtotype(const char *str)
 {
-	SWITCH {
-	CASE(str[0] == 'c') return CL_DEVICE_TYPE_CPU;
-	CASE(str[0] == 'g') return CL_DEVICE_TYPE_GPU;
-	CASE(str[0] == 'a') return CL_DEVICE_TYPE_ACCELERATOR;
-	CASE(str[0] == 'o') return CL_DEVICE_TYPE_CUSTOM;
-	DEFAULT             return CL_DEVICE_TYPE_DEFAULT;
+	switch(str[0]) {
+	case 'c': return CL_DEVICE_TYPE_CPU;
+	case 'g': return CL_DEVICE_TYPE_GPU;
+	case 'a': return CL_DEVICE_TYPE_ACCELERATOR;
+	case 'o': return CL_DEVICE_TYPE_CUSTOM;
+	default : return CL_DEVICE_TYPE_DEFAULT;
 	}
 }
 
 static inline size_t
 strtoprec(const char *str)
 {
-	SWITCH {
-	CASE(str[0] == 's') return sizeof(float);
-	CASE(str[0] == 'f') return sizeof(float);
-	CASE(str[0] == 'd') return sizeof(double);
-	CASE(str[0] == 'l') return sizeof(long double);
-	DEFAULT             return 0U;
+	switch(str[0]) {
+	case 's': return sizeof(float);
+	case 'f': return sizeof(float);
+	case 'd': return sizeof(double);
+	case 'l': return sizeof(long double);
+	default : return 0U;
 	}
 }
 
