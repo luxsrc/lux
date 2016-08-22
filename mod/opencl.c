@@ -73,6 +73,8 @@ typedef %s4  extended4;\n\
 typedef %s8  extended8;\n\
 typedef %s16 extended16;\n\
 \n\
+#define K(x) x %s\n\
+\n\
 ";
 
 static const char *
@@ -403,7 +405,8 @@ LUX_MKMOD(const struct LuxOopencl *opts)
 		snprintf(buf, sizeof(buf), preamble_fmt,
 		         fn, fn, fn, fn, fn,
 		         rn, rn, rn, rn, rn,
-		         xn, xn, xn, xn, xn);
+		         xn, xn, xn, xn, xn,
+		         EGO->realsz>4 ? EGO->realsz>8 ? "## L" : "" : "## f");
 	}
 
 	path = dlfname(opts->base ? opts->base : (void *)LUX_MKMOD);
