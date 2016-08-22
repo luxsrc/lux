@@ -19,6 +19,27 @@
  */
 #ifndef _LUX_NUMERIC_H_
 #define _LUX_NUMERIC_H_
+/*
+ * In C, the different floating point types, i.e., float, double, and
+ * long double, almost always have fixed size.  They are 32-bit,
+ * 64-bit, and 80-bit, respecitvely.  The different integer types,
+ * i.e., short, int, and long, have lengths that are platform
+ * dependent.
+ *
+ * In OpenCL, both floating point and integer types have fixed size.
+ * They are:
+ *
+ *  API Type	Kernel	Size
+ *  cl_char	char	8-bit
+ *  cl_short	short	16-bit
+ *  cl_int	int	32-bit
+ *  cl_long	long	64-bit
+ *
+ *  cl_half	half	16-bit
+ *  cl_float	float	32-bit
+ *  cl_double	double	64-bit (optional)
+ *
+ */
 
 #if HAVE_STDDEF_H
 #include <stddef.h> /* for size_t and ptrdiff_t */
