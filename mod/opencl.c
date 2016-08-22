@@ -34,6 +34,8 @@ struct opencl {
 	cl_command_queue queue[1]; /* flexible array element */
 };
 
+#define EGO ((struct opencl *)ego)
+
 static int
 lsplf(Lux_opencl *ego)
 {
@@ -153,7 +155,7 @@ static cl_kernel
 mkkern(Lux_opencl *ego, const char *name)
 {
 	cl_int    err;
-	cl_kernel k = clCreateKernel(((struct opencl *)ego)->pro, name, &err);
+	cl_kernel k = clCreateKernel(EGO->pro, name, &err);
 	if(!k || err != CL_SUCCESS) {
 		lux_error("Failed to obtain compute kernel \"%s\"\n", name);
 		exit(1);
@@ -171,7 +173,7 @@ rmkern(Lux_opencl *ego, cl_kernel k)
 static cl_mem
 mk(Lux_opencl *ego, unsigned flags, size_t sz)
 {
-	return clCreateBuffer(((struct opencl *)ego)->ctx, flags, sz, NULL, NULL);
+	return clCreateBuffer(EGO->ctx, flags, sz, NULL, NULL);
 }
 
 static void
@@ -287,12 +289,12 @@ void
 LUX_RMMOD(void *ego)
 {
 	cl_int err;
-	size_t i = ((struct opencl *)ego)->nqueue;
+	size_t i = EGO->nqueue;
 	while(i--) {
-		err = clReleaseCommandQueue(((struct opencl *)ego)->queue[i]);
+		err = clReleaseCommandQueue(EGO->queue[i]);
 		/* TODO: check error */
 	}
-	err = clReleaseContext(((struct opencl *)ego)->ctx);
+	err = clReleaseContext(EGO->ctx);
 	/* TODO: check error */
 	free(ego);
 }
