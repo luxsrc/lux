@@ -31,9 +31,6 @@
 typedef struct LuxSopencl Lux_opencl;
 
 struct LuxSopencl {
-	cl_context super;
-	cl_program program;
-
 	cl_platform_id (*lsplf)(Lux_opencl *, unsigned);
 	int            (*lsdev)(Lux_opencl *, unsigned, unsigned, cl_device_type);
 
@@ -54,14 +51,6 @@ struct LuxSopencl {
 	double    (*exec)(Lux_opencl *, cl_kernel, size_t, const size_t *, const size_t *);
 
 	cl_command_queue que; /* default queue on default device */
-
-	size_t integersz;
-	size_t fastsz;
-	size_t realsz;
-	size_t extendedsz;
-
-	size_t nqueue;
-	cl_command_queue queue[1]; /* flexible array element */
 };
 
 struct LuxOopencl {

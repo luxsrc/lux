@@ -25,7 +25,25 @@
 #include <string.h> /* for strlen() */
 #include "opencl.h"
 
-#define COUNT_MAX 16
+struct opencl {
+	Lux_opencl super;
+
+	cl_context ctx;
+	cl_program pro;
+
+	size_t integersz;
+	size_t fastsz;
+	size_t realsz;
+	size_t extendedsz;
+
+	size_t           nqueue;
+	cl_command_queue queue[1]; /* flexible array element */
+};
+
+#define EGO ((struct opencl *)ego)
+
+#define PLF_COUNT 8  /* 3 bits */
+#define DEV_COUNT 32 /* 5 bits */
 
 typedef union {
 	cl_half   h;
@@ -36,10 +54,10 @@ typedef union {
 static cl_platform_id
 lsplf(Lux_opencl *ego, unsigned iplf)
 {
-	cl_platform_id p[COUNT_MAX];
+	cl_platform_id p[PLF_COUNT];
 	cl_uint        n, i;
 
-	(void)clGetPlatformIDs(COUNT_MAX, p, &n);
+	(void)clGetPlatformIDs(PLF_COUNT, p, &n);
 
 	lux_print("%d platform%s found:\n", n, n > 1 ? "s are" : " is");
 	for(i = 0; i < n; ++i) {
@@ -66,12 +84,12 @@ lsplf(Lux_opencl *ego, unsigned iplf)
 static int
 lsdev(Lux_opencl *ego, unsigned iplf, unsigned idev, cl_device_type devtype)
 {
-	cl_platform_id p[COUNT_MAX];
-	cl_device_id   d[COUNT_MAX];
+	cl_platform_id p[PLF_COUNT];
+	cl_device_id   d[DEV_COUNT];
 	cl_uint        n, i;
 
-	(void)clGetPlatformIDs(COUNT_MAX, p, NULL);
-	(void)clGetDeviceIDs(p[iplf], devtype, COUNT_MAX, d, &n);
+	(void)clGetPlatformIDs(PLF_COUNT, p, NULL);
+	(void)clGetDeviceIDs(p[iplf], devtype, DEV_COUNT, d, &n);
 
 	lux_print("%d device%s found:\n", n, n > 1 ? "s are" : " is");
 	for(i = 0; i < n; ++i) {
@@ -184,7 +202,7 @@ static cl_kernel
 mkkern(Lux_opencl *ego, const char *name)
 {
 	cl_int    err;
-	cl_kernel k = clCreateKernel(ego->program, name, &err);
+	cl_kernel k = clCreateKernel(EGO->pro, name, &err);
 	if(!k || err != CL_SUCCESS) {
 		lux_error("Failed to obtain compute kernel \"%s\"\n", name);
 		exit(1);
@@ -202,7 +220,7 @@ rmkern(Lux_opencl *ego, cl_kernel k)
 static cl_mem
 mk(Lux_opencl *ego, unsigned flags, size_t sz)
 {
-	return clCreateBuffer(ego->super, flags, sz, NULL, NULL);
+	return clCreateBuffer(EGO->ctx, flags, sz, NULL, NULL);
 }
 
 static void
@@ -245,26 +263,26 @@ static void
 setW(Lux_opencl *ego, cl_kernel kern, size_t i, whole w)
 {
 	cl_uint clw = w;
-	clSetKernelArg(kern, i, ego->integersz, &clw);
+	clSetKernelArg(kern, i, EGO->integersz, &clw);
 }
 
 static void
 setZ(Lux_opencl *ego, cl_kernel kern, size_t i, integer z)
 {
 	cl_int clz = z;
-	clSetKernelArg(kern, i, ego->integersz, &clz);
+	clSetKernelArg(kern, i, EGO->integersz, &clz);
 }
 
 static void
 setR(Lux_opencl *ego, cl_kernel kern, size_t i, real r)
 {
 	cl_real clr;
-	switch(ego->realsz) {
+	switch(EGO->realsz) {
 	case 2: clr.h = r; break;
 	case 4: clr.f = r; break;
 	case 8: clr.d = r; break;
 	}
-	clSetKernelArg(kern, i, ego->realsz, &clr);
+	clSetKernelArg(kern, i, EGO->realsz, &clr);
 }
 
 static double
@@ -275,7 +293,7 @@ exec(Lux_opencl *ego, cl_kernel kern,
 	cl_ulong t0, t1;
 
 	/* TODO: automatic load balancing across devices */
-	clEnqueueNDRangeKernel(ego->queue[0], kern,
+	clEnqueueNDRangeKernel(ego->que, kern,
 	                       dim, NULL, gsz,  bsz, 0, NULL, &event);
 	clWaitForEvents(1, &event);
 
@@ -299,9 +317,9 @@ LUX_MKMOD(const struct LuxOopencl *opts)
 	cl_context_properties plf[] = {CL_CONTEXT_PLATFORM,
 	                               (cl_context_properties)NULL,
 	                               (cl_context_properties)NULL};
-	cl_device_id   dev[COUNT_MAX];
-	size_t         i, ndev;
-	cl_int         err;
+	cl_device_id dev[DEV_COUNT];
+	size_t       i, ndev;
+	cl_int       err;
 
 	struct LuxOopencl def = OPENCL_NULL;
 	if(!opts)
@@ -317,7 +335,8 @@ LUX_MKMOD(const struct LuxOopencl *opts)
 	if(!ctx || err)
 		return NULL;
 
-	err = clGetContextInfo(ctx, CL_CONTEXT_DEVICES, sizeof(dev), dev, &ndev);
+	err = clGetContextInfo(ctx, CL_CONTEXT_DEVICES,
+	                       sizeof(dev), dev, &ndev);
 	if(err)
 		goto cleanup1;
 
@@ -330,7 +349,7 @@ LUX_MKMOD(const struct LuxOopencl *opts)
 		          opts->idev == i ? "* " : "", dev[i]);
 	lux_print("\n");
 
-	ego = (Lux_opencl *)malloc(sizeof(Lux_opencl) +
+	ego = (Lux_opencl *)malloc(sizeof(struct opencl) +
 	                           (ndev-1) * sizeof(cl_command_queue));
 	if(!ego)
 		goto cleanup1;
@@ -365,32 +384,34 @@ LUX_MKMOD(const struct LuxOopencl *opts)
 		exit(1);
 	}
 
-	ego->super      = ctx;
-	ego->program    = pro;
-	ego->lsplf      = lsplf;
-	ego->lsdev      = lsdev;
-	ego->mkkern     = mkkern;
-	ego->rmkern     = rmkern;
-	ego->mk         = mk;
-	ego->rm         = rm;
-	ego->mmap       = mmap;
-	ego->munmap     = munmap;
-	ego->set        = set;
-	ego->setM       = setM;
-	ego->setW       = setW;
-	ego->setZ       = setZ;
-	ego->setR       = setR;
-	ego->exec       = exec;
-	ego->integersz  = sizeof(cl_int);
-	ego->fastsz     = sizeof(float);
-	ego->realsz     = opts->realsz;
-	ego->extendedsz = sizeof(double);
-	ego->nqueue     = ndev;
+	ego->lsplf  = lsplf;
+	ego->lsdev  = lsdev;
+	ego->mkkern = mkkern;
+	ego->rmkern = rmkern;
+	ego->mk     = mk;
+	ego->rm     = rm;
+	ego->mmap   = mmap;
+	ego->munmap = munmap;
+	ego->set    = set;
+	ego->setM   = setM;
+	ego->setW   = setW;
+	ego->setZ   = setZ;
+	ego->setR   = setR;
+	ego->exec   = exec;
+
+	EGO->integersz  = sizeof(cl_int);
+	EGO->fastsz     = sizeof(float);
+	EGO->realsz     = opts->realsz;
+	EGO->extendedsz = sizeof(double);
+
+	EGO->ctx    = ctx;
+	EGO->pro    = pro;
+	EGO->nqueue = ndev;
 	for(i = 0; i < ndev; ++i) {
 		cl_command_queue q = clCreateCommandQueue(ctx, dev[i], 0, &err);
 		if(!q || err)
 			goto cleanup2;
-		ego->queue[i] = q;
+		EGO->queue[i] = q;
 		if(i == opts->idev)
 			ego->que = q;
 	}
@@ -398,7 +419,7 @@ LUX_MKMOD(const struct LuxOopencl *opts)
 
  cleanup2:
 	while(i--) {
-		err = clReleaseCommandQueue(ego->queue[i]);
+		err = clReleaseCommandQueue(ego->que);
 		/* TODO: check error */
 	}
  cleanup1:
@@ -412,12 +433,12 @@ void
 LUX_RMMOD(void *ego)
 {
 	cl_int err;
-	size_t i = ((Lux_opencl *)ego)->nqueue;
+	size_t i = EGO->nqueue;
 	while(i--) {
-		err = clReleaseCommandQueue(((Lux_opencl *)ego)->queue[i]);
+		err = clReleaseCommandQueue(EGO->queue[i]);
 		/* TODO: check error */
 	}
-	err = clReleaseContext(((Lux_opencl *)ego)->super);
+	err = clReleaseContext(EGO->ctx);
 	/* TODO: check error */
 	free(ego);
 }
