@@ -99,6 +99,7 @@ ftryopen(const char *name)
 		FILE *f;
 		char  buf[1024];
 		sprintf(buf, fmt[i], name);
+
 		f = fopen(buf, "r");
 		if(f) {
 			lux_print("Loaded kernel \"%s\"\n", buf);
@@ -126,15 +127,46 @@ freadall(FILE *f)
 }
 
 static const char *
-getsrc(const char *name)
+getsrc(const char *path, const char *name)
 {
-	FILE *f = ftryopen(name);
-	if(f) {
+	FILE *f = NULL;
+	char buf[1024];
+
+	if(!f) {
+		if(!path) {
+			f = ftryopen(name);
+		}
+	}
+
+	if(!f) {
+		const char *sep = strrchr(path, '.');
+		if(sep) {
+			size_t l = sep - path;
+			memcpy(buf, path, l);
+			buf[l] = '/';
+			strcpy(buf+l+1, name);
+			f = ftryopen(buf);
+		}
+	}
+
+	if(!f) {
+		const char *sep = strrchr(path, '/');
+		if(sep) {
+			size_t l = sep - path;
+			memcpy(buf, path, l);
+			buf[l] = '/';
+			strcpy(buf+l+1, name);
+			f = ftryopen(buf);
+		}
+	}
+
+	if(!f)
+		return NULL;
+	else {
 		const char *s = freadall(f);
 		fclose(f);
 		return s;
 	}
-	return NULL;
 }
 
 static cl_kernel
@@ -257,7 +289,7 @@ LUX_MKMOD(const struct LuxOopencl *opts)
 
 	for(i = 0; opts->src[i]; ++i) {
 		if(strlen(opts->src[i]) < 64) { /* UGLY HACK */
-			const char *s = getsrc(opts->src[i]);
+			const char *s = getsrc(opts->path, opts->src[i]);
 			if(!s) {
 				lux_error("Failed to load source\n");
 				exit(1);
