@@ -39,7 +39,7 @@ main(int argc, char *argv[])
 	int      status = EXIT_SUCCESS;
 	Lux_job *sim    = NULL;
 
-	lux_setup();
+	lux_setup(&argc, &argv);
 
 	argv[0] = (char *)basename(argv[0]);
 	if(!strcmp(argv[0], "lux")) {

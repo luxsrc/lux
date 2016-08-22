@@ -39,12 +39,15 @@ cleanup(void)
 }
 
 void
-lux_setup(void)
+lux_setup(int *argc, char ***argv)
 {
 	if(!atexit(cleanup))
 		setup();
 	else
 		lux_abort();
+
+	(void)argc; /* silence unused variable warning */
+	(void)argv; /* silence unused variable warning */
 }
 
 void
