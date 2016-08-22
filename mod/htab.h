@@ -65,4 +65,19 @@ hpop(struct htab *h, uintptr_t k)
 	return NULL;
 }
 
+static inline struct htab_node *
+hget(struct htab *h, uintptr_t k)
+{
+	struct htab_node **p = h->node + WANG(k) % h->count;
+	while(*p) {
+		struct htab_node *n = *p;
+		if(n->key == k) {
+			/* Compare to hpop(): do not do `*p = n->next;` */
+			return n;
+		}
+		p = &n->next;
+	}
+	return NULL;
+}
+
 #endif /* _LUX_HTAB_H_ */
