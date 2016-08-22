@@ -41,7 +41,7 @@ lsplf(Lux_opencl *ego, unsigned iplf)
 
 		(void)clGetPlatformInfo(p[i], CL_PLATFORM_NAME,
 		                        sizeof(buf), buf, NULL);
-		lux_print("\t%d. %s ", i, buf);
+		lux_print("%s\t%d. %s ", i == iplf ? "*" : "", i, buf);
 
 		(void)clGetPlatformInfo(p[i], CL_PLATFORM_VENDOR,
 		                        sizeof(buf), buf, NULL);
@@ -49,7 +49,7 @@ lsplf(Lux_opencl *ego, unsigned iplf)
 
 		(void)clGetPlatformInfo(p[i], CL_PLATFORM_VERSION,
 		                        sizeof(buf), buf, NULL);
-		lux_print("%s\n", buf);
+		lux_print("%s (%p)\n", buf, p[i]);
 	}
 
 	return p[iplf < n ? iplf : n];
@@ -58,7 +58,7 @@ lsplf(Lux_opencl *ego, unsigned iplf)
 }
 
 static int
-lsdev(Lux_opencl *ego, unsigned iplf)
+lsdev(Lux_opencl *ego, unsigned iplf, unsigned idev)
 {
 	cl_platform_id p[COUNT_MAX];
 	cl_device_id   d[COUNT_MAX];
@@ -73,7 +73,7 @@ lsdev(Lux_opencl *ego, unsigned iplf)
 
 		(void)clGetDeviceInfo(d[i], CL_DEVICE_NAME,
 		                      sizeof(buf), buf, NULL);
-		lux_print("\t%d. %s ", i, buf);
+		lux_print("%s\t%d. %s ", i == idev ? "*" : "", i, buf);
 
 		(void)clGetDeviceInfo(d[i], CL_DEVICE_VENDOR,
 		                      sizeof(buf), buf, NULL);
@@ -81,7 +81,7 @@ lsdev(Lux_opencl *ego, unsigned iplf)
 
 		(void)clGetDeviceInfo(d[i], CL_DRIVER_VERSION,
 		                      sizeof(buf), buf, NULL);
-		lux_print("%s\n", buf);
+		lux_print("%s (%p)\n", buf, d[i]);
 	}
 
 	return EXIT_SUCCESS;
@@ -272,7 +272,7 @@ LUX_MKMOD(const struct LuxOopencl *opts)
 	lux_print("\nGetting OpenCL platforms... ");
 	plf[1] = (cl_context_properties)lsplf(NULL, opts->iplf);
 	lux_print("\nGetting OpenCL devices from platform %u... ", opts->iplf);
-	lsdev(NULL, opts->iplf);
+	lsdev(NULL, opts->iplf, opts->idev);
 	lux_print("\n");
 
 	ctx = clCreateContextFromType(plf, opts->devtype, NULL, NULL, &err);
@@ -284,10 +284,12 @@ LUX_MKMOD(const struct LuxOopencl *opts)
 		goto cleanup1;
 
 	ndev /= sizeof(cl_device_id);
-	lux_print("OpenCL context %p contains device%s %p",
-	          ctx, ndev > 1 ? "s" : "", dev[0]);
+	lux_print("OpenCL context %p contains device%s %s%p",
+	          ctx, ndev > 1 ? "s" : "",
+	          opts->idev == 0 ? "* " : "", dev[0]);
 	for(i = 1; i < ndev; ++i)
-		lux_print(", %p", dev[i]);
+		lux_print(", %s%p",
+		          opts->idev == i ? "* " : "", dev[i]);
 	lux_print("\n");
 
 	ego = (Lux_opencl *)malloc(sizeof(Lux_opencl) +
