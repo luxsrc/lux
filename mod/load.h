@@ -89,4 +89,15 @@ uload(struct load *load, void *ins)
 		failed = FNOMOD;
 }
 
+static inline const char *
+load_fname(struct load *load, void *ins)
+{
+	struct load_node *node = (struct load_node *)hget(&load->tab,
+	                                                  (uintptr_t)ins);
+	if(node)
+		return dlfname(node->rm ? (void *)node->rm : ins);
+	else
+		return NULL;
+}
+
 #endif /* _LUX_LOAD_H_ */
