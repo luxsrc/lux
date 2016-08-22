@@ -28,7 +28,7 @@
 #define COUNT_MAX 16
 
 static cl_platform_id
-lsplf(unsigned iplf)
+lsplf(Lux_opencl *ego, unsigned iplf)
 {
 	cl_platform_id p[COUNT_MAX];
 	cl_uint        n, i;
@@ -53,10 +53,12 @@ lsplf(unsigned iplf)
 	}
 
 	return p[iplf < n ? iplf : n];
+
+	(void)ego; /* silence unused variable warning */
 }
 
 static int
-lsdev(unsigned iplf)
+lsdev(Lux_opencl *ego, unsigned iplf)
 {
 	cl_platform_id p[COUNT_MAX];
 	cl_device_id   d[COUNT_MAX];
@@ -83,6 +85,8 @@ lsdev(unsigned iplf)
 	}
 
 	return EXIT_SUCCESS;
+
+	(void)ego; /* silence unused variable warning */
 }
 
 static FILE *
@@ -183,21 +187,23 @@ mkkern(Lux_opencl *ego, const char *name)
 }
 
 static void
-rmkern(cl_kernel k)
+rmkern(Lux_opencl *ego, cl_kernel k)
 {
 	(void)clReleaseKernel(k);
+	(void)ego; /* silence unused variable warning */
 }
 
 static cl_mem
-mk(cl_context context, unsigned flags, size_t sz)
+mk(Lux_opencl *ego, unsigned flags, size_t sz)
 {
-	return clCreateBuffer(context, flags, sz, NULL, NULL);
+	return clCreateBuffer(ego->super, flags, sz, NULL, NULL);
 }
 
 static void
-rm(cl_mem buf)
+rm(Lux_opencl *ego, cl_mem buf)
 {
 	(void)clReleaseMemObject(buf);
+	(void)ego; /* silence unused variable warning */
 }
 
 static void *
@@ -264,9 +270,9 @@ LUX_MKMOD(const struct LuxOopencl *opts)
 		opts = &def;
 
 	lux_print("\nGetting OpenCL platforms... ");
-	plf[1] = (cl_context_properties)lsplf(opts->iplf);
+	plf[1] = (cl_context_properties)lsplf(NULL, opts->iplf);
 	lux_print("\nGetting OpenCL devices from platform %u... ", opts->iplf);
-	lsdev(opts->iplf);
+	lsdev(NULL, opts->iplf);
 	lux_print("\n");
 
 	ctx = clCreateContextFromType(plf, opts->devtype, NULL, NULL, &err);
@@ -321,6 +327,8 @@ LUX_MKMOD(const struct LuxOopencl *opts)
 
 	ego->super   = ctx;
 	ego->program = pro;
+	ego->lsplf   = lsplf;
+	ego->lsdev   = lsdev;
 	ego->mkkern  = mkkern;
 	ego->rmkern  = rmkern;
 	ego->mk      = mk;
