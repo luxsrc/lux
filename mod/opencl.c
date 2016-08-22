@@ -36,6 +36,9 @@ struct opencl {
 
 #define EGO ((struct opencl *)ego)
 
+#define PLF_COUNT 8  /* 3 bits */
+#define DEV_COUNT 32 /* 5 bits */
+
 static int
 lsplf(Lux_opencl *ego)
 {

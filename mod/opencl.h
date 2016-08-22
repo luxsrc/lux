@@ -26,9 +26,6 @@
 #include <CL/opencl.h>
 #endif
 
-#define PLF_COUNT 8  /* 3 bits */
-#define DEV_COUNT 32 /* 5 bits */
-
 typedef struct LuxSopencl Lux_opencl;
 
 struct LuxSopencl {
