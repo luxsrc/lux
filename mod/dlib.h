@@ -43,9 +43,17 @@ mkdlib(Lmid_t namespace,
 	struct dlib l = DLIB_NULL;
 
 	char lazybuf[256], *buf = lazybuf;
-	const size_t nlen = strlen(name);
+	const size_t nlen = name ? strlen(name) : 0;
 
-	if(name && name[0] == '/') {
+	if(!name) {
+		/* If name is NULL, then the returned handle is for
+		   the main program */
+
+		l.hdl = dlmopen(namespace, NULL, mode);
+	} else if(name[0] == '/') {
+		/* If `name` starts with '/', assume it corresponds to
+		   an absolute path and ignore variable `paths` */
+
 		buf = lzmalloc(nlen + sizeof(".so"));
 		if(!buf)
 			return l; /* == DLIB_NULL; no need to lzfree(buf);
@@ -55,6 +63,9 @@ mkdlib(Lmid_t namespace,
 
 		l.hdl = dltryopen(namespace, buf, mode);
 	} else while(paths && !l.hdl) {
+		/* If `name` does not start with '/', use paths within
+		   variable `paths` as path-prefixes */
+
 		const char  *psep = strchr(paths, ':');
 		const size_t plen = psep ? (size_t)(psep-paths) : strlen(paths);
 
