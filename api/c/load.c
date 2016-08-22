@@ -31,3 +31,9 @@ lux_unload(void *ins)
 {
 	uload(&LUX->load, ins);
 }
+
+const char *
+lux_fname(void *ins)
+{
+	return load_fname(&LUX->load, ins);
+}

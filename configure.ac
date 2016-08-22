@@ -204,6 +204,7 @@ extern void lux_debug(const void *, ...);
 
 extern void *lux_load(const char *, const void *);
 extern void  lux_unload(void *);
+extern const char *lux_fname(void *);
 
 /*===========================================================================*/
 
