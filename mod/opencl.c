@@ -52,6 +52,9 @@ typedef union {
 #define DEV_COUNT 32 /* 5 bits */
 
 const char preamble_fmt[] = "\
+typedef unsigned whole;\n\
+typedef int      integer;\n\
+\n\
 typedef %s   fast;\n\
 typedef %s2  fast2;\n\
 typedef %s4  fast4;\n\
