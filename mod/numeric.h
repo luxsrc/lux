@@ -26,17 +26,18 @@
  *
  * In one category, the types are platform independent.  When a
  * developer use a type in this category, the behaviors of the type is
- * expect to be the same across platform.  If a platform does not have
- * a particular feature, the type is simply missing.  Floating point
- * types in C fall in this category.  `float` and `double` are 32-bit
- * and 64-bit on almost all platforms, respectively.  `half` and `long
- * double`, if available, are 16-bit and (often) 80-bit, although they
- * may simply be missing if the platform do not support them.
- * "Portable" here means that, if a developer write a code once and
- * the code compiles, he or she knows how it would behave the same
- * across platform.  However, the developer is responsible to check if
- * a type is available in the first place, and use additional checks
- * (mostly with macros) to make the code would compile.
+ * expected to be the same across platform.  If a platform does not
+ * have a particular feature, the type is simply missing.  Floating
+ * point types in C fall in this category.  `float` and `double` are
+ * 32-bit and 64-bit on almost all platforms, respectively.  `half`
+ * and `long double`, if available, are 16-bit and (often) 80-bit,
+ * although they may simply be missing if the platform do not support
+ * them.  "Portable" here means that, if a developer write a code once
+ * and the code compiles, he or she knows how it would behave the same
+ * across platform (assuming round off error is irrelevant).  However,
+ * the developer is responsible to check if a type is available in the
+ * first place, and to use additional checks (mostly with macros) to
+ * make sure that the code would compile.
  *
  * In the other category, the types are known that they can be
  * different on different platforms.  Nevertheless, the same types
@@ -62,36 +63,47 @@
  *  long double  ---          ~80-bit  ---
  *
  * While this helps OpenCL kernels to behave consistently once they
- * compile, it limits the number of devices that the same kernel can
- * compile on.
+ * are compiled, it limits the number of devices that the same kernel
+ * can compile on.
  *
- * To overcome this, lux defines a class of `real` types that can be
- * redefined at *runtime*.  lux can then measure the performance of
- * these different redefinition and provide the most sensible
- * configuration to the user.  Therefore, lux provides
+ * To overcome this, lux follow the second C category above to define
+ * classes of `integer` and `real` types that garanteed to exist, but
+ * may be different on different platform.  In fact, lux OpenCL (see
+ * <lux/opencl.h> goes all the way to make these types redefinable at
+ * *runtime*.  lux can then measure the performance of these different
+ * redefinition and provide the most sensible configuration to the
+ * user.
  *
- *  Type      CPU          GPGPU   GPU     Graphics
+ * As a summary, lux provides
  *
- *  fast      float        float   float   half
- *  real      double       double  float   float
- *  extended  long double  double  double  float
+ *               "Host"    "OpenCL Device", adjustable
+ *            /----^----\  /------------^------------\
+ *  Type      CPU          GPU-HPC   GPU      Graphics
+ *
+ *  integer   ptrdiff_t    int       cl_int   cl_int
+ *  whole     size_t       unsigned  cl_uint  cl_uint
+ *
+ *  fast      float        float     float    half
+ *  real      double       double    float    float
+ *  extended  long double  double    double   float
  */
-#if HAVE_STDDEF_H
+#if ! HAVE_STDDEF_H
+#error <stddef.h> is required to define `whole` and `integer` on the host.
+#endif
+
 #include <stddef.h> /* for size_t and ptrdiff_t */
+
 typedef size_t    whole;
 typedef ptrdiff_t integer;
-#else
-typedef unsigned  whole;
-typedef int       integer;
-#endif
 
 typedef float fast; /* "fast" real number */
 #ifdef LUX_SINGLE
 typedef float real;
+typedef double extended; /* real numbers with possibly extra precision */
 #else
 typedef double real;
-#endif
 typedef long double extended; /* real numbers with possibly extra precision */
+#endif
 
 typedef struct {integer  n, m;} rational;
 
