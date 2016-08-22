@@ -24,11 +24,12 @@
 
 #define A(E) lux_always_assert(E)
 
-int main()
+int
+main(int argc, char *argv[])
 {
 	Lux_mpi *mpi;
 
-	lux_setup();
+	lux_setup(&argc, &argv);
 
 	mpi = lux_load("../mod/.libs/mpi", NULL);
 	A(mpi);
