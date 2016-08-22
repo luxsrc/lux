@@ -91,4 +91,16 @@ strtotype(const char *str)
 	}
 }
 
+static inline size_t
+strtoprec(const char *str)
+{
+	SWITCH {
+	CASE(str[0] == 's') return sizeof(float);
+	CASE(str[0] == 'f') return sizeof(float);
+	CASE(str[0] == 'd') return sizeof(double);
+	CASE(str[0] == 'l') return sizeof(long double);
+	DEFAULT             return 0U;
+	}
+}
+
 #endif /* _LUX_OPENCL_H_ */
