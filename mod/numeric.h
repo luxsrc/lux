@@ -68,9 +68,14 @@
  * To overcome this, lux defines a class of `real` types that can be
  * redefined at *runtime*.  lux can then measure the performance of
  * these different redefinition and provide the most sensible
- * configuration to the user.
+ * configuration to the user.  Therefore, lux provides
+ *
+ *  Type      CPU          GPGPU   GPU     Graphics
+ *
+ *  fast      float        float   float   half
+ *  real      double       double  float   float
+ *  extended  long double  double  double  float
  */
-
 #if HAVE_STDDEF_H
 #include <stddef.h> /* for size_t and ptrdiff_t */
 typedef size_t    whole;
@@ -80,14 +85,13 @@ typedef unsigned  whole;
 typedef int       integer;
 #endif
 
+typedef float fast; /* "fast" real number */
 #ifdef LUX_SINGLE
-typedef float  fast; /* "fast" real number */
-typedef float  real;
+typedef float real;
 #else
-typedef double fast; /* "fast" real number */
 typedef double real;
 #endif
-typedef double extended; /* real numbers with possibly extra precision */
+typedef long double extended; /* real numbers with possibly extra precision */
 
 typedef struct {integer  n, m;} rational;
 
