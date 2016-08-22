@@ -33,7 +33,7 @@ struct LuxSopencl {
 	cl_program program;
 
 	cl_platform_id (*lsplf)(Lux_opencl *, unsigned);
-	int            (*lsdev)(Lux_opencl *, unsigned, unsigned);
+	int            (*lsdev)(Lux_opencl *, unsigned, unsigned, cl_device_type);
 
 	cl_kernel (*mkkern)(Lux_opencl *, const char *);
 	void      (*rmkern)(Lux_opencl *, cl_kernel);

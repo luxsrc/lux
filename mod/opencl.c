@@ -58,14 +58,14 @@ lsplf(Lux_opencl *ego, unsigned iplf)
 }
 
 static int
-lsdev(Lux_opencl *ego, unsigned iplf, unsigned idev)
+lsdev(Lux_opencl *ego, unsigned iplf, unsigned idev, cl_device_type devtype)
 {
 	cl_platform_id p[COUNT_MAX];
 	cl_device_id   d[COUNT_MAX];
 	cl_uint        n, i;
 
 	(void)clGetPlatformIDs(COUNT_MAX, p, NULL);
-	(void)clGetDeviceIDs(p[iplf], CL_DEVICE_TYPE_ALL, COUNT_MAX, d, &n);
+	(void)clGetDeviceIDs(p[iplf], devtype, COUNT_MAX, d, &n);
 
 	lux_print("%d device%s found:\n", n, n > 1 ? "s are" : " is");
 	for(i = 0; i < n; ++i) {
@@ -272,7 +272,7 @@ LUX_MKMOD(const struct LuxOopencl *opts)
 	lux_print("\nGetting OpenCL platforms... ");
 	plf[1] = (cl_context_properties)lsplf(NULL, opts->iplf);
 	lux_print("\nGetting OpenCL devices from platform %u... ", opts->iplf);
-	lsdev(NULL, opts->iplf, opts->idev);
+	lsdev(NULL, opts->iplf, opts->idev, opts->devtype);
 	lux_print("\n");
 
 	ctx = clCreateContextFromType(plf, opts->devtype, NULL, NULL, &err);
