@@ -40,16 +40,33 @@ struct opencl {
 	cl_command_queue queue[1]; /* flexible array element */
 };
 
-#define EGO ((struct opencl *)ego)
-
-#define PLF_COUNT 8  /* 3 bits */
-#define DEV_COUNT 32 /* 5 bits */
-
 typedef union {
 	cl_half   h;
 	cl_float  f;
 	cl_double d;
 } cl_real;
+
+#define EGO ((struct opencl *)ego)
+
+#define PLF_COUNT 8  /* 3 bits */
+#define DEV_COUNT 32 /* 5 bits */
+
+const char preamble_fmt[] = "\
+typedef %s fast;\n\
+typedef %s real;\n\
+typedef %s extended;\n\
+";
+
+static const char *
+prectoreal(size_t realsz)
+{
+	switch(realsz) {
+	case 2 : return "half"  ;
+	case 4 : return "float" ;
+	case 8 : return "double";
+	default: return "float" ;
+	}
+}
 
 static cl_platform_id
 lsplf(Lux_opencl *ego, unsigned iplf)
@@ -317,6 +334,9 @@ LUX_MKMOD(const struct LuxOopencl *opts)
 	cl_context_properties plf[] = {CL_CONTEXT_PLATFORM,
 	                               (cl_context_properties)NULL,
 	                               (cl_context_properties)NULL};
+	char buf[1024];
+	const char *src[16] = {buf, NULL};
+
 	cl_device_id dev[DEV_COUNT];
 	size_t       i, ndev;
 	cl_int       err;
@@ -354,6 +374,16 @@ LUX_MKMOD(const struct LuxOopencl *opts)
 	if(!ego)
 		goto cleanup1;
 
+	EGO->integersz  = sizeof(cl_int);
+	EGO->fastsz     = sizeof(float);
+	EGO->realsz     = opts->realsz;
+	EGO->extendedsz = sizeof(double);
+
+	snprintf(buf, sizeof(buf), preamble_fmt,
+	         prectoreal(EGO->fastsz),
+	         prectoreal(EGO->realsz),
+	         prectoreal(EGO->extendedsz));
+
 	path = dlfname(opts->base ? opts->base : (void *)LUX_MKMOD);
 	for(i = 0; opts->src[i]; ++i) {
 		if(strlen(opts->src[i]) < 64) { /* UGLY HACK */
@@ -362,10 +392,12 @@ LUX_MKMOD(const struct LuxOopencl *opts)
 				lux_error("Failed to load source\n");
 				exit(1);
 			}
-			opts->src[i] = s;
-		}
+			src[i+1] = s;
+		} else
+			src[i+1] = opts->src[i];
 	}
-	pro = clCreateProgramWithSource(ctx, i, opts->src, NULL, &err);
+
+	pro = clCreateProgramWithSource(ctx, i+1, src, NULL, &err);
 	if(!pro || err) {
 		lux_error("Failed to create program\n");
 		exit(1);
@@ -398,11 +430,6 @@ LUX_MKMOD(const struct LuxOopencl *opts)
 	ego->setZ   = setZ;
 	ego->setR   = setR;
 	ego->exec   = exec;
-
-	EGO->integersz  = sizeof(cl_int);
-	EGO->fastsz     = sizeof(float);
-	EGO->realsz     = opts->realsz;
-	EGO->extendedsz = sizeof(double);
 
 	EGO->ctx    = ctx;
 	EGO->pro    = pro;
