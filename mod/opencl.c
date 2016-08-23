@@ -255,7 +255,8 @@ mkkern(Lux_opencl *ego, const char *name)
 		exit(1);
 	}
 
-	err = clGetKernelWorkGroupInfo(kern, NULL, CL_KERNEL_WORK_GROUP_SIZE,
+	err = clGetKernelWorkGroupInfo(kern, ego->dev,
+	                               CL_KERNEL_WORK_GROUP_SIZE,
 	                               sizeof(size_t), &bsz_max, NULL);
 	if(err != CL_SUCCESS) {
 		lux_error("Failed to obtain workgroup size for \"%s\"\n", name);
