@@ -116,7 +116,7 @@ lsplf(Lux_opencl *ego, unsigned iplf)
 
 		(void)clGetPlatformInfo(p[i], CL_PLATFORM_VERSION,
 		                        sizeof(buf), buf, NULL);
-		lux_print("%s (%p)\n", buf, p[i]);
+		lux_print("%s\n", buf);
 	}
 
 	return p[iplf < n ? iplf : n];
@@ -148,7 +148,7 @@ lsdev(Lux_opencl *ego, unsigned iplf, unsigned idev, cl_device_type devtype)
 
 		(void)clGetDeviceInfo(d[i], CL_DRIVER_VERSION,
 		                      sizeof(buf), buf, NULL);
-		lux_print("%s (%p)\n", buf, d[i]);
+		lux_print("%s\n", buf);
 	}
 
 	return EXIT_SUCCESS;
@@ -365,7 +365,7 @@ exec(Lux_opencl *ego, Lux_opencl_kernel *k, size_t dim, const size_t *shape)
 	cl_ulong t0, t1;
 
 	/* In OpenCL, the global size must be multipple of local size;
-	   hence we round up the last dimension to multipple of k->bml */
+	   hence we round up the last dimension to a multiple of k->bml */
 	size_t shapeup[3];
 	size_t i;
 	for(i = 0; i < dim-1; ++i)

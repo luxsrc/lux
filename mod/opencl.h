@@ -38,17 +38,17 @@ struct LuxSopencl {
 	Lux_opencl_kernel *(*mkkern)(Lux_opencl *, const char *);
 	void               (*rmkern)(Lux_opencl *, Lux_opencl_kernel *);
 
-	cl_mem   (*mk    )(Lux_opencl *, unsigned, size_t);
-	void     (*rm    )(Lux_opencl *, cl_mem);
-	void    *(*mmap  )(Lux_opencl *, cl_mem, size_t);
-	void     (*munmap)(Lux_opencl *, cl_mem, void *);
+	cl_mem (*mk    )(Lux_opencl *, unsigned, size_t);
+	void   (*rm    )(Lux_opencl *, cl_mem);
+	void  *(*mmap  )(Lux_opencl *, cl_mem, size_t);
+	void   (*munmap)(Lux_opencl *, cl_mem, void *);
 
-	void     (*set   )(Lux_opencl *, Lux_opencl_kernel *, size_t, size_t, void *);
-	void     (*setM  )(Lux_opencl *, Lux_opencl_kernel *, size_t, cl_mem);
-	void     (*setW  )(Lux_opencl *, Lux_opencl_kernel *, size_t, whole);
-	void     (*setZ  )(Lux_opencl *, Lux_opencl_kernel *, size_t, integer);
-	void     (*setR  )(Lux_opencl *, Lux_opencl_kernel *, size_t, real);
-	double   (*exec  )(Lux_opencl *, Lux_opencl_kernel *, size_t, const size_t *);
+	void   (*set   )(Lux_opencl *, Lux_opencl_kernel *, size_t, size_t, void *);
+	void   (*setM  )(Lux_opencl *, Lux_opencl_kernel *, size_t, cl_mem);
+	void   (*setW  )(Lux_opencl *, Lux_opencl_kernel *, size_t, whole);
+	void   (*setZ  )(Lux_opencl *, Lux_opencl_kernel *, size_t, integer);
+	void   (*setR  )(Lux_opencl *, Lux_opencl_kernel *, size_t, real);
+	double (*exec  )(Lux_opencl *, Lux_opencl_kernel *, size_t, const size_t *);
 
 	cl_device_id     dev; /* default device */
 	cl_command_queue que; /* default queue on default device */
