@@ -492,8 +492,10 @@ LUX_MKMOD(const struct LuxOopencl *opts)
 		if(!q || err)
 			goto cleanup2;
 		EGO->queue[i] = q;
-		if(i == opts->idev)
+		if(i == opts->idev) {
+			ego->dev = dev[i];
 			ego->que = q;
+		}
 	}
 	return ego;
 
