@@ -338,6 +338,7 @@ exec(Lux_opencl *ego, cl_kernel kern,
 	                        sizeof(t0), &t0, NULL);
 	clGetEventProfilingInfo(event, CL_PROFILING_COMMAND_END,
 	                        sizeof(t1), &t1, NULL);
+	clReleaseEvent(event);
 
 	return (double)(t1 - t0);
 }
@@ -460,7 +461,10 @@ LUX_MKMOD(const struct LuxOopencl *opts)
 	EGO->pro    = pro;
 	EGO->nqueue = ndev;
 	for(i = 0; i < ndev; ++i) {
-		cl_command_queue q = clCreateCommandQueue(ctx, dev[i], 0, &err);
+		cl_command_queue q =
+			clCreateCommandQueue(ctx, dev[i],
+			                     CL_QUEUE_PROFILING_ENABLE,
+			                     &err);
 		if(!q || err)
 			goto cleanup2;
 		EGO->queue[i] = q;
