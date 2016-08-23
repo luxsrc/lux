@@ -360,14 +360,22 @@ setR(Lux_opencl *ego, Lux_opencl_kernel *k, size_t i, real r)
 
 static double
 exec(Lux_opencl *ego, Lux_opencl_kernel *k,
-     size_t dim, const size_t *gsz, const size_t *bsz)
+     size_t dim, const size_t *shape, const size_t *local)
 {
 	cl_event event;
 	cl_ulong t0, t1;
 
+	/* In OpenCL, the global size must be multipple of local size;
+	   hence we round up the last dimension to multipple of k->bml */
+	size_t shapeup[3];
+	size_t i;
+	for(i = 0; i < dim-1; ++i)
+		shapeup[i] = shape[i];
+	shapeup[i] = ((shape[i] + k->bml - 1) / k->bml) * k->bml;
+
 	/* TODO: automatic load balancing across devices */
 	clEnqueueNDRangeKernel(ego->que, k->k,
-	                       dim, NULL, gsz,  bsz, 0, NULL, &event);
+	                       dim, NULL, shapeup, local, 0, NULL, &event);
 	clWaitForEvents(1, &event);
 
 	clGetEventProfilingInfo(event, CL_PROFILING_COMMAND_START,
