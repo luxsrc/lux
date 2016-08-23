@@ -235,22 +235,27 @@ getsrc(const char *path, const char *name)
 	}
 }
 
-static cl_kernel
+static kernel_t
 mkkern(Lux_opencl *ego, const char *name)
 {
-	cl_int    err;
-	cl_kernel k = clCreateKernel(EGO->pro, name, &err);
-	if(!k || err != CL_SUCCESS) {
+	cl_int   err;
+	kernel_t k;
+
+	k.k = clCreateKernel(EGO->pro, name, &err);
+	if(!k.k || err != CL_SUCCESS) {
 		lux_error("Failed to obtain compute kernel \"%s\"\n", name);
 		exit(1);
 	}
+
+	k.bsz = 1;
+
 	return k;
 }
 
 static void
-rmkern(Lux_opencl *ego, cl_kernel k)
+rmkern(Lux_opencl *ego, kernel_t k)
 {
-	(void)clReleaseKernel(k);
+	(void)clReleaseKernel(k.k);
 	(void)ego; /* silence unused variable warning */
 }
 
@@ -283,35 +288,35 @@ munmap(Lux_opencl *ego, cl_mem buf, void *host)
 }
 
 static void
-set(Lux_opencl *ego, cl_kernel kern, size_t i, size_t sz, void *arg)
+set(Lux_opencl *ego, kernel_t k, size_t i, size_t sz, void *arg)
 {
-	clSetKernelArg(kern, i, sz, arg);
+	clSetKernelArg(k.k, i, sz, arg);
 	(void)ego; /* silence unused variable warning */
 }
 
 static void
-setM(Lux_opencl *ego, cl_kernel kern, size_t i, cl_mem m)
+setM(Lux_opencl *ego, kernel_t k, size_t i, cl_mem m)
 {
-	clSetKernelArg(kern, i, sizeof(cl_mem), &m);
+	clSetKernelArg(k.k, i, sizeof(cl_mem), &m);
 	(void)ego; /* silence unused variable warning */
 }
 
 static void
-setW(Lux_opencl *ego, cl_kernel kern, size_t i, whole w)
+setW(Lux_opencl *ego, kernel_t k, size_t i, whole w)
 {
 	cl_uint clw = w;
-	clSetKernelArg(kern, i, EGO->integersz, &clw);
+	clSetKernelArg(k.k, i, EGO->integersz, &clw);
 }
 
 static void
-setZ(Lux_opencl *ego, cl_kernel kern, size_t i, integer z)
+setZ(Lux_opencl *ego, kernel_t k, size_t i, integer z)
 {
 	cl_int clz = z;
-	clSetKernelArg(kern, i, EGO->integersz, &clz);
+	clSetKernelArg(k.k, i, EGO->integersz, &clz);
 }
 
 static void
-setR(Lux_opencl *ego, cl_kernel kern, size_t i, real r)
+setR(Lux_opencl *ego, kernel_t k, size_t i, real r)
 {
 	cl_real clr;
 	switch(EGO->realsz) {
@@ -319,18 +324,18 @@ setR(Lux_opencl *ego, cl_kernel kern, size_t i, real r)
 	case 4: clr.f = r; break;
 	case 8: clr.d = r; break;
 	}
-	clSetKernelArg(kern, i, EGO->realsz, &clr);
+	clSetKernelArg(k.k, i, EGO->realsz, &clr);
 }
 
 static double
-exec(Lux_opencl *ego, cl_kernel kern,
+exec(Lux_opencl *ego, kernel_t k,
      size_t dim, const size_t *gsz, const size_t *bsz)
 {
 	cl_event event;
 	cl_ulong t0, t1;
 
 	/* TODO: automatic load balancing across devices */
-	clEnqueueNDRangeKernel(ego->que, kern,
+	clEnqueueNDRangeKernel(ego->que, k.k,
 	                       dim, NULL, gsz,  bsz, 0, NULL, &event);
 	clWaitForEvents(1, &event);
 
