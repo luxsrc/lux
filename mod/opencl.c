@@ -43,6 +43,7 @@ struct opencl {
 struct LuxSopencl_kernel {
 	cl_kernel k;
 	size_t    bsz;
+	size_t    bml;
 };
 
 typedef union {
@@ -246,6 +247,7 @@ mkkern(Lux_opencl *ego, const char *name)
 	cl_int    err;
 	cl_kernel kern;
 	size_t    bsz_max;
+	size_t    bml_pref;
 
 	Lux_opencl_kernel *k;
 
@@ -263,10 +265,19 @@ mkkern(Lux_opencl *ego, const char *name)
 		exit(1);
 	}
 
+	err = clGetKernelWorkGroupInfo(kern, ego->dev,
+	                               CL_KERNEL_PREFERRED_WORK_GROUP_SIZE_MULTIPLE,
+	                               sizeof(size_t), &bml_pref, NULL);
+	if(err != CL_SUCCESS) {
+		lux_error("Failed to obtain preferred multiple for \"%s\"\n", name);
+		exit(1);
+	}
+
 	k = malloc(sizeof(Lux_opencl_kernel));
 	if(k) {
 		k->k   = kern;
 		k->bsz = bsz_max;
+		k->bml = bml_pref;
 	}
 	return k;
 }
