@@ -28,31 +28,27 @@
 
 #include <lux/numeric.h>
 
-typedef struct {
-	cl_kernel k;
-	size_t    bsz;
-} kernel_t;
-
-typedef struct LuxSopencl Lux_opencl;
+typedef struct LuxSopencl        Lux_opencl;
+typedef struct LuxSopencl_kernel Lux_opencl_kernel;
 
 struct LuxSopencl {
 	cl_platform_id (*lsplf)(Lux_opencl *, unsigned);
 	int            (*lsdev)(Lux_opencl *, unsigned, unsigned, cl_device_type);
 
-	kernel_t (*mkkern)(Lux_opencl *, const char *);
-	void     (*rmkern)(Lux_opencl *, kernel_t);
+	Lux_opencl_kernel *(*mkkern)(Lux_opencl *, const char *);
+	void               (*rmkern)(Lux_opencl *, Lux_opencl_kernel *);
 
 	cl_mem   (*mk    )(Lux_opencl *, unsigned, size_t);
 	void     (*rm    )(Lux_opencl *, cl_mem);
 	void    *(*mmap  )(Lux_opencl *, cl_mem, size_t);
 	void     (*munmap)(Lux_opencl *, cl_mem, void *);
 
-	void     (*set   )(Lux_opencl *, kernel_t, size_t, size_t, void *);
-	void     (*setM  )(Lux_opencl *, kernel_t, size_t, cl_mem);
-	void     (*setW  )(Lux_opencl *, kernel_t, size_t, whole);
-	void     (*setZ  )(Lux_opencl *, kernel_t, size_t, integer);
-	void     (*setR  )(Lux_opencl *, kernel_t, size_t, real);
-	double   (*exec  )(Lux_opencl *, kernel_t, size_t, const size_t *, const size_t *);
+	void     (*set   )(Lux_opencl *, Lux_opencl_kernel *, size_t, size_t, void *);
+	void     (*setM  )(Lux_opencl *, Lux_opencl_kernel *, size_t, cl_mem);
+	void     (*setW  )(Lux_opencl *, Lux_opencl_kernel *, size_t, whole);
+	void     (*setZ  )(Lux_opencl *, Lux_opencl_kernel *, size_t, integer);
+	void     (*setR  )(Lux_opencl *, Lux_opencl_kernel *, size_t, real);
+	double   (*exec  )(Lux_opencl *, Lux_opencl_kernel *, size_t, const size_t *, const size_t *);
 
 	cl_command_queue que; /* default queue on default device */
 };

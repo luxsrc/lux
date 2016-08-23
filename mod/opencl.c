@@ -40,6 +40,11 @@ struct opencl {
 	cl_command_queue queue[1]; /* flexible array element */
 };
 
+struct LuxSopencl_kernel {
+	cl_kernel k;
+	size_t    bsz;
+};
+
 typedef union {
 	cl_half   h;
 	cl_float  f;
@@ -235,32 +240,41 @@ getsrc(const char *path, const char *name)
 	}
 }
 
-static kernel_t
+static Lux_opencl_kernel *
 mkkern(Lux_opencl *ego, const char *name)
 {
-	cl_int   err;
-	kernel_t k;
+	cl_int    err;
+	cl_kernel kern;
+	size_t    bsz_max;
 
-	k.k = clCreateKernel(EGO->pro, name, &err);
-	if(!k.k || err != CL_SUCCESS) {
+	Lux_opencl_kernel *k;
+
+	kern = clCreateKernel(EGO->pro, name, &err);
+	if(!kern || err != CL_SUCCESS) {
 		lux_error("Failed to obtain compute kernel \"%s\"\n", name);
 		exit(1);
 	}
 
-	err = clGetKernelWorkGroupInfo(k.k, NULL, CL_KERNEL_WORK_GROUP_SIZE,
-	                               sizeof(size_t), &k.bsz, NULL);
+	err = clGetKernelWorkGroupInfo(kern, NULL, CL_KERNEL_WORK_GROUP_SIZE,
+	                               sizeof(size_t), &bsz_max, NULL);
 	if(err != CL_SUCCESS) {
 		lux_error("Failed to obtain workgroup size for \"%s\"\n", name);
 		exit(1);
 	}
 
+	k = malloc(sizeof(Lux_opencl_kernel));
+	if(k) {
+		k->k   = kern;
+		k->bsz = bsz_max;
+	}
 	return k;
 }
 
 static void
-rmkern(Lux_opencl *ego, kernel_t k)
+rmkern(Lux_opencl *ego, Lux_opencl_kernel *k)
 {
-	(void)clReleaseKernel(k.k);
+	(void)clReleaseKernel(k->k);
+	free(k);
 	(void)ego; /* silence unused variable warning */
 }
 
@@ -293,35 +307,35 @@ munmap(Lux_opencl *ego, cl_mem buf, void *host)
 }
 
 static void
-set(Lux_opencl *ego, kernel_t k, size_t i, size_t sz, void *arg)
+set(Lux_opencl *ego, Lux_opencl_kernel *k, size_t i, size_t sz, void *arg)
 {
-	clSetKernelArg(k.k, i, sz, arg);
+	clSetKernelArg(k->k, i, sz, arg);
 	(void)ego; /* silence unused variable warning */
 }
 
 static void
-setM(Lux_opencl *ego, kernel_t k, size_t i, cl_mem m)
+setM(Lux_opencl *ego, Lux_opencl_kernel *k, size_t i, cl_mem m)
 {
-	clSetKernelArg(k.k, i, sizeof(cl_mem), &m);
+	clSetKernelArg(k->k, i, sizeof(cl_mem), &m);
 	(void)ego; /* silence unused variable warning */
 }
 
 static void
-setW(Lux_opencl *ego, kernel_t k, size_t i, whole w)
+setW(Lux_opencl *ego, Lux_opencl_kernel *k, size_t i, whole w)
 {
 	cl_uint clw = w;
-	clSetKernelArg(k.k, i, EGO->integersz, &clw);
+	clSetKernelArg(k->k, i, EGO->integersz, &clw);
 }
 
 static void
-setZ(Lux_opencl *ego, kernel_t k, size_t i, integer z)
+setZ(Lux_opencl *ego, Lux_opencl_kernel *k, size_t i, integer z)
 {
 	cl_int clz = z;
-	clSetKernelArg(k.k, i, EGO->integersz, &clz);
+	clSetKernelArg(k->k, i, EGO->integersz, &clz);
 }
 
 static void
-setR(Lux_opencl *ego, kernel_t k, size_t i, real r)
+setR(Lux_opencl *ego, Lux_opencl_kernel *k, size_t i, real r)
 {
 	cl_real clr;
 	switch(EGO->realsz) {
@@ -329,18 +343,18 @@ setR(Lux_opencl *ego, kernel_t k, size_t i, real r)
 	case 4: clr.f = r; break;
 	case 8: clr.d = r; break;
 	}
-	clSetKernelArg(k.k, i, EGO->realsz, &clr);
+	clSetKernelArg(k->k, i, EGO->realsz, &clr);
 }
 
 static double
-exec(Lux_opencl *ego, kernel_t k,
+exec(Lux_opencl *ego, Lux_opencl_kernel *k,
      size_t dim, const size_t *gsz, const size_t *bsz)
 {
 	cl_event event;
 	cl_ulong t0, t1;
 
 	/* TODO: automatic load balancing across devices */
-	clEnqueueNDRangeKernel(ego->que, k.k,
+	clEnqueueNDRangeKernel(ego->que, k->k,
 	                       dim, NULL, gsz,  bsz, 0, NULL, &event);
 	clWaitForEvents(1, &event);
 
