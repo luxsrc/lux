@@ -48,7 +48,7 @@ struct LuxSopencl {
 	void     (*setW  )(Lux_opencl *, Lux_opencl_kernel *, size_t, whole);
 	void     (*setZ  )(Lux_opencl *, Lux_opencl_kernel *, size_t, integer);
 	void     (*setR  )(Lux_opencl *, Lux_opencl_kernel *, size_t, real);
-	double   (*exec  )(Lux_opencl *, Lux_opencl_kernel *, size_t, const size_t *, const size_t *);
+	double   (*exec  )(Lux_opencl *, Lux_opencl_kernel *, size_t, const size_t *);
 
 	cl_device_id     dev; /* default device */
 	cl_command_queue que; /* default queue on default device */

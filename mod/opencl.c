@@ -359,8 +359,7 @@ setR(Lux_opencl *ego, Lux_opencl_kernel *k, size_t i, real r)
 }
 
 static double
-exec(Lux_opencl *ego, Lux_opencl_kernel *k,
-     size_t dim, const size_t *shape, const size_t *local)
+exec(Lux_opencl *ego, Lux_opencl_kernel *k, size_t dim, const size_t *shape)
 {
 	cl_event event;
 	cl_ulong t0, t1;
@@ -375,7 +374,7 @@ exec(Lux_opencl *ego, Lux_opencl_kernel *k,
 
 	/* TODO: automatic load balancing across devices */
 	clEnqueueNDRangeKernel(ego->que, k->k,
-	                       dim, NULL, shapeup, local, 0, NULL, &event);
+	                       dim, NULL, shapeup, NULL, 0, NULL, &event);
 	clWaitForEvents(1, &event);
 
 	clGetEventProfilingInfo(event, CL_PROFILING_COMMAND_START,
