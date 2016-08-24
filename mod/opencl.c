@@ -280,7 +280,7 @@ rmkern(Lux_opencl *ego, Lux_opencl_kernel *k)
 }
 
 static cl_mem
-mk(Lux_opencl *ego, unsigned flags, size_t sz)
+mk(Lux_opencl *ego, size_t sz, unsigned flags)
 {
 	return clCreateBuffer(EGO->ctx, flags, sz, NULL, NULL);
 }
