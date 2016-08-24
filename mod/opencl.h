@@ -95,4 +95,15 @@ strtoprec(const char *str)
 	}
 }
 
+static inline const char *
+prectoreal(size_t realsz)
+{
+	switch(realsz) {
+	case 2 : return "half"  ;
+	case 4 : return "float" ;
+	case 8 : return "double";
+	default: return "float" ;
+	}
+}
+
 #endif /* _LUX_OPENCL_H_ */

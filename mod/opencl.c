@@ -83,17 +83,6 @@ typedef %s16 extended16;\n\
 \n\
 ";
 
-static const char *
-prectoreal(size_t realsz)
-{
-	switch(realsz) {
-	case 2 : return "half"  ;
-	case 4 : return "float" ;
-	case 8 : return "double";
-	default: return "float" ;
-	}
-}
-
 static cl_platform_id
 lsplf(Lux_opencl *ego, unsigned iplf)
 {
