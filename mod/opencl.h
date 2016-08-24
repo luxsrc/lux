@@ -76,8 +76,9 @@ strtotype(const char *str)
 	case 'g': return CL_DEVICE_TYPE_GPU;
 	case 'a': return CL_DEVICE_TYPE_ACCELERATOR;
 #ifdef CL_DEVICE_TYPE_CUSTOM /* OpenCL version >= 1.2 */
-	case 'o': return CL_DEVICE_TYPE_CUSTOM;
+	case 'u': return CL_DEVICE_TYPE_CUSTOM;
 #endif
+	case 'A': return CL_DEVICE_TYPE_ALL;
 	default : return CL_DEVICE_TYPE_DEFAULT;
 	}
 }
