@@ -78,8 +78,8 @@ strtotype(const char *str)
 #ifdef CL_DEVICE_TYPE_CUSTOM /* OpenCL version >= 1.2 */
 	case 'u': return CL_DEVICE_TYPE_CUSTOM;
 #endif
-	case 'A': return CL_DEVICE_TYPE_ALL;
-	default : return CL_DEVICE_TYPE_DEFAULT;
+	case 'd': return CL_DEVICE_TYPE_DEFAULT;
+	default : return CL_DEVICE_TYPE_ALL;
 	}
 }
 
