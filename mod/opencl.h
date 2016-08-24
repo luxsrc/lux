@@ -96,9 +96,9 @@ strtoprec(const char *str)
 }
 
 static inline const char *
-prectoreal(size_t realsz)
+prectostr(size_t prec)
 {
-	switch(realsz) {
+	switch(prec) {
 	case 2 : return "half"  ;
 	case 4 : return "float" ;
 	case 8 : return "double";

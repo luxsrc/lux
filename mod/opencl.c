@@ -432,9 +432,9 @@ LUX_MKMOD(const struct LuxOopencl *opts)
 	EGO->realsz     = opts->realsz;
 	EGO->extendedsz = sizeof(double);
 	{
-		const char *fn = prectoreal(EGO->fastsz);
-		const char *rn = prectoreal(EGO->realsz);
-		const char *xn = prectoreal(EGO->extendedsz);
+		const char *fn = prectostr(EGO->fastsz);
+		const char *rn = prectostr(EGO->realsz);
+		const char *xn = prectostr(EGO->extendedsz);
 		snprintf(buf, sizeof(buf), preamble_fmt,
 		         fn, fn, fn, fn, fn,
 		         rn, rn, rn, rn, rn,
