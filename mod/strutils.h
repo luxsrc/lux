@@ -60,6 +60,8 @@ strtoda(const char *str, char **endptr)
 
 	for(;;) {
 		double d = strtod(str, (char **)&str);
+		if(*str == '_' || *str == ',' || *str == ';')
+			++str;
 		if(d == 0.0)
 			break;
 		da[n++] = d;
