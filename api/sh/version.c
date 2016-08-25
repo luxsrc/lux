@@ -26,8 +26,10 @@ version(void)
 	lux_print("\
 lux (" LUX_NAME ") commit '" LUX_VERSION "'\n\
 \n\
-Copyright (C) 2009 Chi-kwan Chan\n\
-Copyright (C) 2009 Harvard-Smithsonian Center for Astrophysics\n\
+Copyright (C) 2009--2011,2014,2016 Chi-kwan Chan\n\
+Copyright (C) 2009,2010 Harvard-Smithsonian Center for Astrophysics\n\
+Copyright (C) 2011      Nordic Institute for Theoretical Physics\n\
+Copyright (C) 2014,2016 Steward Observatory\n\
 \n\
 License GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>.\n\
 This is free software: you are free to change and redistribute it.\n\

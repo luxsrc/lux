@@ -21,6 +21,8 @@
 #define _LUX_STRUTILS_H_
 
 #include <ctype.h>
+#include <math.h>
+#include <stdlib.h>
 #include <string.h>
 
 typedef struct {
@@ -48,6 +50,33 @@ _basename(const char *s)
 		if('/' == *h++)
 			s = h;
 	return s;
+}
+
+static inline double *
+strtoda(const char *str, char **endptr)
+{
+	size_t  c  = 8;
+	size_t  n  = 0;
+	double *da = malloc(sizeof(double) * c);
+	char   *end;
+
+	for(;;) {
+		double d = strtod(str, &end);
+		if(*end == '_' || *end == ',' || *end == ';')
+			++end;
+		if(str == end)
+			break;
+		da[n++] = d;
+		if(n == c) {
+			c *= 2;
+			da = realloc(da, sizeof(double) * c);
+		}
+		str = end;
+	}
+
+	da[n++] = NAN; /* end of array */
+	*endptr = end;
+	return da;
 }
 
 #endif /* _LUX_STRUTILS_H_ */

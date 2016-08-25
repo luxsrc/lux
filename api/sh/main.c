@@ -30,8 +30,8 @@ static const char banner[] = "\
   ,--.                     a flexible and extendable framework\n\
   |  ,--.,--,--.  ,--.         for scientific computation\n\
   |  |  ||  |\\  `'  /\n\
-  |  |  ''  ;/  /.  \\                alpha version\n\
-  `--'`----''--'  `--`             commit '" LUX_VERSION "'\n";
+  |  |  ''  ;/  /.  \\                 Pre-release\n\
+  `--'`----''--'  `--`              version '" LUX_VERSION "'\n";
 
 int
 main(int argc, char *argv[])
