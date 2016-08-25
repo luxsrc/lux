@@ -21,6 +21,7 @@
 #define _LUX_STRUTILS_H_
 
 #include <ctype.h>
+#include <math.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -57,22 +58,24 @@ strtoda(const char *str, char **endptr)
 	size_t  c  = 8;
 	size_t  n  = 0;
 	double *da = malloc(sizeof(double) * c);
+	char   *end;
 
 	for(;;) {
-		double d = strtod(str, (char **)&str);
-		if(*str == '_' || *str == ',' || *str == ';')
-			++str;
-		if(d == 0.0)
+		double d = strtod(str, &end);
+		if(*end == '_' || *end == ',' || *end == ';')
+			++end;
+		if(str == end)
 			break;
 		da[n++] = d;
 		if(n == c) {
 			c *= 2;
 			da = realloc(da, sizeof(double) * c);
 		}
+		str = end;
 	}
 
-	da[n++] = 0.0; /* end of array */
-	*endptr = (char *)str;
+	da[n++] = NAN; /* end of array */
+	*endptr = end;
 	return da;
 }
 
