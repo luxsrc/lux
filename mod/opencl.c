@@ -291,6 +291,24 @@ rm(Lux_opencl *ego, cl_mem buf)
 	(void)ego; /* silence unused variable warning */
 }
 
+static cl_mem
+h2d(Lux_opencl *ego, cl_mem dst, void *src, size_t sz)
+{
+	(void)clEnqueueWriteBuffer(ego->que,
+	                           dst, CL_TRUE, 0, sz,
+	                           src, 0, NULL, NULL);
+	return dst;
+}
+
+static void *
+d2h(Lux_opencl *ego, void *dst, cl_mem src, size_t sz)
+{
+	(void)clEnqueueReadBuffer(ego->que,
+	                          src, CL_TRUE, 0, sz,
+	                          dst, 0, NULL, NULL);
+	return dst;
+}
+
 static void *
 mmap(Lux_opencl *ego, cl_mem buf, size_t sz)
 {
@@ -479,6 +497,8 @@ LUX_MKMOD(const struct LuxOopencl *opts)
 	ego->rmkern = rmkern;
 	ego->mk     = mk;
 	ego->rm     = rm;
+	ego->h2d    = h2d;
+	ego->d2h    = d2h;
 	ego->mmap   = mmap;
 	ego->munmap = munmap;
 	ego->set    = set;

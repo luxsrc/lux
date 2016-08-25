@@ -40,6 +40,8 @@ struct LuxSopencl {
 
 	cl_mem (*mk    )(Lux_opencl *, size_t, unsigned);
 	void   (*rm    )(Lux_opencl *, cl_mem);
+	cl_mem (*h2d   )(Lux_opencl *, cl_mem, void *, size_t);
+	void  *(*d2h   )(Lux_opencl *, void *, cl_mem, size_t);
 	void  *(*mmap  )(Lux_opencl *, cl_mem, size_t);
 	void   (*munmap)(Lux_opencl *, cl_mem, void *);
 
