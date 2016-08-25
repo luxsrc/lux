@@ -148,12 +148,7 @@ lsdev(Lux_opencl *ego, unsigned iplf, unsigned idev, cl_device_type devtype)
 static FILE *
 ftryopen(const char *name)
 {
-	const char *fmt[] = {
-		"%s",
-		"%s.cl",
-		LUX_MOD_PATH "/%s",
-		LUX_MOD_PATH "/%s.cl"
-	};
+	const char *fmt[] = {"%s", "%s.cl"};
 
 	size_t i;
 	for(i = 0; i < countof(fmt); ++i) {
