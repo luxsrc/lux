@@ -339,6 +339,13 @@ setM(Lux_opencl *ego, Lux_opencl_kernel *k, size_t i, cl_mem m)
 }
 
 static void
+setS(Lux_opencl *ego, Lux_opencl_kernel *k, size_t i, size_t sz)
+{
+	clSetKernelArg(k->k, i, sz, NULL);
+	(void)ego; /* silence unused variable warning */
+}
+
+static void
 setW(Lux_opencl *ego, Lux_opencl_kernel *k, size_t i, whole w)
 {
 	cl_uint clw = w;
@@ -502,6 +509,7 @@ LUX_MKMOD(const struct LuxOopencl *opts)
 	ego->mmap   = mmap;
 	ego->munmap = munmap;
 	ego->set    = set;
+	ego->setS   = setS;
 	ego->setM   = setM;
 	ego->setW   = setW;
 	ego->setZ   = setZ;

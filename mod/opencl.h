@@ -47,6 +47,7 @@ struct LuxSopencl {
 
 	void   (*set   )(Lux_opencl *, Lux_opencl_kernel *, size_t, size_t, void *);
 	void   (*setM  )(Lux_opencl *, Lux_opencl_kernel *, size_t, cl_mem);
+	void   (*setS  )(Lux_opencl *, Lux_opencl_kernel *, size_t, size_t);
 	void   (*setW  )(Lux_opencl *, Lux_opencl_kernel *, size_t, whole);
 	void   (*setZ  )(Lux_opencl *, Lux_opencl_kernel *, size_t, integer);
 	void   (*setR  )(Lux_opencl *, Lux_opencl_kernel *, size_t, real);
