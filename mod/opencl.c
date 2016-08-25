@@ -185,16 +185,17 @@ freadall(FILE *f)
 static const char *
 getsrc(const char *path, const char *name)
 {
-	FILE *f = NULL;
 	char buf[1024];
 
-	if(!f) {
-		if(!path) {
-			f = ftryopen(name);
-		}
-	}
+	/* Always try to open without path */
+	FILE *f = ftryopen(name);
+	if(name[0] == '/' || /* done trying if aboslute or */
+	   name[0] == '.')   /* explicit relative path     */
+		goto nopath;
 
 	if(!f) {
+		/* Try to open with an associated directory named as
+		   the base module */
 		const char *sep = strrchr(path, '.');
 		if(sep) {
 			size_t l = sep - path;
@@ -206,6 +207,8 @@ getsrc(const char *path, const char *name)
 	}
 
 	if(!f) {
+		/* Try to open with at the same directory that
+		   contains the base module */
 		const char *sep = strrchr(path, '/');
 		if(sep) {
 			size_t l = sep - path;
@@ -216,6 +219,7 @@ getsrc(const char *path, const char *name)
 		}
 	}
 
+ nopath:
 	if(!f)
 		return NULL;
 	else {
