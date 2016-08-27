@@ -58,6 +58,10 @@ struct LuxSopencl {
 	double (*exec  )(Lux_opencl *, Lux_opencl_kernel *, size_t, const size_t *);
 };
 
+struct LuxSopencl_kernel {
+	cl_kernel krn;
+};
+
 struct LuxOopencl {
 	void *base;
 

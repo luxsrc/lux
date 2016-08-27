@@ -38,10 +38,11 @@ struct opencl {
 	cl_command_queue queue[1]; /* flexible array element */
 };
 
-struct LuxSopencl_kernel {
-	cl_kernel k;
-	size_t    bsz;
-	size_t    bml;
+struct kernel {
+	Lux_opencl_kernel super;
+
+	size_t bsz;
+	size_t bml;
 };
 
 typedef union {
@@ -231,19 +232,19 @@ static Lux_opencl_kernel *
 mkkern(Lux_opencl *ego, const char *name)
 {
 	cl_int    err;
-	cl_kernel kern;
+	cl_kernel krn;
 	size_t    bsz_max;
 	size_t    bml_pref;
 
 	Lux_opencl_kernel *k;
 
-	kern = clCreateKernel(EGO->pro, name, &err);
-	if(!kern || err != CL_SUCCESS) {
+	krn = clCreateKernel(EGO->pro, name, &err);
+	if(!krn || err != CL_SUCCESS) {
 		lux_error("Failed to obtain compute kernel \"%s\"\n", name);
 		exit(1);
 	}
 
-	err = clGetKernelWorkGroupInfo(kern, ego->dev,
+	err = clGetKernelWorkGroupInfo(krn, ego->dev,
 	                               CL_KERNEL_WORK_GROUP_SIZE,
 	                               sizeof(size_t), &bsz_max, NULL);
 	if(err != CL_SUCCESS) {
@@ -251,7 +252,7 @@ mkkern(Lux_opencl *ego, const char *name)
 		exit(1);
 	}
 
-	err = clGetKernelWorkGroupInfo(kern, ego->dev,
+	err = clGetKernelWorkGroupInfo(krn, ego->dev,
 	                               CL_KERNEL_PREFERRED_WORK_GROUP_SIZE_MULTIPLE,
 	                               sizeof(size_t), &bml_pref, NULL);
 	if(err != CL_SUCCESS) {
@@ -259,11 +260,11 @@ mkkern(Lux_opencl *ego, const char *name)
 		exit(1);
 	}
 
-	k = malloc(sizeof(Lux_opencl_kernel));
+	k = malloc(sizeof(struct kernel));
 	if(k) {
-		k->k   = kern;
-		k->bsz = bsz_max;
-		k->bml = bml_pref;
+		k->krn = krn;
+		((struct kernel *)k)->bsz = bsz_max;
+		((struct kernel *)k)->bml = bml_pref;
 	}
 	return k;
 }
@@ -271,7 +272,7 @@ mkkern(Lux_opencl *ego, const char *name)
 static void
 rmkern(Lux_opencl *ego, Lux_opencl_kernel *k)
 {
-	(void)clReleaseKernel(k->k);
+	(void)clReleaseKernel(k->krn);
 	free(k);
 	(void)ego; /* silence unused variable warning */
 }
@@ -325,21 +326,21 @@ munmap(Lux_opencl *ego, cl_mem buf, void *host)
 static void
 set(Lux_opencl *ego, Lux_opencl_kernel *k, size_t i, size_t sz, void *arg)
 {
-	clSetKernelArg(k->k, i, sz, arg);
+	clSetKernelArg(k->krn, i, sz, arg);
 	(void)ego; /* silence unused variable warning */
 }
 
 static void
 setM(Lux_opencl *ego, Lux_opencl_kernel *k, size_t i, cl_mem m)
 {
-	clSetKernelArg(k->k, i, sizeof(cl_mem), &m);
+	clSetKernelArg(k->krn, i, sizeof(cl_mem), &m);
 	(void)ego; /* silence unused variable warning */
 }
 
 static void
 setS(Lux_opencl *ego, Lux_opencl_kernel *k, size_t i, size_t sz)
 {
-	clSetKernelArg(k->k, i, sz, NULL);
+	clSetKernelArg(k->krn, i, sz, NULL);
 	(void)ego; /* silence unused variable warning */
 }
 
@@ -347,14 +348,14 @@ static void
 setW(Lux_opencl *ego, Lux_opencl_kernel *k, size_t i, whole w)
 {
 	cl_uint clw = w;
-	clSetKernelArg(k->k, i, EGO->integersz, &clw);
+	clSetKernelArg(k->krn, i, EGO->integersz, &clw);
 }
 
 static void
 setZ(Lux_opencl *ego, Lux_opencl_kernel *k, size_t i, integer z)
 {
 	cl_int clz = z;
-	clSetKernelArg(k->k, i, EGO->integersz, &clz);
+	clSetKernelArg(k->krn, i, EGO->integersz, &clz);
 }
 
 static void
@@ -366,7 +367,7 @@ setR(Lux_opencl *ego, Lux_opencl_kernel *k, size_t i, real r)
 	case 4: clr.f = r; break;
 	case 8: clr.d = r; break;
 	}
-	clSetKernelArg(k->k, i, EGO->realsz, &clr);
+	clSetKernelArg(k->krn, i, EGO->realsz, &clr);
 }
 
 static double
@@ -376,15 +377,16 @@ exec(Lux_opencl *ego, Lux_opencl_kernel *k, size_t dim, const size_t *shape)
 	cl_ulong t0, t1;
 
 	/* In OpenCL, the global size must be multipple of local size;
-	   hence we round up the last dimension to a multiple of k->bml */
+	   hence we round up the last dimension to a multiple of bml */
+	size_t bml = ((struct kernel *)k)->bml;
 	size_t shapeup[3];
 	size_t i;
 	for(i = 0; i < dim-1; ++i)
 		shapeup[i] = shape[i];
-	shapeup[i] = ((shape[i] + k->bml - 1) / k->bml) * k->bml;
+	shapeup[i] = ((shape[i] + bml - 1) / bml) * bml;
 
 	/* TODO: automatic load balancing across devices */
-	clEnqueueNDRangeKernel(ego->que, k->k,
+	clEnqueueNDRangeKernel(ego->que, k->krn,
 	                       dim, NULL, shapeup, NULL, 0, NULL, &event);
 	clWaitForEvents(1, &event);
 
