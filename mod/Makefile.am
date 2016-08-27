@@ -41,22 +41,11 @@ pkginclude_HEADERS += numeric.h shorthand.h
 #==============================================================================
 # Interfaces and implementations of dynamic modules
 pkginclude_HEADERS += job.h opencl.h message.h resource.h
-SUBDIRS             = job
-pkglib_LTLIBRARIES  = opencl.la
-
-opencl_la_SOURCES  = opencl.h opencl.c
-opencl_la_CPPFLAGS = $(AM_CPPFLAGS) -DLUX_MOD_NAME=opencl
-opencl_la_LDFLAGS  = $(AM_LDFLAGS)
-if SUPPORT_FRAMEWORK
-opencl_la_LDFLAGS += -framework OpenCL
-else
-opencl_la_LDFLAGS += -lOpenCL
-endif
-opencl_la_LIBADD   = ../api/c/libux.la
+SUBDIRS             = job   opencl
 
 if USING_MPI
 pkginclude_HEADERS += mpi.h
-pkglib_LTLIBRARIES += mpi.la
+pkglib_LTLIBRARIES  = mpi.la
 mpi_la_SOURCES  = mpi.h mpi.c
 mpi_la_SOURCES += mangle.h mutex.h
 mpi_la_CFLAGS   = $(PTHREAD_CFLAGS)

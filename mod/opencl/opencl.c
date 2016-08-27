@@ -23,7 +23,7 @@
 #include <stdlib.h> /* for malloc(), free(), and NULL */
 #include <stdio.h>  /* for sprintf() etc */
 #include <string.h> /* for strlen() */
-#include "opencl.h"
+#include "../opencl.h"
 
 struct opencl {
 	Lux_opencl super;
