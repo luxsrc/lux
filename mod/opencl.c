@@ -28,14 +28,12 @@
 struct opencl {
 	Lux_opencl super;
 
-	cl_context ctx;
-	cl_program pro;
-
 	size_t integersz;
 	size_t fastsz;
 	size_t realsz;
 	size_t extendedsz;
 
+	cl_program       pro;
 	size_t           nqueue;
 	cl_command_queue queue[1]; /* flexible array element */
 };
@@ -281,7 +279,7 @@ rmkern(Lux_opencl *ego, Lux_opencl_kernel *k)
 static cl_mem
 mk(Lux_opencl *ego, size_t sz, unsigned flags)
 {
-	return clCreateBuffer(EGO->ctx, flags, sz, NULL, NULL);
+	return clCreateBuffer(EGO->super.ctx, flags, sz, NULL, NULL);
 }
 
 static void
@@ -516,7 +514,6 @@ LUX_MKMOD(const struct LuxOopencl *opts)
 	ego->setR   = setR;
 	ego->exec   = exec;
 
-	EGO->ctx    = ctx;
 	EGO->pro    = pro;
 	EGO->nqueue = ndev;
 	for(i = 0; i < ndev; ++i) {
@@ -528,6 +525,7 @@ LUX_MKMOD(const struct LuxOopencl *opts)
 			goto cleanup2;
 		EGO->queue[i] = q;
 		if(i == opts->idev) {
+			ego->ctx = ctx;
 			ego->dev = dev[i];
 			ego->que = q;
 		}
@@ -555,7 +553,7 @@ LUX_RMMOD(void *ego)
 		err = clReleaseCommandQueue(EGO->queue[i]);
 		/* TODO: check error */
 	}
-	err = clReleaseContext(EGO->ctx);
+	err = clReleaseContext(EGO->super.ctx);
 	/* TODO: check error */
 	free(ego);
 }

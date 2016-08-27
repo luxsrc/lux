@@ -32,6 +32,10 @@ typedef struct LuxSopencl        Lux_opencl;
 typedef struct LuxSopencl_kernel Lux_opencl_kernel;
 
 struct LuxSopencl {
+	cl_context       ctx; /* default opencl context */
+	cl_device_id     dev; /* default device */
+	cl_command_queue que; /* default queue on default device */
+
 	cl_platform_id (*lsplf)(Lux_opencl *, unsigned);
 	int            (*lsdev)(Lux_opencl *, unsigned, unsigned, cl_device_type);
 
@@ -52,9 +56,6 @@ struct LuxSopencl {
 	void   (*setZ  )(Lux_opencl *, Lux_opencl_kernel *, size_t, integer);
 	void   (*setR  )(Lux_opencl *, Lux_opencl_kernel *, size_t, real);
 	double (*exec  )(Lux_opencl *, Lux_opencl_kernel *, size_t, const size_t *);
-
-	cl_device_id     dev; /* default device */
-	cl_command_queue que; /* default queue on default device */
 };
 
 struct LuxOopencl {
