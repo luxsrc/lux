@@ -38,70 +38,70 @@ typedef union {
 	cl_double d;
 } cl_real;
 
-#define EGO ((struct opencl *)ego)
-#define KRN ((struct kernel *)krn)
+#define OCL ((struct opencl *)ocl)
+#define EGO ((struct kernel *)ego)
 
 static void
-set(Lux_opencl_kernel *krn, size_t i, size_t sz, void *arg)
+set(Lux_opencl_kernel *ego, size_t i, size_t sz, void *arg)
 {
-	clSetKernelArg(krn->krn, i, sz, arg);
+	clSetKernelArg(ego->krn, i, sz, arg);
 }
 
 static void
-setM(Lux_opencl_kernel *krn, size_t i, cl_mem m)
+setM(Lux_opencl_kernel *ego, size_t i, cl_mem m)
 {
-	clSetKernelArg(krn->krn, i, sizeof(cl_mem), &m);
+	clSetKernelArg(ego->krn, i, sizeof(cl_mem), &m);
 }
 
 static void
-setS(Lux_opencl_kernel *krn, size_t i, size_t sz)
+setS(Lux_opencl_kernel *ego, size_t i, size_t sz)
 {
-	clSetKernelArg(krn->krn, i, sz, NULL);
+	clSetKernelArg(ego->krn, i, sz, NULL);
 }
 
 static void
-setW(Lux_opencl_kernel *krn, size_t i, whole w)
+setW(Lux_opencl_kernel *ego, size_t i, whole w)
 {
 	cl_uint clw = w;
-	clSetKernelArg(krn->krn, i, KRN->integersz, &clw);
+	clSetKernelArg(ego->krn, i, EGO->integersz, &clw);
 }
 
 static void
-setZ(Lux_opencl_kernel *krn, size_t i, integer z)
+setZ(Lux_opencl_kernel *ego, size_t i, integer z)
 {
 	cl_int clz = z;
-	clSetKernelArg(krn->krn, i, KRN->integersz, &clz);
+	clSetKernelArg(ego->krn, i, EGO->integersz, &clz);
 }
 
 static void
-setR(Lux_opencl_kernel *krn, size_t i, real r)
+setR(Lux_opencl_kernel *ego, size_t i, real r)
 {
 	cl_real clr;
-	switch(KRN->realsz) {
+	switch(EGO->realsz) {
 	case 2: clr.h = r; break;
 	case 4: clr.f = r; break;
 	case 8: clr.d = r; break;
 	}
-	clSetKernelArg(krn->krn, i, KRN->realsz, &clr);
+	clSetKernelArg(ego->krn, i, EGO->realsz, &clr);
 }
 
 Lux_opencl_kernel *
-mkkern(Lux_opencl *ego, const char *name)
+mkkern(Lux_opencl *ocl, const char *name)
 {
 	cl_int    err;
 	cl_kernel kernel;
 	size_t    bsz_max;
 	size_t    bml_pref;
 
-	Lux_opencl_kernel *krn;
+	Lux_opencl_kernel *ego;
 
-	kernel = clCreateKernel(EGO->pro, name, &err);
+	kernel = clCreateKernel(OCL->pro, name, &err);
 	if(!kernel || err != CL_SUCCESS) {
 		lux_error("Failed to obtain compute kernel \"%s\"\n", name);
 		exit(1);
 	}
 
-	err = clGetKernelWorkGroupInfo(kernel, ego->dev,
+	err = clGetKernelWorkGroupInfo(kernel, ocl->dev,
 	                               CL_KERNEL_WORK_GROUP_SIZE,
 	                               sizeof(size_t), &bsz_max, NULL);
 	if(err != CL_SUCCESS) {
@@ -109,7 +109,7 @@ mkkern(Lux_opencl *ego, const char *name)
 		exit(1);
 	}
 
-	err = clGetKernelWorkGroupInfo(kernel, ego->dev,
+	err = clGetKernelWorkGroupInfo(kernel, ocl->dev,
 	                               CL_KERNEL_PREFERRED_WORK_GROUP_SIZE_MULTIPLE,
 	                               sizeof(size_t), &bml_pref, NULL);
 	if(err != CL_SUCCESS) {
@@ -117,36 +117,36 @@ mkkern(Lux_opencl *ego, const char *name)
 		exit(1);
 	}
 
-	krn = malloc(sizeof(struct kernel));
-	if(krn) {
-		krn->krn = kernel;
+	ego = malloc(sizeof(struct kernel));
+	if(ego) {
+		ego->krn = kernel;
 
-		krn->set  = set;
-		krn->setS = setS;
-		krn->setM = setM;
-		krn->setW = setW;
-		krn->setZ = setZ;
-		krn->setR = setR;
+		ego->set  = set;
+		ego->setS = setS;
+		ego->setM = setM;
+		ego->setW = setW;
+		ego->setZ = setZ;
+		ego->setR = setR;
 
-		KRN->integersz  = EGO->integersz;
-		KRN->fastsz     = EGO->fastsz;
-		KRN->realsz     = EGO->realsz;
-		KRN->extendedsz = EGO->extendedsz;
-		KRN->bsz        = bsz_max;
-		KRN->bml        = bml_pref;
+		EGO->integersz  = OCL->integersz;
+		EGO->fastsz     = OCL->fastsz;
+		EGO->realsz     = OCL->realsz;
+		EGO->extendedsz = OCL->extendedsz;
+		EGO->bsz        = bsz_max;
+		EGO->bml        = bml_pref;
 	}
-	return krn;
+	return ego;
 }
 
 double
-exec(Lux_opencl *ego, Lux_opencl_kernel *krn, size_t dim, const size_t *shape)
+exec(Lux_opencl *ocl, Lux_opencl_kernel *ego, size_t dim, const size_t *shape)
 {
 	cl_event event;
 	cl_ulong t0, t1;
 
 	/* In OpenCL, the global size must be multipple of local size;
 	   hence we round up the last dimension to a multiple of bml */
-	size_t bml = KRN->bml;
+	size_t bml = EGO->bml;
 	size_t shapeup[3];
 	size_t i;
 	for(i = 0; i < dim-1; ++i)
@@ -154,7 +154,7 @@ exec(Lux_opencl *ego, Lux_opencl_kernel *krn, size_t dim, const size_t *shape)
 	shapeup[i] = ((shape[i] + bml - 1) / bml) * bml;
 
 	/* TODO: automatic load balancing across devices */
-	clEnqueueNDRangeKernel(ego->que, krn->krn,
+	clEnqueueNDRangeKernel(ocl->que, ego->krn,
 	                       dim, NULL, shapeup, NULL, 0, NULL, &event);
 	clWaitForEvents(1, &event);
 
@@ -168,9 +168,9 @@ exec(Lux_opencl *ego, Lux_opencl_kernel *krn, size_t dim, const size_t *shape)
 }
 
 void
-rmkern(Lux_opencl *ego, Lux_opencl_kernel *krn)
+rmkern(Lux_opencl *ocl, Lux_opencl_kernel *ego)
 {
-	(void)clReleaseKernel(krn->krn);
-	free(krn);
-	(void)ego; /* silence unused variable warning */
+	(void)clReleaseKernel(ego->krn);
+	free(ego);
+	(void)ocl; /* silence unused variable warning */
 }
