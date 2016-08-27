@@ -108,16 +108,28 @@ with(Lux_opencl_kernel *ego, ...)
 
 		SWITCH {
 		TYPE("uint")
-			whole w = va_arg(ap, whole);
+			whole w;
+			if(sizeof(whole) >= sizeof(unsigned))
+				w = va_arg(ap, whole);
+			else
+				w = va_arg(ap, unsigned);
 			setW(ego, i, w);
 		TYPE("int")
-			integer z = va_arg(ap, integer);
+			integer z;
+			if(sizeof(integer) >= sizeof(int))
+				z = va_arg(ap, integer);
+			else
+				z = va_arg(ap, int);
 			setZ(ego, i, z);
 		TYPE("real")
-			real r = va_arg(ap, real);
+			real r;
+			if(sizeof(real) >= sizeof(double))
+				r = va_arg(ap, real);
+			else
+				r = va_arg(ap, double);
 			setR(ego, i, r);
 		CASE(type[strlen(type)-1] == '*')
-			cl_kernel_arg_address_qualifier	aq;
+			cl_kernel_arg_address_qualifier aq;
 			clGetKernelArgInfo(ego->krn, i,
 			                   CL_KERNEL_ARG_ADDRESS_QUALIFIER,
 			                   sizeof(aq), &aq, NULL);
