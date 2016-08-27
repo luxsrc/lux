@@ -40,6 +40,7 @@ struct LuxSopencl {
 	int            (*lsdev)(Lux_opencl *, unsigned, unsigned, cl_device_type);
 
 	Lux_opencl_kernel *(*mkkern)(Lux_opencl *, const char *);
+	double             (*exec  )(Lux_opencl *, Lux_opencl_kernel *, size_t, const size_t *);
 	void               (*rmkern)(Lux_opencl *, Lux_opencl_kernel *);
 
 	cl_mem (*mk    )(Lux_opencl *, size_t, unsigned);
@@ -48,18 +49,17 @@ struct LuxSopencl {
 	void  *(*d2h   )(Lux_opencl *, void *, cl_mem, size_t);
 	void  *(*mmap  )(Lux_opencl *, cl_mem, size_t);
 	void   (*munmap)(Lux_opencl *, cl_mem, void *);
-
-	void   (*set   )(Lux_opencl *, Lux_opencl_kernel *, size_t, size_t, void *);
-	void   (*setM  )(Lux_opencl *, Lux_opencl_kernel *, size_t, cl_mem);
-	void   (*setS  )(Lux_opencl *, Lux_opencl_kernel *, size_t, size_t);
-	void   (*setW  )(Lux_opencl *, Lux_opencl_kernel *, size_t, whole);
-	void   (*setZ  )(Lux_opencl *, Lux_opencl_kernel *, size_t, integer);
-	void   (*setR  )(Lux_opencl *, Lux_opencl_kernel *, size_t, real);
-	double (*exec  )(Lux_opencl *, Lux_opencl_kernel *, size_t, const size_t *);
 };
 
 struct LuxSopencl_kernel {
 	cl_kernel krn;
+
+	void (*set )(Lux_opencl_kernel *, size_t, size_t, void *);
+	void (*setM)(Lux_opencl_kernel *, size_t, cl_mem);
+	void (*setS)(Lux_opencl_kernel *, size_t, size_t);
+	void (*setW)(Lux_opencl_kernel *, size_t, whole);
+	void (*setZ)(Lux_opencl_kernel *, size_t, integer);
+	void (*setR)(Lux_opencl_kernel *, size_t, real);
 };
 
 struct LuxOopencl {
