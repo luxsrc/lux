@@ -20,6 +20,7 @@
 #ifndef _MOD_H_
 #define _MOD_H_
 
+#include <stdio.h> /* for sprintf() etc */
 #include "../opencl.h"
 
 struct opencl {
@@ -34,6 +35,9 @@ struct opencl {
 	size_t           nqueue;
 	cl_command_queue queue[1]; /* flexible array element */
 };
+
+extern const char  preamble_fmt[];
+extern const char *getsrc(const char *, const char *);
 
 extern Lux_opencl_kernel *mkkern(Lux_opencl *, const char *);
 extern double             exec  (Lux_opencl *, Lux_opencl_kernel *, size_t, const size_t *);

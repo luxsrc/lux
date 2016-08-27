@@ -21,7 +21,6 @@
 #include <lux/dlfcn.h>
 #include <lux/mangle.h>
 #include <stdlib.h> /* for malloc(), free(), and NULL */
-#include <stdio.h>  /* for sprintf() etc */
 #include <string.h> /* for strlen() */
 #include "mod.h"
 
@@ -29,32 +28,6 @@
 
 #define PLF_COUNT 8  /* 3 bits */
 #define DEV_COUNT 32 /* 5 bits */
-
-const char preamble_fmt[] = "\
-typedef unsigned whole;\n\
-typedef int      integer;\n\
-\n\
-typedef %s   fast;\n\
-typedef %s2  fast2;\n\
-typedef %s4  fast4;\n\
-typedef %s8  fast8;\n\
-typedef %s16 fast16;\n\
-\n\
-typedef %s   real;\n\
-typedef %s2  real2;\n\
-typedef %s4  real4;\n\
-typedef %s8  real8;\n\
-typedef %s16 real16;\n\
-\n\
-typedef %s   extended;\n\
-typedef %s2  extended2;\n\
-typedef %s4  extended4;\n\
-typedef %s8  extended8;\n\
-typedef %s16 extended16;\n\
-\n\
-#define K(x) x %s\n\
-\n\
-";
 
 static cl_platform_id
 lsplf(Lux_opencl *ego, unsigned iplf)
@@ -116,90 +89,6 @@ lsdev(Lux_opencl *ego, unsigned iplf, unsigned idev, cl_device_type devtype)
 	return EXIT_SUCCESS;
 
 	(void)ego; /* silence unused variable warning */
-}
-
-static FILE *
-ftryopen(const char *name)
-{
-	const char *fmt[] = {"%s", "%s.cl"};
-
-	size_t i;
-	for(i = 0; i < countof(fmt); ++i) {
-		FILE *f;
-		char  buf[1024];
-		sprintf(buf, fmt[i], name);
-
-		f = fopen(buf, "r");
-		if(f) {
-			lux_print("Loaded kernel \"%s\"\n", buf);
-			return f;
-		}
-	}
-	return NULL;
-}
-
-static const char *
-freadall(FILE *f)
-{
-	size_t l;
-	char  *s;
-
-	fseek(f, 0, SEEK_END);
-	l = ftell(f);
-	fseek(f, 0, SEEK_SET);
-
-	s = malloc(l+1);
-	fread(s, l, 1, f);
-	s[l] = '\0';
-
-	return s;
-}
-
-static const char *
-getsrc(const char *path, const char *name)
-{
-	char buf[1024];
-
-	/* Always try to open without path */
-	FILE *f = ftryopen(name);
-	if(name[0] == '/' || /* done trying if aboslute or */
-	   name[0] == '.')   /* explicit relative path     */
-		goto nopath;
-
-	if(!f) {
-		/* Try to open with an associated directory named as
-		   the base module */
-		const char *sep = strrchr(path, '.');
-		if(sep) {
-			size_t l = sep - path;
-			memcpy(buf, path, l);
-			buf[l] = '/';
-			strcpy(buf+l+1, name);
-			f = ftryopen(buf);
-		}
-	}
-
-	if(!f) {
-		/* Try to open with at the same directory that
-		   contains the base module */
-		const char *sep = strrchr(path, '/');
-		if(sep) {
-			size_t l = sep - path;
-			memcpy(buf, path, l);
-			buf[l] = '/';
-			strcpy(buf+l+1, name);
-			f = ftryopen(buf);
-		}
-	}
-
- nopath:
-	if(!f)
-		return NULL;
-	else {
-		const char *s = freadall(f);
-		fclose(f);
-		return s;
-	}
 }
 
 static cl_mem
