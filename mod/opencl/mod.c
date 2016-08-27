@@ -223,7 +223,8 @@ LUX_MKMOD(const struct LuxOopencl *opts)
 		exit(1);
 	}
 
-	err = clBuildProgram(pro, ndev, dev, opts->flags, NULL, NULL);
+	snprintf(buf, sizeof(buf), "-cl-kernel-arg-info %s", opts->flags);
+	err = clBuildProgram(pro, ndev, dev, buf, NULL, NULL);
 	if(err != CL_SUCCESS) {
 		lux_error("Failed to build program\n");
 		for(i = 0; i < ndev; ++i) {

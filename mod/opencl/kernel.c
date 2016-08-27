@@ -18,6 +18,9 @@
  * along with lux.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include <lux.h>
+#include <lux/switch.h>
+#include <stdarg.h>
+#include <string.h>
 #include "mod.h"
 
 struct kernel {
@@ -40,6 +43,8 @@ typedef union {
 
 #define OCL ((struct opencl *)ocl)
 #define EGO ((struct kernel *)ego)
+
+#define TYPE(s) CASE(!strcmp(type, s))
 
 static void
 set(Lux_opencl_kernel *ego, size_t i, size_t sz, void *arg)
@@ -85,6 +90,53 @@ setR(Lux_opencl_kernel *ego, size_t i, real r)
 	clSetKernelArg(ego->krn, i, EGO->realsz, &clr);
 }
 
+static Lux_opencl_kernel *
+with(Lux_opencl_kernel *ego, ...)
+{
+	va_list ap;
+	cl_uint i, argc;
+
+	clGetKernelInfo(ego->krn, CL_KERNEL_NUM_ARGS,
+	                sizeof(cl_uint), &argc, NULL);
+
+	va_start(ap, ego);
+	for(i = 0; i < argc; ++i) {
+		char type[64];
+		clGetKernelArgInfo(ego->krn, i,
+		                   CL_KERNEL_ARG_TYPE_NAME,
+		                   sizeof(type), type, NULL);
+
+		SWITCH {
+		TYPE("uint")
+			whole w = va_arg(ap, whole);
+			setW(ego, i, w);
+		TYPE("int")
+			integer z = va_arg(ap, integer);
+			setZ(ego, i, z);
+		TYPE("real")
+			real r = va_arg(ap, real);
+			setR(ego, i, r);
+		CASE(type[strlen(type)-1] == '*')
+			cl_kernel_arg_address_qualifier	aq;
+			clGetKernelArgInfo(ego->krn, i,
+			                   CL_KERNEL_ARG_ADDRESS_QUALIFIER,
+			                   sizeof(aq), &aq, NULL);
+			if(aq == CL_KERNEL_ARG_ADDRESS_LOCAL) {
+				size_t s = va_arg(ap, size_t);
+				setS(ego, i, s);
+			} else {
+				cl_mem p = va_arg(ap, cl_mem);
+				setM(ego, i, p);
+			}
+		DEFAULT
+			lux_error("unknown type \"%s\"\n", type);
+		}
+	}
+	va_end(ap);
+
+	return ego;
+}
+
 Lux_opencl_kernel *
 mkkern(Lux_opencl *ocl, const char *name)
 {
@@ -127,6 +179,7 @@ mkkern(Lux_opencl *ocl, const char *name)
 		ego->setW = setW;
 		ego->setZ = setZ;
 		ego->setR = setR;
+		ego->with = with;
 
 		EGO->integersz  = OCL->integersz;
 		EGO->fastsz     = OCL->fastsz;

@@ -60,6 +60,8 @@ struct LuxSopencl_kernel {
 	void (*setW)(Lux_opencl_kernel *, size_t, whole);
 	void (*setZ)(Lux_opencl_kernel *, size_t, integer);
 	void (*setR)(Lux_opencl_kernel *, size_t, real);
+
+	Lux_opencl_kernel *(*with)(Lux_opencl_kernel *, ...);
 };
 
 struct LuxOopencl {
