@@ -36,8 +36,13 @@ pkginclude_HEADERS += numeric.h shorthand.h
 
 #==============================================================================
 # Interfaces and implementations of dynamic modules
-pkginclude_HEADERS += job.h opencl.h message.h resource.h
-SUBDIRS             = job   opencl
+pkginclude_HEADERS += job.h message.h resource.h
+SUBDIRS             = job
+
+if USING_OPENCL
+pkginclude_HEADERS += opencl.h
+SUBDIRS            += opencl
+endif
 
 if USING_MPI
 pkginclude_HEADERS += mpi.h
