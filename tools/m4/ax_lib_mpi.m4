@@ -20,7 +20,6 @@
 #   If MPI is successfully found, this macro calls
 #
 #     AC_SUBST(MPI_CC)
-#     AC_SUBST(MPI_VERSION)
 #     AC_SUBST(MPI_CFLAGS)
 #     AC_SUBST(MPI_CPPFLAGS)
 #     AC_SUBST(MPI_LDFLAGS)
@@ -108,7 +107,6 @@ AC_ARG_WITH([mpi],
 
 dnl Set defaults to blank
 MPI_CC=""
-MPI_VERSION=""
 MPI_CFLAGS=""
 MPI_CPPFLAGS=""
 MPI_LDFLAGS=""
@@ -117,7 +115,7 @@ MPI_LIBS=""
 dnl Try and find MPI compiler tools and options.
 if test "$with_mpi" = "yes"; then
 	if test -z "$MPICC"; then
-		dnl Check to see if mpicc is in the path.
+		# Check to see if mpicc is in the path.
 		AC_PATH_PROGS([MPICC], [mpicc])
 	else
 		AC_MSG_CHECKING([Using provided MPI C wrapper])
@@ -134,23 +132,42 @@ MPI support is being disabled (equivalent to --with-mpi=no).
 ])
 		with_mpi="no"
 	else
-		dnl Get the flags using OpenMPI "--showme:*"
-		MPI_CC=$($MPICC --showme:command)
-		MPI_VERSION=$(mpicc --showme:versione | cut -d' ' -f2-)
-		MPI_CPPFLAGS=$(for d in $(mpicc -showme:incdirs); do printf " -I$d"; done)
-		MPI_LDFLAGS=$(for d in $(mpicc -showme:libdirs); do printf " -L$d"; done)
-		MPI_LIBS=$(for l in $(mpicc -showme:libs); do printf " -l$l"; done)
-		AC_MSG_RESULT([yes (version $[MPI_VERSION])])
+		# Get the flags
+		if mpicc --showme:version > /dev/null 2>&1; then
+			# OpenMPI, uses "--showme:*"
+			MPI_CC=$(eval $MPICC --showme:command)
+			MPI_CPPFLAGS=$(for d in $(eval $MPICC -showme:incdirs); do printf " -I$d"; done)
+			MPI_LDFLAGS=$(for d in $(eval $MPICC -showme:libdirs); do printf " -L$d"; done)
+			MPI_LIBS=$(for l in $(eval $MPICC -showme:libs); do printf " -l$l"; done)
+		else
+			# Not OpenMPI, uses "-show"
+			ax_lib_mpi_save_args=("$[@]") # save arguments
+			set -- $(eval $MPICC -show)
+			MPI_CC="$[1]"; shift
+			while (("$[#]")); do
+				case "$[1]" in
+					-I*)      MPI_CPPFLAGS="$MPI_CPPFLAGS $[1]" ;;
+					-L*)      MPI_LDFLAGS="$MPI_LDFLAGS $[1]" ;;
+					-l*)      MPI_LIBS="$MPI_LIBS $[1]" ;;
+					-Xlinker) MPI_LDFLAGS="$MPI_LDFLAGS $[1] $[2]"; shift;;
+					*)        MPI_CFLAGS="$MPI_CFLAGS $[1]";;
+				esac
+				shift
+			done
+			set -- "${ax_lib_mpi_save_args[[@]]}" # restore arguments
+		fi
 
-		dnl Check header and library
+		# Check header and library
 		AC_LANG_PUSH([C])
 
 			ax_lib_mpi_save_CC=$CC
+			ax_lib_mpi_save_CFLAGS=$CFLAGS
 			ax_lib_mpi_save_CPPFLAGS=$CPPFLAGS
 			ax_lib_mpi_save_LDFLAGS=$LDFLAGS
 			ax_lib_mpi_save_LIBS=$LIBS
 
 			CC=$MPI_CC
+			CFLAGS=$MPI_CFLAGS
 			CPPFLAGS=$MPI_CPPFLAGS
 			LDFLAGS=$MPI_LDFLAGS
 			LIBS=$MPI_LIBS
@@ -162,15 +179,15 @@ MPI support is being disabled (equivalent to --with-mpi=no).
 			fi
 
 			CC=$ax_lib_mpi_save_CC
+			CFLAGS=$ax_lib_mpi_save_CFLAGS
 			CPPFLAGS=$ax_lib_mpi_save_CPPFLAGS
 			LDFLAGS=$ax_lib_mpi_save_LDFLAGS
 			LIBS=$ax_lib_mpi_save_LIBS
 
 		AC_LANG_POP([C])
 
-		dnl Define variables
+		# Define variables
 		AC_SUBST([MPI_CC])
-		AC_SUBST([MPI_VERSION])
 		AC_SUBST([MPI_CFLAGS])
 		AC_SUBST([MPI_CPPFLAGS])
 		AC_SUBST([MPI_LDFLAGS])
