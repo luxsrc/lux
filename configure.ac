@@ -148,7 +148,7 @@ AC_ARG_ENABLE(assertion, [AC_HELP_STRING([--enable-assertion],[compile lux with 
 if test "$ok" = "yes"; then
 	AC_DEFINE(LUX_ASSERTION, [1], [Define to 1 if to enable assertion for debugging])
 fi
-AM_CONDITIONAL(USING_ASSERTION, test "$ok" = "yes")
+AM_CONDITIONAL(USING_ASSERTION, [test "$ok" = "yes"])
 
 dnl Make single-precision a configure option (default disabled)
 AC_ARG_ENABLE(single, [AC_HELP_STRING([--enable-single],[compile lux in single precision])], ok=$enableval, ok=no)
@@ -156,14 +156,14 @@ AC_ARG_ENABLE(float,  [AC_HELP_STRING([--enable-float], [synonym for --enable-si
 if test "$ok" = "yes"; then
 	AC_DEFINE(LUX_SINGLE, [1], [Define to 1 if single precision is used as the default precision.])
 fi
-AM_CONDITIONAL(USING_SINGLE, test "$ok" = "yes")
+AM_CONDITIONAL(USING_SINGLE, [test "$ok" = "yes"])
 
 dnl Make MPI a configure option (default disabled)
 AC_ARG_ENABLE(mpi, [AC_HELP_STRING([--enable-mpi],[compile lux with mpi module])], ok=$enableval, ok=no)
 if test "$ok" = "yes"; then
 	AC_DEFINE(LUX_MPI, [1], [Define to 1 if MPI is enabled.])
 fi
-AM_CONDITIONAL(USING_MPI, test "$ok" = "yes")
+AM_CONDITIONAL(USING_MPI, [test "$ok" = "yes"])
 
 AH_BOTTOM([/*===========================================================================*/
 
