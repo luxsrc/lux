@@ -18,7 +18,6 @@ AM_PROG_CC_C_O
 AX_PROG_CC_FRAMEWORK
 AM_CONDITIONAL([SUPPORT_FRAMEWORK], [eval test \$ax_cv_prog_cc_${ac_cc}_framework = yes])
 
-AX_MPI([CC="$MPICC"])
 AX_PTHREAD([CC="$PTHREAD_CC"]) dnl correctly uses $CC from AX_MPI() unless on AIX
 
 AC_C_TYPEOF
@@ -161,6 +160,7 @@ AM_CONDITIONAL(USING_SINGLE, [test "$ok" = "yes"])
 dnl Make MPI a configure option (default disabled)
 AC_ARG_ENABLE(mpi, [AC_HELP_STRING([--enable-mpi],[compile lux with mpi module])], ok=$enableval, ok=no)
 if test "$ok" = "yes"; then
+	AX_MPI(, [AC_MSG_ERROR([failed to find MPI library for --enable-mpi])])
 	AC_DEFINE(LUX_MPI, [1], [Define to 1 if MPI is enabled.])
 fi
 AM_CONDITIONAL(USING_MPI, [test "$ok" = "yes"])
