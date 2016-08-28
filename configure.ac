@@ -157,6 +157,10 @@ if test "$ok" = "yes"; then
 fi
 AM_CONDITIONAL(USING_SINGLE, [test "$ok" = "yes"])
 
+dnl Check if we may use OpenMP
+AX_OPENMP([with_openmp=yes], [with_openmp=no])
+AM_CONDITIONAL(USING_OPENMP, [test "$with_openmp" = "yes"])
+
 dnl Make MPI a configure option (default auto)
 AX_LIB_MPI
 AM_CONDITIONAL(USING_MPI, [test "$with_mpi" = "yes"])
