@@ -164,26 +164,7 @@ AX_OPENMP([with_openmp=yes], [with_openmp=no])
 AM_CONDITIONAL(USING_OPENMP, [test "$with_openmp" = "yes"])
 
 dnl Make OpenCL a configure option (default auto)
-OPENCL_CPPFLAGS=""
-OPENCL_LDFLAGS=""
-AC_ARG_WITH([opencl],
-	AS_HELP_STRING(
-		[--with-opencl=[yes/no/PATH]],
-		[location of OpenCL library]
-  	),
-	[if test "$withval" = "no"; then
-		with_opencl="no"
-	elif test "$withval" = "yes"; then
-		with_opencl="yes"
-	else
-		OPENCL_CPPFLAGS="-I${withval}/include"
-		OPENCL_LDFLAGS="-L${withval}/lib64 -L${withval}/lib"
-		with_opencl="yes"
-	fi],
-	[with_opencl="yes"]
-)
-AC_SUBST([OPENCL_CPPFLAGS])
-AC_SUBST([OPENCL_LDFLAGS])
+AX_LIB_OPENCL
 AM_CONDITIONAL(USING_OPENCL, [test "$with_opencl" = "yes"])
 
 dnl Make MPI a configure option (default auto)
