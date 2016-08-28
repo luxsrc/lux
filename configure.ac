@@ -18,8 +18,6 @@ AM_PROG_CC_C_O
 AX_PROG_CC_FRAMEWORK
 AM_CONDITIONAL([SUPPORT_FRAMEWORK], [eval test \$ax_cv_prog_cc_${ac_cc}_framework = yes])
 
-AX_PTHREAD([CC="$PTHREAD_CC"]) dnl correctly uses $CC from AX_MPI() unless on AIX
-
 AC_C_TYPEOF
 AC_C_CONST
 AC_C_INLINE
@@ -156,6 +154,10 @@ if test "$ok" = "yes"; then
 	AC_DEFINE(LUX_SINGLE, [1], [Define to 1 if single precision is used as the default precision.])
 fi
 AM_CONDITIONAL(USING_SINGLE, [test "$ok" = "yes"])
+
+dnl Check if we may use pthread
+AX_PTHREAD([with_pthread=yes], [with_pthread=no]) # may cause problem on AIX; see comments in "tools/m4/ax_pthread.m4"
+AM_CONDITIONAL(USING_PTHREAD, [test "$with_pthread" = "yes"])
 
 dnl Check if we may use OpenMP
 AX_OPENMP([with_openmp=yes], [with_openmp=no])
