@@ -242,3 +242,44 @@ fi
 if [[ ! -e tools/scripts/lux-libtool ]]; then
 	$LN_S ../../libtool tools/scripts/lux-libtool
 fi
+
+# Print summary
+echo "================================================================"
+echo "Lux m4_esyscmd([tr -d '\n' < .version])"
+echo "----------------------------------------------------------------"
+echo "Lux default  :"
+cat << EOF
+	CC="$CC"
+	CFLAGS="$CFLAGS"
+	CPPFLAGS="$CPPFLAGS"
+	LDFLAGS="$LDFLAGS"
+	LIBS="$LIBS"
+EOF
+echo "----------------------------------------------------------------"
+echo "With pthread : $with_pthread"
+test "$with_pthread" = "yes" && cat << EOF
+	PTHREAD_CC="$PTHREAD_CC"
+	PTHREAD_CFLAGS="$PTHREAD_CFLAGS"
+	PTHREAD_LIBS="$PTHREAD_LIBS"
+EOF
+echo "----------------------------------------------------------------"
+echo "With OpenMP  : $with_openmp"
+test "$with_openmp" = "yes" && cat << EOF
+	OPENMP_CFLAGS="$OPENMP_CFLAGS"
+EOF
+echo "----------------------------------------------------------------"
+echo "With OpenCL  : $with_opencl"
+test "$with_opencl" = "yes" && cat << EOF
+	OPENCL_CPPFLAGS="$OPENCL_CPPFLAGS"
+	OPENCL_LDFLAGS="$OPENCL_LDFLAGS"
+EOF
+echo "----------------------------------------------------------------"
+echo "With MPI     : $with_mpi"
+test "$with_mpi" = "yes" && cat << EOF
+	MPI_CC="$MPI_CC"
+	MPI_CFLAGS="$MPI_CFLAGS"
+	MPI_CPPFLAGS="$MPI_CPPFLAGS"
+	MPI_LDFLAGS="$MPI_LDFLAGS"
+	MPI_LIBS="$MPI_LIBS"
+EOF
+echo "================================================================"
