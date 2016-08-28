@@ -1,10 +1,7 @@
 AM_CPPFLAGS = -I$(top_builddir)
+SUBDIRS =
 
-if USING_MPI
-SUBDIRS = mpi
-endif
-
-check_PROGRAMS = ck_atomic_parafor ck_cookie ck_dope ck_lazybuf ck_mpool ck_mview ck_parray ck_queue ck_ring ck_stack ck_ticks_timer ck_tpool
+check_PROGRAMS = ck_atomic_parafor ck_cookie ck_dope ck_lazybuf ck_mpool ck_mview ck_parray ck_queue ck_ring ck_stack ck_ticks_timer
 
 ck_atomic_parafor_SOURCES = ck_atomic_parafor.c ../mod/atomic.h ../mod/parafor.h
 ck_atomic_parafor_LDADD   = ../api/c/libux.la
@@ -39,7 +36,12 @@ ck_ring_LDADD   = ../api/c/libux.la
 ck_ticks_timer_SOURCES = ck_ticks_timer.c ../mod/ticks.h ../mod/timer.h
 ck_ticks_timer_LDADD   = ../api/c/libux.la
 
-ck_tpool_SOURCES = ck_tpool.c ../mod/tpool.h
-ck_tpool_LDADD   = ../api/c/libux.la
+if USING_MPI
+SUBDIRS += mpi
+endif
+
+if USING_PTHREAD
+SUBDIRS += pthread
+endif
 
 TESTS = $(check_PROGRAMS)
