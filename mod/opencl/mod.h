@@ -23,6 +23,9 @@
 #include <stdio.h> /* for sprintf() etc */
 #include "../opencl.h"
 
+#define PLF_COUNT 8  /* 3 bits */
+#define DEV_COUNT 32 /* 5 bits */
+
 struct opencl {
 	Lux_opencl super;
 
@@ -36,11 +39,15 @@ struct opencl {
 	cl_command_queue queue[1]; /* flexible array element */
 };
 
+extern cl_platform_id lsplf(Lux_opencl *, unsigned);
+extern int            lsdev(Lux_opencl *, unsigned, unsigned, cl_device_type);
+
 extern const char  preamble_fmt[];
 extern const char *getsrc(const char *, const char *);
 
 extern Lux_opencl_kernel *mkkern(Lux_opencl *, const char *);
-extern double             exec  (Lux_opencl *, Lux_opencl_kernel *, size_t, const size_t *);
+extern double             exec  (Lux_opencl *, Lux_opencl_kernel *,
+                                 size_t, const size_t *);
 extern void               rmkern(Lux_opencl *, Lux_opencl_kernel *);
 
 #endif /* _MOD_H_ */
