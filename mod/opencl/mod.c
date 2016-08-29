@@ -19,6 +19,7 @@
  */
 #include <lux.h>
 #include <lux/dlfcn.h>
+#include <lux/lazybuf.h>
 #include <lux/mangle.h>
 #include <stdlib.h> /* for malloc(), free(), and NULL */
 #include <string.h> /* for strlen() */
@@ -115,14 +116,26 @@ LUX_MKMOD(const struct LuxOopencl *opts)
 	snprintf(buf, sizeof(buf), "-cl-kernel-arg-info %s", opts->flags);
 	err = clBuildProgram(pro, ndev, dev, buf, NULL, NULL);
 	if(err != CL_SUCCESS) {
+		char   lazybuf[8192], *buf = lazybuf;
+		size_t len = sizeof(lazybuf);
+
 		lux_error("Failed to build program\n");
 		for(i = 0; i < ndev; ++i) {
-			size_t len;
-			char   buf[10240];
-			clGetProgramBuildInfo(pro, dev[i], CL_PROGRAM_BUILD_LOG,
-			                      sizeof(buf), buf, &len);
+			cl_int err;
+			size_t need;
+		retry:
+			err = clGetProgramBuildInfo(pro, dev[i],
+			                            CL_PROGRAM_BUILD_LOG,
+			                            len, buf, &need);
+			if(err) {
+				len = need;
+				buf = lzrealloc(buf, len);
+				goto retry;
+			}
 			lux_error("%s\n", buf);
 		}
+
+		lzfree(buf);
 		exit(1);
 	}
 
