@@ -29,7 +29,7 @@
 void *
 LUX_MKMOD(const struct LuxOopencl *opts)
 {
-	Lux_opencl  *ego = NULL;
+	Lux_opencl *ego = NULL;
 
 	cl_context ctx;
 	cl_program pro;
@@ -183,4 +183,6 @@ LUX_RMMOD(void *ego)
 	err = clReleaseContext(EGO->super.ctx);
 	/* TODO: check error */
 	free(ego);
+
+	(void)err; /* silence "set but not used" warning */
 }
