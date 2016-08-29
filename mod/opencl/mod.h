@@ -49,6 +49,8 @@ struct opencl {
 	cl_command_queue queue[1]; /* flexible array element */
 };
 
+extern const char *strerr(cl_int);
+
 extern cl_platform_id lsplf(Lux_opencl *, unsigned);
 extern int            lsdev(Lux_opencl *, unsigned, unsigned, cl_device_type);
 

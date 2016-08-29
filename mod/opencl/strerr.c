@@ -1,0 +1,91 @@
+/*
+ * Copyright (C) 2016 Chi-kwan Chan
+ * Copyright (C) 2016 Steward Observatory
+ *
+ * This file is part of lux.
+ *
+ * lux is free software: you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * lux is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ * or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public
+ * License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with lux.  If not, see <http://www.gnu.org/licenses/>.
+ */
+#include <lux.h>
+#include <lux/mangle.h>
+#include "mod.h"
+
+#define C(E) case E: return #E
+
+const char *
+strerr(cl_int err)
+{
+	switch(err) {
+	C(CL_SUCCESS);
+	C(CL_DEVICE_NOT_FOUND);
+	C(CL_DEVICE_NOT_AVAILABLE);
+	C(CL_COMPILER_NOT_AVAILABLE);
+	C(CL_MEM_OBJECT_ALLOCATION_FAILURE);
+	C(CL_OUT_OF_RESOURCES);
+	C(CL_OUT_OF_HOST_MEMORY);
+	C(CL_PROFILING_INFO_NOT_AVAILABLE);
+	C(CL_MEM_COPY_OVERLAP);
+	C(CL_IMAGE_FORMAT_MISMATCH);
+	C(CL_IMAGE_FORMAT_NOT_SUPPORTED);
+	C(CL_BUILD_PROGRAM_FAILURE);
+	C(CL_MAP_FAILURE);
+	C(CL_MISALIGNED_SUB_BUFFER_OFFSET);
+	C(CL_EXEC_STATUS_ERROR_FOR_EVENTS_IN_WAIT_LIST);
+	C(CL_COMPILE_PROGRAM_FAILURE);
+	C(CL_LINKER_NOT_AVAILABLE);
+	C(CL_LINK_PROGRAM_FAILURE);
+	C(CL_DEVICE_PARTITION_FAILED);
+	C(CL_KERNEL_ARG_INFO_NOT_AVAILABLE);
+	C(CL_INVALID_VALUE);
+	C(CL_INVALID_DEVICE_TYPE);
+	C(CL_INVALID_PLATFORM);
+	C(CL_INVALID_DEVICE);
+	C(CL_INVALID_CONTEXT);
+	C(CL_INVALID_QUEUE_PROPERTIES);
+	C(CL_INVALID_COMMAND_QUEUE);
+	C(CL_INVALID_HOST_PTR);
+	C(CL_INVALID_MEM_OBJECT);
+	C(CL_INVALID_IMAGE_FORMAT_DESCRIPTOR);
+	C(CL_INVALID_IMAGE_SIZE);
+	C(CL_INVALID_SAMPLER);
+	C(CL_INVALID_BINARY);
+	C(CL_INVALID_BUILD_OPTIONS);
+	C(CL_INVALID_PROGRAM);
+	C(CL_INVALID_PROGRAM_EXECUTABLE);
+	C(CL_INVALID_KERNEL_NAME);
+	C(CL_INVALID_KERNEL_DEFINITION);
+	C(CL_INVALID_KERNEL);
+	C(CL_INVALID_ARG_INDEX);
+	C(CL_INVALID_ARG_VALUE);
+	C(CL_INVALID_ARG_SIZE);
+	C(CL_INVALID_KERNEL_ARGS);
+	C(CL_INVALID_WORK_DIMENSION);
+	C(CL_INVALID_WORK_GROUP_SIZE);
+	C(CL_INVALID_WORK_ITEM_SIZE);
+	C(CL_INVALID_GLOBAL_OFFSET);
+	C(CL_INVALID_EVENT_WAIT_LIST);
+	C(CL_INVALID_EVENT);
+	C(CL_INVALID_OPERATION);
+	C(CL_INVALID_GL_OBJECT);
+	C(CL_INVALID_BUFFER_SIZE);
+	C(CL_INVALID_MIP_LEVEL);
+	C(CL_INVALID_GLOBAL_WORK_SIZE);
+	C(CL_INVALID_PROPERTY);
+	C(CL_INVALID_IMAGE_DESCRIPTOR);
+	C(CL_INVALID_COMPILER_OPTIONS);
+	C(CL_INVALID_LINKER_OPTIONS);
+	C(CL_INVALID_DEVICE_PARTITION_COUNT);
+	default: return "Unknown error code";
+	}
+}
