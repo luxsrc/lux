@@ -20,6 +20,7 @@
 #include <lux.h>
 #include <lux/switch.h>
 #include <stdarg.h>
+#include <stdlib.h>
 #include <string.h>
 #include "mod.h"
 

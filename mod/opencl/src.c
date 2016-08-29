@@ -18,6 +18,7 @@
  * along with lux.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include <lux.h>
+#include <string.h>
 #include "mod.h"
 
 const char preamble_fmt[] = "\
