@@ -117,7 +117,7 @@ LUX_MKMOD(const struct LuxOopencl *opts)
 	err = clBuildProgram(pro, ndev, dev, buf, NULL, NULL);
 	if(err != CL_SUCCESS) {
 		char   lazybuf[8192], *buf = lazybuf;
-		size_t len = sizeof(lazybuf);
+		size_t sz = sizeof(lazybuf);
 
 		lux_error("Failed to build program\n");
 		for(i = 0; i < ndev; ++i) {
@@ -126,10 +126,10 @@ LUX_MKMOD(const struct LuxOopencl *opts)
 		retry:
 			err = clGetProgramBuildInfo(pro, dev[i],
 			                            CL_PROGRAM_BUILD_LOG,
-			                            len, buf, &need);
+			                            sz, buf, &need);
 			if(err) {
-				len = need;
-				buf = lzrealloc(buf, len);
+				sz  = need;
+				buf = lzrealloc(buf, sz);
 				goto retry;
 			}
 			lux_error("%s\n", buf);
