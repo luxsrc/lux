@@ -121,17 +121,8 @@ LUX_MKMOD(const struct LuxOopencl *opts)
 
 		lux_error("Failed to build program\n");
 		for(i = 0; i < ndev; ++i) {
-			cl_int err;
-			size_t need;
-		retry:
-			err = clGetProgramBuildInfo(pro, dev[i],
-			                            CL_PROGRAM_BUILD_LOG,
-			                            sz, buf, &need);
-			if(err) {
-				sz  = need;
-				buf = lzrealloc(buf, sz);
-				goto retry;
-			}
+			getinfo(ProgramBuild, retry,
+			        pro, dev[i], CL_PROGRAM_BUILD_LOG);
 			lux_error("%s\n", buf);
 		}
 

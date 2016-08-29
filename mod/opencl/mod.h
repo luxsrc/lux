@@ -26,6 +26,16 @@
 #define PLF_COUNT 8  /* 3 bits */
 #define DEV_COUNT 32 /* 5 bits */
 
+#define getinfo(f, l, ...) do {	                          \
+	size_t need;                                      \
+l:                                                        \
+	if(clGet##f##Info(__VA_ARGS__, sz, buf, &need)) { \
+		sz  = need;                               \
+		buf = lzrealloc(buf, sz);                 \
+		goto l;                                   \
+	}                                                 \
+} while(0)
+
 struct opencl {
 	Lux_opencl super;
 

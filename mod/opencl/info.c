@@ -22,16 +22,6 @@
 #include <stdlib.h> /* for NULL */
 #include "mod.h"
 
-#define info(t, i, T, K) do {	                              \
-	size_t need;                                          \
-retry_##K:                                                    \
-	if(clGet##t##Info(i, CL_##T##_##K, sz, buf, &need)) { \
-		sz  = need;                                   \
-		buf = lzrealloc(buf, sz);                     \
-		goto retry_##K;                               \
-	}                                                     \
-} while(0)
-
 cl_platform_id
 lsplf(Lux_opencl *ego, unsigned iplf)
 {
@@ -45,13 +35,13 @@ lsplf(Lux_opencl *ego, unsigned iplf)
 
 	lux_print("%d platform%s found:\n", n, n > 1 ? "s are" : " is");
 	for(i = 0; i < n; ++i) {
-		info(Platform, p[i], PLATFORM, NAME);
+		getinfo(Platform, retry_name,    p[i], CL_PLATFORM_NAME);
 		lux_print("%s\t%d. %s ", i == iplf ? "*" : "", i, buf);
 
-		info(Platform, p[i], PLATFORM, VENDOR);
+		getinfo(Platform, retry_vendor,  p[i], CL_PLATFORM_VENDOR);
 		lux_print("by %s: ", buf);
 
-		info(Platform, p[i], PLATFORM, VERSION);
+		getinfo(Platform, retry_version, p[i], CL_PLATFORM_VERSION);
 		lux_print("%s\n", buf);
 	}
 
@@ -76,13 +66,13 @@ lsdev(Lux_opencl *ego, unsigned iplf, unsigned idev, cl_device_type devtype)
 
 	lux_print("%d device%s found:\n", n, n > 1 ? "s are" : " is");
 	for(i = 0; i < n; ++i) {
-		info(Device, d[i], DEVICE, NAME);
+		getinfo(Device, retry_name,    d[i], CL_DEVICE_NAME);
 		lux_print("%s\t%d. %s ", i == idev ? "*" : "", i, buf);
 
-		info(Device, d[i], DEVICE, VENDOR);
+		getinfo(Device, retry_vendor,  d[i], CL_DEVICE_VENDOR);
 		lux_print("by %s: ", buf);
 
-		info(Device, d[i], DEVICE, VERSION);
+		getinfo(Device, retry_version, d[i], CL_DEVICE_VERSION);
 		lux_print("%s\n", buf);
 	}
 
