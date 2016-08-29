@@ -20,7 +20,6 @@
 #include <lux.h>
 #include <lux/dlfcn.h>
 #include <lux/lazybuf.h>
-#include <lux/mangle.h>
 #include <stdlib.h> /* for malloc(), free(), and NULL */
 #include <string.h> /* for strlen() */
 #include "mod.h"

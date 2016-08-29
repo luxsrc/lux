@@ -18,7 +18,6 @@
  * along with lux.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include <lux.h>
-#include <lux/mangle.h>
 #include "mod.h"
 
 #define C(E) case E: return #E

@@ -20,6 +20,7 @@
 #ifndef _MOD_H_
 #define _MOD_H_
 
+#include <lux/mangle.h>
 #include <stdio.h> /* for sprintf() etc */
 #include "../opencl.h"
 
@@ -35,6 +36,23 @@ l:                                                        \
 		goto l;                                   \
 	}                                                 \
 } while(0)
+
+#define check(f, ...) do {                                      \
+	cl_int err;                                             \
+	err = cl##f(__VA_ARGS__);                               \
+	if(err != CL_SUCCESS)                                   \
+		lux_error(LUX_STRING(cl##f) " failed \"%s\"\n", \
+		          strerr(err));                         \
+} while(0)
+
+#define safe(T, f, ...) ({                                      \
+	cl_int err;                                             \
+	T r = cl##f(__VA_ARGS__, &err);                         \
+	if(err != CL_SUCCESS)                                   \
+		lux_error(LUX_STRING(cl##f) " failed \"%s\"\n", \
+		          strerr(err));                         \
+	r;                                                      \
+})
 
 struct opencl {
 	Lux_opencl super;

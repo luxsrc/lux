@@ -24,22 +24,14 @@
 cl_mem
 mk(Lux_opencl *ego, size_t sz, unsigned flags)
 {
-	cl_int err;
-	cl_mem buf = clCreateBuffer(ego->ctx, flags, sz, NULL, &err);
-	if(err != CL_SUCCESS)
-		lux_error("Failed to create buffer \"%s\"\n",
-		          strerr(err));
-	return buf;
+	return safe(cl_mem,
+	            CreateBuffer, ego->ctx, flags, sz, NULL);
 }
 
 void
 rm(Lux_opencl *ego, cl_mem buf)
 {
-	cl_int err;
-	err = clReleaseMemObject(buf);
-	if(err != CL_SUCCESS)
-		lux_error("Failed to release memory object \"%s\"\n",
-		          strerr(err));
+	check(ReleaseMemObject, buf);
 
 	(void)ego; /* silence unused variable warning */
 }
@@ -47,49 +39,32 @@ rm(Lux_opencl *ego, cl_mem buf)
 cl_mem
 h2d(Lux_opencl *ego, cl_mem dst, void *src, size_t sz)
 {
-	cl_int err;
-	err = clEnqueueWriteBuffer(ego->que,
-	                           dst, CL_TRUE, 0, sz,
-	                           src, 0, NULL, NULL);
-	if(err != CL_SUCCESS)
-		lux_error("Failed to enqueue write buffer \"%s\"\n",
-		          strerr(err));
+	check(EnqueueWriteBuffer, ego->que,
+	      dst, CL_TRUE, 0, sz,
+	      src, 0, NULL, NULL);
 	return dst;
 }
 
 void *
 d2h(Lux_opencl *ego, void *dst, cl_mem src, size_t sz)
 {
-	cl_int err;
-	err = clEnqueueReadBuffer(ego->que,
-	                          src, CL_TRUE, 0, sz,
-	                          dst, 0, NULL, NULL);
-	if(err != CL_SUCCESS)
-		lux_error("Failed to enqueue read buffer \"%s\"\n",
-		          strerr(err));
+	check(EnqueueReadBuffer, ego->que,
+	      src, CL_TRUE, 0, sz,
+	      dst, 0, NULL, NULL);
 	return dst;
 }
 
 void *
 mmap(Lux_opencl *ego, cl_mem buf, size_t sz)
 {
-	cl_int err;
-	void *host = clEnqueueMapBuffer(ego->que, buf,
-	                               CL_TRUE, CL_MAP_READ, 0, sz,
-	                               0, NULL, NULL, &err);
-	if(err != CL_SUCCESS)
-		lux_error("Failed to enqueue map buffer \"%s\"\n",
-		          strerr(err));
-	return host;
+	return safe(void *,
+	            EnqueueMapBuffer, ego->que, buf,
+	            CL_TRUE, CL_MAP_READ, 0, sz, 0, NULL, NULL);
 }
 
 void
 munmap(Lux_opencl *ego, cl_mem buf, void *host)
 {
-	cl_int err;
-	err = clEnqueueUnmapMemObject(ego->que, buf, host,
-	                              0, NULL, NULL);
-	if(err != CL_SUCCESS)
-		lux_error("Failed to enqueue unmap buffer \"%s\"\n",
-		          strerr(err));
+	check(EnqueueUnmapMemObject,
+	      ego->que, buf, host, 0, NULL, NULL);
 }
