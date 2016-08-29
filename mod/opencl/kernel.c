@@ -49,33 +49,33 @@ typedef union {
 static void
 set(Lux_opencl_kernel *ego, size_t i, size_t sz, void *arg)
 {
-	clSetKernelArg(ego->krn, i, sz, arg);
+	check(SetKernelArg, ego->krn, i, sz, arg);
 }
 
 static void
 setM(Lux_opencl_kernel *ego, size_t i, cl_mem m)
 {
-	clSetKernelArg(ego->krn, i, sizeof(cl_mem), &m);
+	check(SetKernelArg, ego->krn, i, sizeof(cl_mem), &m);
 }
 
 static void
 setS(Lux_opencl_kernel *ego, size_t i, size_t sz)
 {
-	clSetKernelArg(ego->krn, i, sz, NULL);
+	check(SetKernelArg, ego->krn, i, sz, NULL);
 }
 
 static void
 setW(Lux_opencl_kernel *ego, size_t i, whole w)
 {
 	cl_uint clw = w;
-	clSetKernelArg(ego->krn, i, EGO->integersz, &clw);
+	check(SetKernelArg, ego->krn, i, EGO->integersz, &clw);
 }
 
 static void
 setZ(Lux_opencl_kernel *ego, size_t i, integer z)
 {
 	cl_int clz = z;
-	clSetKernelArg(ego->krn, i, EGO->integersz, &clz);
+	check(SetKernelArg, ego->krn, i, EGO->integersz, &clz);
 }
 
 static void
@@ -87,7 +87,7 @@ setR(Lux_opencl_kernel *ego, size_t i, real r)
 	case 4: clr.f = r; break;
 	case 8: clr.d = r; break;
 	}
-	clSetKernelArg(ego->krn, i, EGO->realsz, &clr);
+	check(SetKernelArg, ego->krn, i, EGO->realsz, &clr);
 }
 
 static Lux_opencl_kernel *
@@ -96,15 +96,16 @@ with(Lux_opencl_kernel *ego, ...)
 	va_list ap;
 	cl_uint i, argc;
 
-	clGetKernelInfo(ego->krn, CL_KERNEL_NUM_ARGS,
-	                sizeof(cl_uint), &argc, NULL);
+	check(GetKernelInfo,
+	      ego->krn, CL_KERNEL_NUM_ARGS,
+	      sizeof(cl_uint), &argc, NULL);
 
 	va_start(ap, ego);
 	for(i = 0; i < argc; ++i) {
 		char type[64];
-		clGetKernelArgInfo(ego->krn, i,
-		                   CL_KERNEL_ARG_TYPE_NAME,
-		                   sizeof(type), type, NULL);
+		check(GetKernelArgInfo,
+		      ego->krn, i, CL_KERNEL_ARG_TYPE_NAME,
+		      sizeof(type), type, NULL);
 
 		SWITCH {
 		TYPE("uint")
@@ -130,9 +131,10 @@ with(Lux_opencl_kernel *ego, ...)
 			setR(ego, i, r);
 		CASE(type[strlen(type)-1] == '*')
 			cl_kernel_arg_address_qualifier aq;
-			clGetKernelArgInfo(ego->krn, i,
-			                   CL_KERNEL_ARG_ADDRESS_QUALIFIER,
-			                   sizeof(aq), &aq, NULL);
+			check(GetKernelArgInfo,
+			      ego->krn, i,
+			      CL_KERNEL_ARG_ADDRESS_QUALIFIER,
+			      sizeof(aq), &aq, NULL);
 			if(aq == CL_KERNEL_ARG_ADDRESS_LOCAL) {
 				size_t s = va_arg(ap, size_t);
 				setS(ego, i, s);
@@ -219,15 +221,16 @@ exec(Lux_opencl *ocl, Lux_opencl_kernel *ego, size_t dim, const size_t *shape)
 	shapeup[i] = ((shape[i] + bml - 1) / bml) * bml;
 
 	/* TODO: automatic load balancing across devices */
-	clEnqueueNDRangeKernel(ocl->que, ego->krn,
-	                       dim, NULL, shapeup, NULL, 0, NULL, &event);
-	clWaitForEvents(1, &event);
+	check(EnqueueNDRangeKernel,
+	      ocl->que, ego->krn,
+	      dim, NULL, shapeup, NULL, 0, NULL, &event);
+	check(WaitForEvents, 1, &event);
 
-	clGetEventProfilingInfo(event, CL_PROFILING_COMMAND_START,
-	                        sizeof(t0), &t0, NULL);
-	clGetEventProfilingInfo(event, CL_PROFILING_COMMAND_END,
-	                        sizeof(t1), &t1, NULL);
-	clReleaseEvent(event);
+	check(GetEventProfilingInfo,
+	      event, CL_PROFILING_COMMAND_START, sizeof(t0), &t0, NULL);
+	check(GetEventProfilingInfo,
+	      event, CL_PROFILING_COMMAND_END, sizeof(t1), &t1, NULL);
+	check(ReleaseEvent, event);
 
 	return (double)(t1 - t0);
 }
@@ -235,7 +238,8 @@ exec(Lux_opencl *ocl, Lux_opencl_kernel *ego, size_t dim, const size_t *shape)
 void
 rmkern(Lux_opencl *ocl, Lux_opencl_kernel *ego)
 {
-	(void)clReleaseKernel(ego->krn);
+	check(ReleaseKernel, ego->krn);
 	free(ego);
+
 	(void)ocl; /* silence unused variable warning */
 }
