@@ -22,6 +22,16 @@
 #include <stdlib.h> /* for NULL */
 #include "mod.h"
 
+#define info(t, i, T, K) do {	                              \
+	size_t need;                                          \
+retry_##K:                                                    \
+	if(clGet##t##Info(i, CL_##T##_##K, sz, buf, &need)) { \
+		sz  = need;                                   \
+		buf = lzrealloc(buf, sz);                     \
+		goto retry_##K;                               \
+	}                                                     \
+} while(0)
+
 cl_platform_id
 lsplf(Lux_opencl *ego, unsigned iplf)
 {
@@ -35,37 +45,13 @@ lsplf(Lux_opencl *ego, unsigned iplf)
 
 	lux_print("%d platform%s found:\n", n, n > 1 ? "s are" : " is");
 	for(i = 0; i < n; ++i) {
-		cl_int err;
-		size_t need;
-
-	retry_name:
-		err = clGetPlatformInfo(p[i], CL_PLATFORM_NAME,
-		                        sz, buf, &need);
-		if(err) {
-			sz  = need;
-			buf = lzrealloc(buf, sz);
-			goto retry_name;
-		}
+		info(Platform, p[i], PLATFORM, NAME);
 		lux_print("%s\t%d. %s ", i == iplf ? "*" : "", i, buf);
 
-	retry_vendor:
-		err = clGetPlatformInfo(p[i], CL_PLATFORM_VENDOR,
-		                        sz, buf, &need);
-		if(err) {
-			sz  = need;
-			buf = lzrealloc(buf, sz);
-			goto retry_vendor;
-		}
+		info(Platform, p[i], PLATFORM, VENDOR);
 		lux_print("by %s: ", buf);
 
-	retry_version:
-		err = clGetPlatformInfo(p[i], CL_PLATFORM_VERSION,
-		                        sz, buf, &need);
-		if(err) {
-			sz  = need;
-			buf = lzrealloc(buf, sz);
-			goto retry_version;
-		}
+		info(Platform, p[i], PLATFORM, VERSION);
 		lux_print("%s\n", buf);
 	}
 
@@ -90,37 +76,13 @@ lsdev(Lux_opencl *ego, unsigned iplf, unsigned idev, cl_device_type devtype)
 
 	lux_print("%d device%s found:\n", n, n > 1 ? "s are" : " is");
 	for(i = 0; i < n; ++i) {
-		cl_int err;
-		size_t need;
-
-	retry_name:
-		err = clGetDeviceInfo(d[i], CL_DEVICE_NAME,
-		                      sz, buf, &need);
-		if(err) {
-			sz  = need;
-			buf = lzrealloc(buf, sz);
-			goto retry_name;
-		}
+		info(Device, d[i], DEVICE, NAME);
 		lux_print("%s\t%d. %s ", i == idev ? "*" : "", i, buf);
 
-	retry_vendor:
-		err = clGetDeviceInfo(d[i], CL_DEVICE_VENDOR,
-		                      sz, buf, &need);
-		if(err) {
-			sz  = need;
-			buf = lzrealloc(buf, sz);
-			goto retry_vendor;
-		}
+		info(Device, d[i], DEVICE, VENDOR);
 		lux_print("by %s: ", buf);
 
-	retry_version:
-		err = clGetDeviceInfo(d[i], CL_DRIVER_VERSION,
-		                      sz, buf, &need);
-		if(err) {
-			sz  = need;
-			buf = lzrealloc(buf, sz);
-			goto retry_version;
-		}
+		info(Device, d[i], DEVICE, VERSION);
 		lux_print("%s\n", buf);
 	}
 
