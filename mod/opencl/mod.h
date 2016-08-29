@@ -50,4 +50,11 @@ extern double             exec  (Lux_opencl *, Lux_opencl_kernel *,
                                  size_t, const size_t *);
 extern void               rmkern(Lux_opencl *, Lux_opencl_kernel *);
 
+extern cl_mem   mk(Lux_opencl *, size_t, unsigned);
+extern void     rm(Lux_opencl *, cl_mem);
+extern cl_mem  h2d(Lux_opencl *, cl_mem, void *, size_t);
+extern void   *d2h(Lux_opencl *, void *, cl_mem, size_t);
+extern void  *mmap(Lux_opencl *, cl_mem, size_t);
+extern void munmap(Lux_opencl *, cl_mem, void *);
+
 #endif /* _MOD_H_ */

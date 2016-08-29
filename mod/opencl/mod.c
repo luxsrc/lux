@@ -26,52 +26,6 @@
 
 #define EGO ((struct opencl *)ego)
 
-static cl_mem
-mk(Lux_opencl *ego, size_t sz, unsigned flags)
-{
-	return clCreateBuffer(EGO->super.ctx, flags, sz, NULL, NULL);
-}
-
-static void
-rm(Lux_opencl *ego, cl_mem buf)
-{
-	(void)clReleaseMemObject(buf);
-	(void)ego; /* silence unused variable warning */
-}
-
-static cl_mem
-h2d(Lux_opencl *ego, cl_mem dst, void *src, size_t sz)
-{
-	(void)clEnqueueWriteBuffer(ego->que,
-	                           dst, CL_TRUE, 0, sz,
-	                           src, 0, NULL, NULL);
-	return dst;
-}
-
-static void *
-d2h(Lux_opencl *ego, void *dst, cl_mem src, size_t sz)
-{
-	(void)clEnqueueReadBuffer(ego->que,
-	                          src, CL_TRUE, 0, sz,
-	                          dst, 0, NULL, NULL);
-	return dst;
-}
-
-static void *
-mmap(Lux_opencl *ego, cl_mem buf, size_t sz)
-{
-	return clEnqueueMapBuffer(ego->que, buf,
-	                          CL_TRUE, CL_MAP_READ, 0, sz,
-	                          0, NULL, NULL, NULL);
-}
-
-static void
-munmap(Lux_opencl *ego, cl_mem buf, void *host)
-{
-	(void)clEnqueueUnmapMemObject(ego->que, buf, host,
-	                              0, NULL, NULL);
-}
-
 void *
 LUX_MKMOD(const struct LuxOopencl *opts)
 {
