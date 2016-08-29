@@ -18,6 +18,7 @@
  * along with lux.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include <lux.h>
+#include <lux/lazybuf.h>
 #include <stdlib.h> /* for NULL */
 #include "mod.h"
 
@@ -25,27 +26,50 @@ cl_platform_id
 lsplf(Lux_opencl *ego, unsigned iplf)
 {
 	cl_platform_id p[PLF_COUNT];
-	cl_uint        n, i;
+	cl_uint        i, n;
+
+	char   lazybuf[1024], *buf = lazybuf;
+	size_t len = sizeof(lazybuf);
 
 	(void)clGetPlatformIDs(PLF_COUNT, p, &n);
 
 	lux_print("%d platform%s found:\n", n, n > 1 ? "s are" : " is");
 	for(i = 0; i < n; ++i) {
-		char buf[1024];
+		cl_int err;
+		size_t need;
 
-		(void)clGetPlatformInfo(p[i], CL_PLATFORM_NAME,
-		                        sizeof(buf), buf, NULL);
+	retry_name:
+		err = clGetPlatformInfo(p[i], CL_PLATFORM_NAME,
+		                        len, buf, &need);
+		if(err) {
+			len = need;
+			buf = lzrealloc(buf, len);
+			goto retry_name;
+		}
 		lux_print("%s\t%d. %s ", i == iplf ? "*" : "", i, buf);
 
-		(void)clGetPlatformInfo(p[i], CL_PLATFORM_VENDOR,
-		                        sizeof(buf), buf, NULL);
+	retry_vendor:
+		err = clGetPlatformInfo(p[i], CL_PLATFORM_VENDOR,
+		                        len, buf, &need);
+		if(err) {
+			len = need;
+			buf = lzrealloc(buf, len);
+			goto retry_vendor;
+		}
 		lux_print("by %s: ", buf);
 
-		(void)clGetPlatformInfo(p[i], CL_PLATFORM_VERSION,
-		                        sizeof(buf), buf, NULL);
+	retry_version:
+		err = clGetPlatformInfo(p[i], CL_PLATFORM_VERSION,
+		                        len, buf, &need);
+		if(err) {
+			len = need;
+			buf = lzrealloc(buf, len);
+			goto retry_version;
+		}
 		lux_print("%s\n", buf);
 	}
 
+	lzfree(buf);
 	return p[iplf < n ? iplf : n];
 
 	(void)ego; /* silence unused variable warning */
@@ -56,28 +80,51 @@ lsdev(Lux_opencl *ego, unsigned iplf, unsigned idev, cl_device_type devtype)
 {
 	cl_platform_id p[PLF_COUNT];
 	cl_device_id   d[DEV_COUNT];
-	cl_uint        n, i;
+	cl_uint        i, n;
+
+	char   lazybuf[1024], *buf = lazybuf;
+	size_t len = sizeof(lazybuf);
 
 	(void)clGetPlatformIDs(PLF_COUNT, p, NULL);
 	(void)clGetDeviceIDs(p[iplf], devtype, DEV_COUNT, d, &n);
 
 	lux_print("%d device%s found:\n", n, n > 1 ? "s are" : " is");
 	for(i = 0; i < n; ++i) {
-		char buf[1024];
+		cl_int err;
+		size_t need;
 
-		(void)clGetDeviceInfo(d[i], CL_DEVICE_NAME,
-		                      sizeof(buf), buf, NULL);
+	retry_name:
+		err = clGetDeviceInfo(d[i], CL_DEVICE_NAME,
+		                      len, buf, &need);
+		if(err) {
+			len = need;
+			buf = lzrealloc(buf, len);
+			goto retry_name;
+		}
 		lux_print("%s\t%d. %s ", i == idev ? "*" : "", i, buf);
 
-		(void)clGetDeviceInfo(d[i], CL_DEVICE_VENDOR,
-		                      sizeof(buf), buf, NULL);
+	retry_vendor:
+		err = clGetDeviceInfo(d[i], CL_DEVICE_VENDOR,
+		                      len, buf, &need);
+		if(err) {
+			len = need;
+			buf = lzrealloc(buf, len);
+			goto retry_vendor;
+		}
 		lux_print("by %s: ", buf);
 
-		(void)clGetDeviceInfo(d[i], CL_DRIVER_VERSION,
-		                      sizeof(buf), buf, NULL);
+	retry_version:
+		err = clGetDeviceInfo(d[i], CL_DRIVER_VERSION,
+		                      len, buf, &need);
+		if(err) {
+			len = need;
+			buf = lzrealloc(buf, len);
+			goto retry_version;
+		}
 		lux_print("%s\n", buf);
 	}
 
+	lzfree(buf);
 	return EXIT_SUCCESS;
 
 	(void)ego; /* silence unused variable warning */
