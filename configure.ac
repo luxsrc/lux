@@ -161,25 +161,25 @@ if test "$ok" = "yes"; then
 fi
 AM_CONDITIONAL(USING_SINGLE, [test "$ok" = "yes"])
 
-dnl Check if we may use pthread
-AX_PTHREAD([with_pthread=yes], [with_pthread=no]) # may cause problem on AIX; see comments in "tools/m4/ax_pthread.m4"
-AM_CONDITIONAL(USING_PTHREAD, [test "$with_pthread" = "yes"])
-
-dnl Check if we may use OpenMP
-AX_OPENMP([with_openmp=yes], [with_openmp=no])
-AM_CONDITIONAL(USING_OPENMP, [test "$with_openmp" = "yes"])
-
-dnl Make OpenCL a configure option (default auto)
-AX_LIB_OPENCL
-AM_CONDITIONAL(USING_OPENCL, [test "$with_opencl" = "yes"])
+dnl Make HDF5 a configure option (default auto)
+AX_LIB_HDF5
+AM_CONDITIONAL(USING_HDF5, test "$with_hdf5" = "yes")
 
 dnl Make MPI a configure option (default auto)
 AX_LIB_MPI
 AM_CONDITIONAL(USING_MPI, [test "$with_mpi" = "yes"])
 
-dnl Make HDF5 a configure option (default auto)
-AX_LIB_HDF5
-AM_CONDITIONAL(USING_HDF5, test "$with_hdf5" = "yes")
+dnl Make OpenCL a configure option (default auto)
+AX_LIB_OPENCL
+AM_CONDITIONAL(USING_OPENCL, [test "$with_opencl" = "yes"])
+
+dnl Check if we may use OpenMP
+AX_OPENMP([with_openmp=yes], [with_openmp=no])
+AM_CONDITIONAL(USING_OPENMP, [test "$with_openmp" = "yes"])
+
+dnl Check if we may use pthread
+AX_PTHREAD([with_pthread=yes], [with_pthread=no]) # may cause problem on AIX; see comments in "tools/m4/ax_pthread.m4"
+AM_CONDITIONAL(USING_PTHREAD, [test "$with_pthread" = "yes"])
 
 AH_BOTTOM([/*===========================================================================*/
 
@@ -266,22 +266,13 @@ cat << EOF
 	LUX_LIBS="$LUX_LIBS"
 EOF
 echo "----------------------------------------------------------------"
-echo "With pthread  : $with_pthread"
-test "$with_pthread" = "yes" && cat << EOF
-	PTHREAD_CC="$PTHREAD_CC"
-	PTHREAD_CFLAGS="$PTHREAD_CFLAGS"
-	PTHREAD_LIBS="$PTHREAD_LIBS"
-EOF
-echo "----------------------------------------------------------------"
-echo "With OpenMP   : $with_openmp"
-test "$with_openmp" = "yes" && cat << EOF
-	OPENMP_CFLAGS="$OPENMP_CFLAGS"
-EOF
-echo "----------------------------------------------------------------"
-echo "With OpenCL   : $with_opencl"
-test "$with_opencl" = "yes" && cat << EOF
-	OPENCL_CPPFLAGS="$OPENCL_CPPFLAGS"
-	OPENCL_LDFLAGS="$OPENCL_LDFLAGS"
+echo "With HDF5     : $with_hdf5"
+test "$with_hdf5" = "yes" && cat << EOF
+	HDF5_CC="$HDF5_CC"
+	HDF5_CFLAGS="$HDF5_CFLAGS"
+	HDF5_CPPFLAGS="$HDF5_CPPFLAGS"
+	HDF5_LDFLAGS="$HDF5_LDFLAGS"
+	HDF5_LIBS="$HDF5_LIBS"
 EOF
 echo "----------------------------------------------------------------"
 echo "With MPI      : $with_mpi"
@@ -293,13 +284,22 @@ test "$with_mpi" = "yes" && cat << EOF
 	MPI_LIBS="$MPI_LIBS"
 EOF
 echo "----------------------------------------------------------------"
-echo "With HDF5     : $with_hdf5"
-test "$with_hdf5" = "yes" && cat << EOF
-	HDF5_CC="$HDF5_CC"
-	HDF5_CFLAGS="$HDF5_CFLAGS"
-	HDF5_CPPFLAGS="$HDF5_CPPFLAGS"
-	HDF5_LDFLAGS="$HDF5_LDFLAGS"
-	HDF5_LIBS="$HDF5_LIBS"
+echo "With OpenCL   : $with_opencl"
+test "$with_opencl" = "yes" && cat << EOF
+	OPENCL_CPPFLAGS="$OPENCL_CPPFLAGS"
+	OPENCL_LDFLAGS="$OPENCL_LDFLAGS"
+EOF
+echo "----------------------------------------------------------------"
+echo "With OpenMP   : $with_openmp"
+test "$with_openmp" = "yes" && cat << EOF
+	OPENMP_CFLAGS="$OPENMP_CFLAGS"
+EOF
+echo "----------------------------------------------------------------"
+echo "With pthread  : $with_pthread"
+test "$with_pthread" = "yes" && cat << EOF
+	PTHREAD_CC="$PTHREAD_CC"
+	PTHREAD_CFLAGS="$PTHREAD_CFLAGS"
+	PTHREAD_LIBS="$PTHREAD_LIBS"
 EOF
 echo "----------------------------------------------------------------"
 echo "Combined flags:"
