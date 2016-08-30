@@ -171,6 +171,10 @@ dnl Make MPI a configure option (default auto)
 AX_LIB_MPI
 AM_CONDITIONAL(USING_MPI, [test "$with_mpi" = "yes"])
 
+dnl Make HDF5 a configure option (default auto)
+AX_LIB_HDF5
+AM_CONDITIONAL(USING_HDF5, test "$with_hdf5" = "yes")
+
 AH_BOTTOM([/*===========================================================================*/
 
 #ifndef countof
@@ -281,5 +285,14 @@ test "$with_mpi" = "yes" && cat << EOF
 	MPI_CPPFLAGS="$MPI_CPPFLAGS"
 	MPI_LDFLAGS="$MPI_LDFLAGS"
 	MPI_LIBS="$MPI_LIBS"
+EOF
+echo "----------------------------------------------------------------"
+echo "With HDF5    : $with_hdf5"
+test "$with_hdf5" = "yes" && cat << EOF
+	HDF5_CC="$HDF5_CC"
+	HDF5_CFLAGS="$HDF5_CFLAGS"
+	HDF5_CPPFLAGS="$HDF5_CPPFLAGS"
+	HDF5_LDFLAGS="$HDF5_LDFLAGS"
+	HDF5_LIBS="$HDF5_LIBS"
 EOF
 echo "================================================================"
