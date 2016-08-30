@@ -1,20 +1,78 @@
-dnl Initialization for autoconf, automake, and libtool
+dnl Initialization for autoconf
 AC_PREREQ([2.64])
 AC_INIT([lux framework], m4_esyscmd([tr -d '\n' < .version]), [chanc@email.arizona.edu], [lux], [http://luxsrc.org/])
 AC_CONFIG_AUX_DIR([.build-aux])
 AC_CONFIG_MACRO_DIR([.build-m4])
 AC_CONFIG_SRCDIR([lux.hin])
 
-AM_INIT_AUTOMAKE([1.11.6 -Wall -Werror gnu nostdinc]) dnl cannot use gnits because of version number and the missing "THANKS" file
-AM_PROG_AR
+dnl First save manually set environmental variables
+test -z "${MPICC+x}"  || manual_MPICC="$MPICC"
+test -z "${CC+x}"     || manual_CC="$CC"
+test -z "${CFLAGS+x}" || manual_CFLAGS="$CFLAGS"
 
+dnl Determine default compiler
+AC_PROG_CC
+
+dnl Initialization for automake libtool
+AM_INIT_AUTOMAKE([1.11.6 -Wall -Werror gnu nostdinc]) dnl cannot use gnits because of version number and the missing "THANKS" file
+AM_PROG_AR dnl Must be called after setting manual_CC
+
+dnl Make HDF5 a configure option (default auto)
+AX_LIB_HDF5
+if test "$with_hdf5" = "yes"; then
+	if test $(basename "$H5CC") == h5cc; then
+		dnl Series HDF5: update CC if it was not set manually
+		if test -z "${manual_CC+x}"; then
+			test -z "${manual_CFLAGS+x}" && unset CFLAGS
+			CC="$HDF5_CC"
+			AC_PROG_CC(["$CC"])
+		fi
+	else
+		dnl Parallel HDF5: update MPICC if it was not set manually
+		test -z "${manual_MPICC+x}" && MPICC="$HDF5_CC"
+	fi
+fi
+AM_CONDITIONAL(USING_HDF5, test "$with_hdf5" = "yes")
+
+dnl Make MPI a configure option (default auto)
+AX_LIB_MPI
+if test "$with_mpi" = "yes"; then
+	dnl Update CC if it was determined automatically
+	if test -z "${manual_CC+x}"; then
+		test -z "${manual_CFLAGS+x}" && unset CFLAGS
+		CC="$MPI_CC"
+		AC_PROG_CC(["$CC"])
+	fi
+fi
+AM_CONDITIONAL(USING_MPI, [test "$with_mpi" = "yes"])
+
+dnl Make OpenCL a configure option (default auto)
+AX_LIB_OPENCL
+AM_CONDITIONAL(USING_OPENCL, [test "$with_opencl" = "yes"])
+
+dnl Check if we may use OpenMP
+AX_OPENMP([with_openmp=yes], [with_openmp=no])
+AM_CONDITIONAL(USING_OPENMP, [test "$with_openmp" = "yes"])
+
+dnl Check if we may use pthread
+AX_PTHREAD([with_pthread=yes], [with_pthread=no]) # may cause problem on AIX; see comments in "tools/m4/ax_pthread.m4"
+if test "$with_pthread" = "yes"; then
+	# Enable pthread-capable compiler by default
+	test -z "${manual_CFLAGS+x}" && unset CFLAGS
+	CC="${CC:-PTHREAD_CC}"
+	AC_PROG_CC(["$CC"])
+fi
+AM_CONDITIONAL(USING_PTHREAD, [test "$with_pthread" = "yes"])
+
+dnl Initialization for libtool
 LT_PREREQ([2.2.10])
-LT_INIT([dlopen disable-static])
+LT_INIT([dlopen disable-static]) dnl must be call after AM_PROG_AR
 
 dnl Check for programs and compiler characteristics
 AC_PROG_CPP
 AC_PROG_CC_STDC
 AM_PROG_CC_C_O
+
 AX_PROG_CC_FRAMEWORK
 AM_CONDITIONAL([SUPPORT_FRAMEWORK], [eval test \$ax_cv_prog_cc_${ac_cc}_framework = yes])
 
@@ -22,12 +80,6 @@ AC_C_TYPEOF
 AC_C_CONST
 AC_C_INLINE
 AC_C_RESTRICT
-
-LUX_CC="$CC"
-LUX_CFLAGS="$CFLAGS"
-LUX_CPPFLAGS="$CPPFLAGS"
-LUX_LDFLAGS="$LDFLAGS"
-LUX_LIBS="$LIBS"
 
 AC_PROG_LN_S
 
@@ -161,26 +213,6 @@ if test "$ok" = "yes"; then
 fi
 AM_CONDITIONAL(USING_SINGLE, [test "$ok" = "yes"])
 
-dnl Make HDF5 a configure option (default auto)
-AX_LIB_HDF5
-AM_CONDITIONAL(USING_HDF5, test "$with_hdf5" = "yes")
-
-dnl Make MPI a configure option (default auto)
-AX_LIB_MPI
-AM_CONDITIONAL(USING_MPI, [test "$with_mpi" = "yes"])
-
-dnl Make OpenCL a configure option (default auto)
-AX_LIB_OPENCL
-AM_CONDITIONAL(USING_OPENCL, [test "$with_opencl" = "yes"])
-
-dnl Check if we may use OpenMP
-AX_OPENMP([with_openmp=yes], [with_openmp=no])
-AM_CONDITIONAL(USING_OPENMP, [test "$with_openmp" = "yes"])
-
-dnl Check if we may use pthread
-AX_PTHREAD([with_pthread=yes], [with_pthread=no]) # may cause problem on AIX; see comments in "tools/m4/ax_pthread.m4"
-AM_CONDITIONAL(USING_PTHREAD, [test "$with_pthread" = "yes"])
-
 AH_BOTTOM([/*===========================================================================*/
 
 #ifndef countof
@@ -256,15 +288,6 @@ fi
 # Print summary
 echo "================================================================"
 echo "Lux m4_esyscmd([tr -d '\n' < .version])"
-echo "----------------------------------------------------------------"
-echo "Lux default   :"
-cat << EOF
-	LUX_CC="$LUX_CC"
-	LUX_CFLAGS="$LUX_CFLAGS"
-	LUX_CPPFLAGS="$LUX_CPPFLAGS"
-	LUX_LDFLAGS="$LUX_LDFLAGS"
-	LUX_LIBS="$LUX_LIBS"
-EOF
 echo "----------------------------------------------------------------"
 echo "With HDF5     : $with_hdf5"
 test "$with_hdf5" = "yes" && cat << EOF
