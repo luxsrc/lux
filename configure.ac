@@ -23,6 +23,12 @@ AC_C_CONST
 AC_C_INLINE
 AC_C_RESTRICT
 
+LUX_CC="$CC"
+LUX_CFLAGS="$CFLAGS"
+LUX_CPPFLAGS="$CPPFLAGS"
+LUX_LDFLAGS="$LDFLAGS"
+LUX_LIBS="$LIBS"
+
 AC_PROG_LN_S
 
 dnl Check for headers
@@ -251,34 +257,34 @@ fi
 echo "================================================================"
 echo "Lux m4_esyscmd([tr -d '\n' < .version])"
 echo "----------------------------------------------------------------"
-echo "Lux default  :"
+echo "Lux default   :"
 cat << EOF
-	CC="$CC"
-	CFLAGS="$CFLAGS"
-	CPPFLAGS="$CPPFLAGS"
-	LDFLAGS="$LDFLAGS"
-	LIBS="$LIBS"
+	LUX_CC="$LUX_CC"
+	LUX_CFLAGS="$LUX_CFLAGS"
+	LUX_CPPFLAGS="$LUX_CPPFLAGS"
+	LUX_LDFLAGS="$LUX_LDFLAGS"
+	LUX_LIBS="$LUX_LIBS"
 EOF
 echo "----------------------------------------------------------------"
-echo "With pthread : $with_pthread"
+echo "With pthread  : $with_pthread"
 test "$with_pthread" = "yes" && cat << EOF
 	PTHREAD_CC="$PTHREAD_CC"
 	PTHREAD_CFLAGS="$PTHREAD_CFLAGS"
 	PTHREAD_LIBS="$PTHREAD_LIBS"
 EOF
 echo "----------------------------------------------------------------"
-echo "With OpenMP  : $with_openmp"
+echo "With OpenMP   : $with_openmp"
 test "$with_openmp" = "yes" && cat << EOF
 	OPENMP_CFLAGS="$OPENMP_CFLAGS"
 EOF
 echo "----------------------------------------------------------------"
-echo "With OpenCL  : $with_opencl"
+echo "With OpenCL   : $with_opencl"
 test "$with_opencl" = "yes" && cat << EOF
 	OPENCL_CPPFLAGS="$OPENCL_CPPFLAGS"
 	OPENCL_LDFLAGS="$OPENCL_LDFLAGS"
 EOF
 echo "----------------------------------------------------------------"
-echo "With MPI     : $with_mpi"
+echo "With MPI      : $with_mpi"
 test "$with_mpi" = "yes" && cat << EOF
 	MPI_CC="$MPI_CC"
 	MPI_CFLAGS="$MPI_CFLAGS"
@@ -287,12 +293,21 @@ test "$with_mpi" = "yes" && cat << EOF
 	MPI_LIBS="$MPI_LIBS"
 EOF
 echo "----------------------------------------------------------------"
-echo "With HDF5    : $with_hdf5"
+echo "With HDF5     : $with_hdf5"
 test "$with_hdf5" = "yes" && cat << EOF
 	HDF5_CC="$HDF5_CC"
 	HDF5_CFLAGS="$HDF5_CFLAGS"
 	HDF5_CPPFLAGS="$HDF5_CPPFLAGS"
 	HDF5_LDFLAGS="$HDF5_LDFLAGS"
 	HDF5_LIBS="$HDF5_LIBS"
+EOF
+echo "----------------------------------------------------------------"
+echo "Combined flags:"
+cat << EOF
+	CC="$CC"
+	CFLAGS="$CFLAGS"
+	CPPFLAGS="$CPPFLAGS"
+	LDFLAGS="$LDFLAGS"
+	LIBS="$LIBS"
 EOF
 echo "================================================================"
