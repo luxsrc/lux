@@ -40,7 +40,10 @@ AC_CHECK_FUNCS([BSDgettimeofday gettimeofday gethrtime read_real_time time_base_
 AC_SEARCH_LIBS([dlinfo],  [dl], [AC_DEFINE(HAVE_DLINFO,  1, [Define to 1 if you have the `dlinfo' function.])],  [AC_MSG_WARN([failed to find the dlinfo() function])])
 AC_SEARCH_LIBS([dladdr],  [dl], [AC_DEFINE(HAVE_DLADDR,  1, [Define to 1 if you have the `dladdr' function.])],  [AC_MSG_WARN([failed to find the dladdr() function])])
 AC_SEARCH_LIBS([dlmopen], [dl], [AC_DEFINE(HAVE_DLMOPEN, 1, [Define to 1 if you have the `dlmopen' function.])], [AC_MSG_WARN([failed to find the dlmopen() function])])
-AC_CHECK_FUNCS([fopencookie funopen vsnprintf memfd_create shm_open])
+AC_CHECK_FUNCS([fopencookie funopen vsnprintf memfd_create shm_open shm_unlink])
+
+dnl Check for libraries
+AC_CHECK_LIB([rt], [shm_open])
 
 dnl Cray UNICOS _rtc() (real-time clock) intrinsic
 AC_MSG_CHECKING([for _rtc intrinsic])
