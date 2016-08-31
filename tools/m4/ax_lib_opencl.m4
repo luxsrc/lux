@@ -83,9 +83,7 @@
 
 AC_DEFUN([AX_LIB_OPENCL], [
 
-OPENCL_CPPFLAGS=""
-OPENCL_LDFLAGS=""
-
+dnl Add a default --with-opencl configuration option.
 AC_ARG_WITH([opencl],
 	AS_HELP_STRING(
 		[--with-opencl=[yes/no/PATH]],
@@ -96,16 +94,41 @@ AC_ARG_WITH([opencl],
 	elif test "$withval" = "yes"; then
 		with_opencl="yes"
 	else
-		OPENCL_CPPFLAGS="-I${withval}/include"
-		OPENCL_LDFLAGS="-L${withval}/lib64 -L${withval}/lib"
 		with_opencl="yes"
+		OPENCL_PREFIX="${withval}"
 	fi],
 	[with_opencl="yes"]
 )
 
+dnl Set defaults to blank
+OPENCL_CPPFLAGS=""
+OPENCL_LDFLAGS=""
+OPENCL_LIBS=""
+
+dnl Determine compile/link flags
 if test "$with_opencl" = "yes"; then
+	dnl Determine if we are on Mac and need to compile/link OpenCL as Apple framework
+	AC_REQUIRE([AX_PROG_CC_FRAMEWORK])
+
+	if test "$ac_cv_prog_cc_framework" = "yes"; then
+		if test -n "$OPENCL_PREFIX"; then
+			OPENCL_CPPFLAGS+=" -F${OPENCL_PREFIX}"
+			OPENCL_LDFLAGS+=" -F${OPENCL_PREFIX}"
+		fi
+		OPENCL_CPPFLAGS+=" -framework OpenCL"
+		OPENCL_LDFLAGS+=" -framework OpenCL"
+	else
+		if test -n "$OPENCL_PREFIX"; then
+			OPENCL_CPPFLAGS+=" -I${OPENCL_PREFIX}/include"
+			OPENCL_LDFLAGS+=" -L${OPENCL_PREFIX}/lib64 -L${OPENCL_PREFIX}/lib"
+		fi
+		OPENCL_LIBS+=" OpenCL"
+	fi
+
+	dnl Define variables
 	AC_SUBST([OPENCL_CPPFLAGS])
 	AC_SUBST([OPENCL_LDFLAGS])
+	AC_SUBST([OPENCL_LIBS])
 	AC_DEFINE([HAVE_OPENCL], [1], [Defined if you have OpenCL support])
 fi
 ])
