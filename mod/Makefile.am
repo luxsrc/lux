@@ -1,7 +1,3 @@
-AM_CPPFLAGS = -I$(top_builddir)
-AM_LDFLAGS  = -no-undefined -export-dynamic -export-symbols-regex '^lux[A-Z_]' -module
-
-#==============================================================================
 # Platform modules (provide a consistent platform)
 pkginclude_HEADERS  = cookie.h dlfcn.h failed.h memfd.h
 
@@ -40,15 +36,15 @@ pkginclude_HEADERS += numeric.h shorthand.h
 
 #==============================================================================
 # Interfaces and implementations of dynamic modules
-pkginclude_HEADERS += job.h opencl.h message.h resource.h
-SUBDIRS             = job   opencl
+pkginclude_HEADERS += job.h message.h resource.h
+SUBDIRS             = job
+
+if USING_OPENCL
+pkginclude_HEADERS += opencl.h
+SUBDIRS            += opencl
+endif
 
 if USING_MPI
 pkginclude_HEADERS += mpi.h
-pkglib_LTLIBRARIES  = mpi.la
-mpi_la_SOURCES  = mpi.h mpi.c
-mpi_la_SOURCES += mangle.h mutex.h
-mpi_la_CFLAGS   = $(PTHREAD_CFLAGS)
-mpi_la_CPPFLAGS = $(AM_CPPFLAGS) -DLUX_MOD_NAME=mpi
-mpi_la_LIBADD   = $(PTHREAD_LIBS) $(MPILIBS) ../api/c/libux.la
+SUBDIRS            += mpi
 endif

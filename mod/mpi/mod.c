@@ -21,7 +21,7 @@
 #include <lux/mangle.h>
 #include <lux/mutex.h>
 #include <stdlib.h> /* for NULL and malloc() */
-#include "mpi.h"
+#include "../mpi.h"
 
 #define EGO ((Lux_mpi *)ego)
 #define MPI_INITED_EXT (-1)

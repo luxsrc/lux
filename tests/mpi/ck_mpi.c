@@ -31,7 +31,7 @@ main(int argc, char *argv[])
 
 	lux_setup(&argc, &argv);
 
-	mpi = lux_load("../mod/.libs/mpi", NULL);
+	mpi = lux_load("../../mod/mpi/.libs/mpi", NULL);
 	A(mpi);
 
 	switch(mpi->thread_mode) {

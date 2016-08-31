@@ -15,11 +15,6 @@ dnl Check for programs and compiler characteristics
 AC_PROG_CPP
 AC_PROG_CC_STDC
 AM_PROG_CC_C_O
-AX_PROG_CC_FRAMEWORK
-AM_CONDITIONAL([SUPPORT_FRAMEWORK], [eval test \$ax_cv_prog_cc_${ac_cc}_framework = yes])
-
-AX_MPI([CC="$MPICC"])
-AX_PTHREAD([CC="$PTHREAD_CC"]) dnl correctly uses $CC from AX_MPI() unless on AIX
 
 AC_C_TYPEOF
 AC_C_CONST
@@ -148,7 +143,7 @@ AC_ARG_ENABLE(assertion, [AC_HELP_STRING([--enable-assertion],[compile lux with 
 if test "$ok" = "yes"; then
 	AC_DEFINE(LUX_ASSERTION, [1], [Define to 1 if to enable assertion for debugging])
 fi
-AM_CONDITIONAL(USING_ASSERTION, test "$ok" = "yes")
+AM_CONDITIONAL(USING_ASSERTION, [test "$ok" = "yes"])
 
 dnl Make single-precision a configure option (default disabled)
 AC_ARG_ENABLE(single, [AC_HELP_STRING([--enable-single],[compile lux in single precision])], ok=$enableval, ok=no)
@@ -156,14 +151,23 @@ AC_ARG_ENABLE(float,  [AC_HELP_STRING([--enable-float], [synonym for --enable-si
 if test "$ok" = "yes"; then
 	AC_DEFINE(LUX_SINGLE, [1], [Define to 1 if single precision is used as the default precision.])
 fi
-AM_CONDITIONAL(USING_SINGLE, test "$ok" = "yes")
+AM_CONDITIONAL(USING_SINGLE, [test "$ok" = "yes"])
 
-dnl Make MPI a configure option (default disabled)
-AC_ARG_ENABLE(mpi, [AC_HELP_STRING([--enable-mpi],[compile lux with mpi module])], ok=$enableval, ok=no)
-if test "$ok" = "yes"; then
-	AC_DEFINE(LUX_MPI, [1], [Define to 1 if MPI is enabled.])
-fi
-AM_CONDITIONAL(USING_MPI, test "$ok" = "yes")
+dnl Check if we may use pthread
+AX_PTHREAD([with_pthread=yes], [with_pthread=no]) # may cause problem on AIX; see comments in "tools/m4/ax_pthread.m4"
+AM_CONDITIONAL(USING_PTHREAD, [test "$with_pthread" = "yes"])
+
+dnl Check if we may use OpenMP
+AX_OPENMP([with_openmp=yes], [with_openmp=no])
+AM_CONDITIONAL(USING_OPENMP, [test "$with_openmp" = "yes"])
+
+dnl Make OpenCL a configure option (default auto)
+AX_LIB_OPENCL
+AM_CONDITIONAL(USING_OPENCL, [test "$with_opencl" = "yes"])
+
+dnl Make MPI a configure option (default auto)
+AX_LIB_MPI
+AM_CONDITIONAL(USING_MPI, [test "$with_mpi" = "yes"])
 
 AH_BOTTOM([/*===========================================================================*/
 
