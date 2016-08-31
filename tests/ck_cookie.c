@@ -64,8 +64,8 @@ int
 main()
 {
 	char out[1024];
-	cookie_t cookie = {0};
-	cookie_io_functions_t funcs = {0};
+	cookie_t cookie = {0, 0, {0}};
+	cookie_io_functions_t funcs = {NULL, NULL, NULL, NULL};
 	FILE *f;
 
 	funcs.read = read;
