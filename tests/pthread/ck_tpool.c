@@ -20,6 +20,8 @@
 #include <lux.h>
 #include <lux/assert.h>
 #include <lux/tpool.h>
+#include <inttypes.h>
+#include <stdint.h>
 #include <stdio.h>
 #include <unistd.h>
 
@@ -33,7 +35,8 @@ struct task {
 void
 exec(Lux_task *t)
 {
-	printf("[%p] %d\n", pthread_self(), ((struct task *)t)->id);
+	printf("[%" PRIxPTR "] %d\n",
+	       (uintptr_t)pthread_self(), ((struct task *)t)->id);
 	usleep(1);
 }
 

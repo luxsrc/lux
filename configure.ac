@@ -26,7 +26,7 @@ AC_PROG_LN_S
 dnl Check for headers
 AC_HEADER_TIME
 AC_CHECK_HEADERS([sys/time.h c_asm.h intrinsics.h mach/mach_time.h])
-AC_CHECK_HEADERS([stddef.h ctype.h obstack.h sys/mman.h sys/stat.h fcntl.h])
+AC_CHECK_HEADERS([stddef.h stdint.h inttypes.h ctype.h obstack.h sys/mman.h sys/stat.h fcntl.h])
 
 dnl Check for types
 AC_CHECK_TYPE([off64_t])
