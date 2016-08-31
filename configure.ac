@@ -16,7 +16,7 @@ AC_PROG_CPP
 AC_PROG_CC_STDC
 AM_PROG_CC_C_O
 AX_PROG_CC_FRAMEWORK
-AM_CONDITIONAL([SUPPORT_FRAMEWORK], [eval test \$ax_cv_prog_cc_${ac_cc}_framework = yes])
+AM_CONDITIONAL([SUPPORT_FRAMEWORK], [test "$ac_cv_prog_cc_framework" = "yes"])
 
 AC_C_TYPEOF
 AC_C_CONST

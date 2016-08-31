@@ -80,9 +80,11 @@ fi
 rm -f core conftest*
 ])dnl
 if eval test \$ax_cv_prog_cc_${ac_cc}_framework = yes; then
+	ac_cv_prog_cc_framework=yes
 	AC_MSG_RESULT([yes])
 	AC_DEFINE(SUPPORT_FRAMEWORK, 1, [Define to 1 if your C compiler supports -framework.])
 else
+	test -z "${ac_cv_prog_cc_framework+x}" && ac_cv_prog_cc_framework=no
 	AC_MSG_RESULT([no])
 fi
 ])# AX_PROG_CC_FRAMEWORK
