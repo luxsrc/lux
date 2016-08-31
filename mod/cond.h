@@ -22,7 +22,7 @@
 
 #include <lux/mutex.h> /* already includes <pthread.h> */
 
-#define COND_NULL PTHREAD_COND_INITIALIZER
+#define COND_NULL {PTHREAD_COND_INITIALIZER}
 
 typedef struct {
 	pthread_cond_t c;

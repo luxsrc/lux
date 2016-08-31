@@ -22,7 +22,7 @@
 
 #include <pthread.h>
 
-#define MUTEX_NULL PTHREAD_MUTEX_INITIALIZER
+#define MUTEX_NULL {PTHREAD_MUTEX_INITIALIZER}
 
 typedef struct {
 	pthread_mutex_t m;
