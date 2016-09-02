@@ -40,6 +40,8 @@ main(int argc, char *argv[])
 	file = hdf5("test.h5", H5F_ACC_TRUNC);
 	A(file);
 
+	lux_print("fid: %d\n", ((Lux_hdf5 *)file)->fid);
+
 	file->close(file);
 	lux_unload(hdf5);
 
