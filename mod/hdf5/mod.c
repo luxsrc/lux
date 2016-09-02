@@ -45,14 +45,23 @@ LUX_MOD(const char *fname, unsigned flags)
 	Lux_file *ego = NULL;
 
 	ego = (Lux_file *)malloc(sizeof(struct hdf5));
-	if(ego) {
-		ego->close = close;
-		SWITCH {
-		CASE(flags == H5F_ACC_EXCL || flags == H5F_ACC_TRUNC)
-			EGO->fid = H5Fcreate(fname, flags, H5P_DEFAULT, H5P_DEFAULT);
-		CASE(flags == H5F_ACC_RDONLY || flags == H5F_ACC_RDWR)
-			EGO->fid = H5Fopen(fname, flags, H5P_DEFAULT);
-		}
+	if(!ego)
+		goto cleanup1;
+
+	SWITCH {
+	CASE(flags == H5F_ACC_EXCL || flags == H5F_ACC_TRUNC)
+		EGO->fid = H5Fcreate(fname, flags, H5P_DEFAULT, H5P_DEFAULT);
+	CASE(flags == H5F_ACC_RDONLY || flags == H5F_ACC_RDWR)
+		EGO->fid = H5Fopen(fname, flags, H5P_DEFAULT);
 	}
+	if(EGO->fid < 0)
+		goto cleanup2;
+
+	ego->close = close;
 	return ego;
+
+cleanup2:
+	free(ego);
+cleanup1:
+	return NULL;
 }
