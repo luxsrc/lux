@@ -17,11 +17,13 @@
  * You should have received a copy of the GNU General Public License
  * along with lux.  If not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef _LUX_IO_H_
-#define _LUX_IO_H_
+#ifndef _LUX_FILE_H_
+#define _LUX_FILE_H_
 
-#include <lux/file.h>
+typedef struct LuxSfile Lux_file;
 
-typedef Lux_file *(Lux_io)(const char *, unsigned);
+struct LuxSfile {
+	void (*close)(Lux_file *);
+};
 
-#endif /* _LUX_IO_H_ */
+#endif /* _LUX_FILE_H_ */
