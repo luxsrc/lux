@@ -48,3 +48,8 @@ if USING_MPI
 pkginclude_HEADERS += mpi.h
 SUBDIRS            += mpi
 endif
+
+if USING_HDF5
+pkginclude_HEADERS += hdf5.h
+SUBDIRS            += hdf5
+endif
