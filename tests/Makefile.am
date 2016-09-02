@@ -44,4 +44,8 @@ if USING_PTHREAD
 SUBDIRS += pthread
 endif
 
+if USING_HDF5
+SUBDIRS += hdf5
+endif
+
 TESTS = $(check_PROGRAMS)
