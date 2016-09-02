@@ -26,23 +26,63 @@
 
 #define A(E) lux_always_assert(E)
 
+#define TESTFNAME "test.h5"
+
+static void
+cleanup(void)
+{
+	(void)remove(TESTFNAME);
+}
+
 int
 main(int argc, char *argv[])
 {
 	Lux_io   *hdf5;
 	Lux_file *file;
 
+	atexit(cleanup); /* in case some of the tests fail */
 	lux_setup(&argc, &argv);
 
 	hdf5 = lux_load("../../mod/hdf5/.libs/hdf5", NULL);
 	A(hdf5);
 
-	file = hdf5("test.h5", H5F_ACC_TRUNC);
+	/* Test opening missing file */
+	file = hdf5(TESTFNAME, H5F_ACC_RDONLY);
+	A(file == NULL);
+
+	file = hdf5(TESTFNAME, H5F_ACC_RDWR);
+	A(file == NULL);
+
+	/* Test creating file */
+	file = hdf5(TESTFNAME, H5F_ACC_EXCL);
 	A(file);
-
-	lux_print("fid: %d\n", ((Lux_hdf5 *)file)->fid);
-
 	file->close(file);
+
+	file = hdf5(TESTFNAME, H5F_ACC_EXCL);
+	A(file == NULL);
+
+	cleanup();
+
+	/* Test truncating file */
+	file = hdf5(TESTFNAME, H5F_ACC_TRUNC);
+	A(file);
+	file->close(file);
+
+	file = hdf5(TESTFNAME, H5F_ACC_TRUNC);
+	A(file);
+	file->close(file);
+
+	/* Test opening existing file */
+	file = hdf5(TESTFNAME, H5F_ACC_RDONLY);
+	A(file);
+	file->close(file);
+
+	file = hdf5(TESTFNAME, H5F_ACC_RDWR);
+	A(file);
+	file->close(file);
+
+	cleanup();
+
 	lux_unload(hdf5);
 
 	return 0;
