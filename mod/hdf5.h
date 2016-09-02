@@ -20,6 +20,14 @@
 #ifndef _LUX_HDF5_H_
 #define _LUX_HDF5_H_
 
+#include <lux/file.h>
 #include <hdf5.h>
+
+typedef struct LuxShdf5 Lux_hdf5;
+
+struct LuxShdf5 {
+	Lux_file super;
+	hid_t    fid;
+};
 
 #endif /* _LUX_HDF5_H_ */

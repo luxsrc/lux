@@ -25,12 +25,7 @@
 #include <lux/switch.h>
 #include <stdlib.h> /* for malloc(), free(), and NULL */
 
-#define EGO ((struct hdf5 *)ego)
-
-struct hdf5 {
-	Lux_file super;
-	hid_t    fid;
-};
+#define EGO ((Lux_hdf5 *)ego)
 
 static void
 close(Lux_file *ego)
@@ -44,7 +39,7 @@ LUX_MOD(const char *fname, unsigned flags)
 {
 	Lux_file *ego = NULL;
 
-	ego = (Lux_file *)malloc(sizeof(struct hdf5));
+	ego = (Lux_file *)malloc(sizeof(Lux_hdf5));
 	if(!ego)
 		goto cleanup1;
 
