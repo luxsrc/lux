@@ -22,6 +22,7 @@
 #include <lux/file.h>
 #include <lux/hdf5.h>
 #include <lux/io.h>
+#include <lux/switch.h>
 #include <stdlib.h> /* for malloc(), free(), and NULL */
 
 #define EGO ((struct hdf5 *)ego)
@@ -46,7 +47,12 @@ LUX_MOD(const char *fname, unsigned flags)
 	ego = (Lux_file *)malloc(sizeof(struct hdf5));
 	if(ego) {
 		ego->close = close;
-		EGO->fid   = H5Fopen(fname, flags, H5P_DEFAULT);
+		SWITCH {
+		CASE(flags == H5F_ACC_EXCL || flags == H5F_ACC_TRUNC)
+			EGO->fid = H5Fcreate(fname, flags, H5P_DEFAULT, H5P_DEFAULT);
+		CASE(flags == H5F_ACC_RDONLY || flags == H5F_ACC_RDWR)
+			EGO->fid = H5Fopen(fname, flags, H5P_DEFAULT);
+		}
 	}
 	return ego;
 }
