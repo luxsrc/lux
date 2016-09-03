@@ -42,7 +42,7 @@ main(int argc, char *argv[])
 	Lux_io   *hdf5;
 	Lux_file *file;
 
-	double *out;
+	double *out, *in;
 	int     i;
 
 	atexit(cleanup); /* in case some of the tests fail */
@@ -64,11 +64,23 @@ main(int argc, char *argv[])
 	file->write_pa(file, "/test", typecodeof(out[0]), out);
 	file->close(file);
 
-	/* TODO: Test read existing file */
+	/* Test read existing file */
+	file = hdf5(TESTFNAME, H5F_ACC_RDONLY);
+	A(file);
+
+	in = file->read_pa(file, "/test");
+	A(in);
+
+	file->close(file);
+
+	for(i = 0; i < 11 * 13 * 17 * 19; ++i)
+		A(in[i] == out[i]);
+
+	pfree(in);
+	pfree(out);
 
 	cleanup();
 
-	pfree(out);
 	lux_unload(hdf5);
 
 	return 0;
