@@ -111,6 +111,7 @@ AC_TRY_LINK([#if HAVE_INTRINSICS_H
 AC_MSG_RESULT($rtc_ok)
 
 dnl Find out the number of bits in integer types
+AC_COMPUTE_INT([cbits], [                   CHAR_BIT], [#include <limits.h>], [AC_MSG_ERROR([failed to compute the size of int in bits])])
 AC_COMPUTE_INT([ibits], [sizeof(int)      * CHAR_BIT], [#include <limits.h>], [AC_MSG_ERROR([failed to compute the size of int in bits])])
 AC_COMPUTE_INT([ubits], [sizeof(unsigned) * CHAR_BIT], [#include <limits.h>], [AC_MSG_ERROR([failed to compute the size of unsigned in bits])])
 AC_COMPUTE_INT([sbits], [sizeof(size_t)   * CHAR_BIT], [#include <limits.h>
@@ -193,6 +194,7 @@ AC_DEFINE_UNQUOTED(LUX_ELAST,        $elast, [Define to the largest system error
 AC_DEFINE_UNQUOTED(LUX_STRINGID_BIT, $hbits, [Define to the required bits to hold a string key.])
 AC_DEFINE_UNQUOTED(LUX_FACILITY_BIT, $mbits, [Define to the required bits to hold a facility key.])
 AC_DEFINE_UNQUOTED(LUX_FAILURE_BIT,  $fbits, [Define to the required bits to hold a lux failure code.])
+AC_DEFINE_UNQUOTED(LUX_CHAR_BIT,     $cbits, [Define to the number of bits of char.])
 AC_DEFINE_UNQUOTED(LUX_INT_BIT,      $ibits, [Define to the number of bits of int.])
 AC_DEFINE_UNQUOTED(LUX_UNSIGNED_BIT, $ubits, [Define to the number of bits of unsigned.])
 AC_DEFINE_UNQUOTED(LUX_SIZE_T_BIT,   $sbits, [Define to the number of bits of int.])
@@ -240,11 +242,11 @@ AH_BOTTOM([/*===================================================================
 #endif
 
 #ifndef TYPECODE
-#define TYPECODE(C, B) (((int)(C)) | ((int)(B) << 8))
+#define TYPECODE(C, B) (((int)(C)) | ((int)(B) << LUX_CHAR_BIT))
 #endif
 
 #ifndef typecodeof
-#define typecodeof(X) ({ typeof(X) z = -1.5; TYPECODE((z == -1.5) ? 'f' : (z == -1) ? 'i' : 'u', sizeof(X) * 8); })
+#define typecodeof(X) ({ typeof(X) z = -1.5; TYPECODE((z == -1.5) ? 'f' : (z == -1) ? 'i' : 'u', sizeof(X) * LUX_CHAR_BIT); })
 #endif
 
 /*===========================================================================*/

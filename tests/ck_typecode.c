@@ -34,20 +34,20 @@ main(int argc, char *argv[])
 	lux_setup(&argc, &argv);
 
 	tc = typecodeof(i);
-	lux_print("int      -> '%c' %d\n", tc, tc >> 8);
-	A(tc == TYPECODE('i', sizeof(i) * 8));
+	lux_print("int      -> '%c' %d\n", tc, tc >> LUX_CHAR_BIT);
+	A(tc == TYPECODE('i', sizeof(i) * LUX_CHAR_BIT));
 
 	tc = typecodeof(u);
-	lux_print("unsigned -> '%c' %d\n", tc, tc >> 8);
-	A(tc == TYPECODE('u', sizeof(u) * 8));
+	lux_print("unsigned -> '%c' %d\n", tc, tc >> LUX_CHAR_BIT);
+	A(tc == TYPECODE('u', sizeof(u) * LUX_CHAR_BIT));
 
 	tc = typecodeof(f);
-	lux_print("float    -> '%c' %d\n", tc, tc >> 8);
-	A(tc == TYPECODE('f', sizeof(f) * 8));
+	lux_print("float    -> '%c' %d\n", tc, tc >> LUX_CHAR_BIT);
+	A(tc == TYPECODE('f', sizeof(f) * LUX_CHAR_BIT));
 
 	tc = typecodeof(d);
-	lux_print("double   -> '%c' %d\n", tc, tc >> 8);
-	A(tc == TYPECODE('f', sizeof(d) * 8));
+	lux_print("double   -> '%c' %d\n", tc, tc >> LUX_CHAR_BIT);
+	A(tc == TYPECODE('f', sizeof(d) * LUX_CHAR_BIT));
 
 	return 0;
 }
