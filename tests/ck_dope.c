@@ -46,9 +46,9 @@ main()
 
 	printf("strides: %zu %zu %zu\n",
 	       dope_gets(dp+0), dope_gets(dp+1), dope_gets(dp+2));
-	A(dope_gets(dp+0) == sizeof(double [5]));
-	A(dope_gets(dp+1) == ALIGN);
-	A(dope_gets(dp+2) == ALIGN * N2);
+	A(dope_gets(dp+0) == ALIGN * 2 * N2);
+	A(dope_gets(dp+1) == ALIGN * 2);
+	A(dope_gets(dp+2) == sizeof(double [5]));
 
 	rmdope(dp);
 	return 0;

@@ -78,10 +78,9 @@ static inline struct dope *
 mkdopedn(size_t esz, size_t a, size_t d, size_t *n)
 {
 	struct dope *dp = palloc(struct dope, d);
-	size_t s = esz;
-	size_t i;
-	for(i = 0; i < d; s *= n[i++]) {
-		if(i == 1)
+ 	size_t s, i;
+	for(s = esz, i = d-1; i < d /* works because size_t */; s *= n[i--]) {
+		if(i+1 == d-1)
 			s = ((s + a - 1) / a) * a;
 		dp[i] = pkdope(s, i, n[i]);
 	}
