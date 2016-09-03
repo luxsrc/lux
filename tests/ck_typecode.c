@@ -29,25 +29,25 @@ main(int argc, char *argv[])
 	unsigned u;
 	float    f;
 	double   d;
-	char     c;
+	int      tc;
 
 	lux_setup(&argc, &argv);
 
-	c = typecodeof(i);
-	lux_print("int      -> '%c'\n", c);
-	A(c == 'i');
+	tc = typecodeof(i);
+	lux_print("int      -> '%c' %d\n", tc, tc >> 8);
+	A(tc == ('i' | (32 << 8)));
 
-	c = typecodeof(u);
-	lux_print("unsigned -> '%c'\n", c);
-	A(c == 'u');
+	tc = typecodeof(u);
+	lux_print("unsigned -> '%c' %d\n", tc, tc >> 8);
+	A(tc == ('u' | (32 << 8)));
 
-	c = typecodeof(f);
-	lux_print("float    -> '%c'\n", c);
-	A(c == 'f');
+	tc = typecodeof(f);
+	lux_print("float    -> '%c' %d\n", tc, tc >> 8);
+	A(tc == ('f' | (32 << 8)));
 
-	c = typecodeof(d);
-	lux_print("double   -> '%c'\n", c);
-	A(c == 'f');
+	tc = typecodeof(d);
+	lux_print("double   -> '%c' %d\n", tc, tc >> 8);
+	A(tc == ('f' | (64 << 8)));
 
 	return 0;
 }
