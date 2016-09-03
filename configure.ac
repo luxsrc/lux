@@ -246,7 +246,7 @@ AH_BOTTOM([/*===================================================================
 #endif
 
 #ifndef typecodeof
-#define typecodeof(X) ({ typeof(X) z = -1.5; TYPECODE((z == -1.5) ? 'f' : (z == -1) ? 'i' : 'u', sizeof(X) * LUX_CHAR_BIT); })
+#define typecodeof(X) ({ typeof(X) z = (typeof(X))-1.5; TYPECODE(((double)z == -1.5) ? 'f' : ((int)z == -1) ? 'i' : 'u', sizeof(X) * LUX_CHAR_BIT); })
 #endif
 
 /*===========================================================================*/
