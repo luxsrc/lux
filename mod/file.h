@@ -24,7 +24,7 @@ typedef struct LuxSfile Lux_file;
 
 struct LuxSfile {
 	void  (*close   )(Lux_file *);
-	void  (*write_pa)(Lux_file *, const char *, const void *);
+	void  (*write_pa)(Lux_file *, const char *, int, const void *);
 	void *(*read_pa )(Lux_file *, const char *);
 };
 
