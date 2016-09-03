@@ -49,18 +49,18 @@
  * across platform and `cl_double` is optional.  The details are
  * listed here:
  *
- *  C Type       OpenCL Type  C Size   OpenCL Size
+ *  C Type       OpenCL Type  C Size    OpenCL Size
  *
- *  char         cl_char      ~8-bit   =8-bit
- *  short        cl_short     >16-bit  =16-bit
- *  int          cl_int       >16-bit  =32-bit
- *  long         cl_long      >32-bit  =64-bit
- *  long long    ---          >64-bit  ---
+ *  char         cl_char      ~  8-bit  =  8-bit
+ *  short        cl_short     >=16-bit  = 16-bit
+ *  int          cl_int       >=16-bit  = 32-bit
+ *  long         cl_long      >=32-bit  = 64-bit
+ *  long long    ---          >=64-bit  ---
  *
- *  ---          cl_half      =16-bit  =16-bit
- *  float        cl_float     =32-bit  =32-bit
- *  double       cl_double    =64-bit  =64-bit
- *  long double  ---          ~80-bit  ---
+ *  ---          cl_half      = 16-bit  = 16-bit
+ *  float        cl_float     = 32-bit  = 32-bit
+ *  double       cl_double    = 64-bit  = 64-bit
+ *  long double  ---          ~ 80-bit  ---
  *
  * While this helps OpenCL kernels to behave consistently once they
  * are compiled, it limits the number of devices that the same kernel
