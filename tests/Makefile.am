@@ -1,7 +1,7 @@
 AM_CPPFLAGS = -I$(top_builddir)
 SUBDIRS =
 
-check_PROGRAMS = ck_atomic_parafor ck_cookie ck_dope ck_lazybuf ck_mpool ck_mview ck_parray ck_queue ck_ring ck_stack ck_ticks_timer
+check_PROGRAMS = ck_atomic_parafor ck_cookie ck_dope ck_lazybuf ck_mpool ck_mview ck_parray ck_queue ck_ring ck_stack ck_typecode ck_ticks_timer
 
 ck_atomic_parafor_SOURCES = ck_atomic_parafor.c ../mod/atomic.h ../mod/parafor.h
 ck_atomic_parafor_LDADD   = ../api/c/libux.la
@@ -27,11 +27,14 @@ ck_parray_LDADD   = ../api/c/libux.la
 ck_queue_SOURCES = ck_queue.c ../mod/queue.h
 ck_queue_LDADD   = ../api/c/libux.la
 
+ck_ring_SOURCES = ck_ring.c ../mod/ring.h
+ck_ring_LDADD   = ../api/c/libux.la
+
 ck_stack_SOURCES = ck_stack.c ../mod/stack.h
 ck_stack_LDADD   = ../api/c/libux.la
 
-ck_ring_SOURCES = ck_ring.c ../mod/ring.h
-ck_ring_LDADD   = ../api/c/libux.la
+ck_typecode_SOURCES = ck_typecode.c
+ck_typecode_LDADD   = ../api/c/libux.la
 
 ck_ticks_timer_SOURCES = ck_ticks_timer.c ../mod/ticks.h ../mod/timer.h
 ck_ticks_timer_LDADD   = ../api/c/libux.la
