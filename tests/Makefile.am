@@ -27,11 +27,11 @@ ck_parray_LDADD   = ../api/c/libux.la
 ck_queue_SOURCES = ck_queue.c ../mod/queue.h
 ck_queue_LDADD   = ../api/c/libux.la
 
-ck_stack_SOURCES = ck_stack.c ../mod/stack.h
-ck_stack_LDADD   = ../api/c/libux.la
-
 ck_ring_SOURCES = ck_ring.c ../mod/ring.h
 ck_ring_LDADD   = ../api/c/libux.la
+
+ck_stack_SOURCES = ck_stack.c ../mod/stack.h
+ck_stack_LDADD   = ../api/c/libux.la
 
 ck_typecode_SOURCES = ck_typecode.c
 ck_typecode_LDADD   = ../api/c/libux.la
