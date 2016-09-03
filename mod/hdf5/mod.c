@@ -57,6 +57,36 @@ getdims(int tc, const void *pa)
 	return dims;
 }
 
+static inline void *
+getpa(int nbits, hid_t dims)
+{
+	void *pa;
+
+	size_t   d  = H5Sget_simple_extent_ndims(dims);
+	hsize_t *ns = malloc(sizeof(hsize_t) * d);
+	size_t  *Ns = malloc(sizeof(size_t)  * d);
+
+	(void)H5Sget_simple_extent_dims(dims, ns, NULL);
+	do {
+		size_t i;
+		for(i = 0; i < d; ++i)
+			Ns[i] = ns[i];
+	} while(0);
+
+	switch(nbits) {
+	case  8: pa = pallocdn(int8_t,  d, Ns); break;
+	case 16: pa = pallocdn(int16_t, d, Ns); break;
+	case 32: pa = pallocdn(int32_t, d, Ns); break;
+	case 64: pa = pallocdn(int64_t, d, Ns); break;
+	default: pa = NULL;                     break;
+	}
+
+	free(Ns);
+	free(ns);
+
+	return pa;
+}
+
 static void
 close(Lux_file *ego)
 {
@@ -80,6 +110,26 @@ write_pa(Lux_file *ego, const char *key, int tc, const void *pa)
 	(void)H5Sclose(dims);
 }
 
+static void *
+read_pa(Lux_file *ego, const char *key)
+{
+	hid_t dset, dims, type;
+	void *pa;
+
+	dset = H5Dopen(EGO->fid, key, H5P_DEFAULT);
+	dims = H5Dget_space(dset);
+	type = H5Dget_type(dset);
+
+	pa = getpa(H5Tget_size(type) * LUX_CHAR_BIT, dims);
+	(void)H5Dread(dset, type, dims, dims, H5P_DEFAULT, pa);
+
+	(void)H5Tclose(type);
+	(void)H5Sclose(dims);
+	(void)H5Dclose(dset);
+
+	return pa;
+}
+
 Lux_file *
 LUX_MOD(const char *fname, unsigned flags)
 {
@@ -100,6 +150,7 @@ LUX_MOD(const char *fname, unsigned flags)
 
 	ego->close    = close;
 	ego->write_pa = write_pa;
+	ego->read_pa  = read_pa;
 	return ego;
 
 cleanup2:
