@@ -239,8 +239,12 @@ AH_BOTTOM([/*===================================================================
 #define localof(T, I) ({ T _ = I; _; })
 #endif
 
+#ifndef TYPECODE
+#define TYPECODE(C, B) (((int)(C)) | ((int)(B) << 8))
+#endif
+
 #ifndef typecodeof
-#define typecodeof(X) ({ typeof(X) z = -1.5; (((z == -1.5) ? 'f' : (z == -1) ? 'i' : 'u') | ((int)sizeof(X) << 11)); })
+#define typecodeof(X) ({ typeof(X) z = -1.5; TYPECODE((z == -1.5) ? 'f' : (z == -1) ? 'i' : 'u', sizeof(X) * 8); })
 #endif
 
 /*===========================================================================*/

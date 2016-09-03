@@ -35,19 +35,19 @@ main(int argc, char *argv[])
 
 	tc = typecodeof(i);
 	lux_print("int      -> '%c' %d\n", tc, tc >> 8);
-	A(tc == ('i' | (32 << 8)));
+	A(tc == TYPECODE('i', sizeof(i) * 8));
 
 	tc = typecodeof(u);
 	lux_print("unsigned -> '%c' %d\n", tc, tc >> 8);
-	A(tc == ('u' | (32 << 8)));
+	A(tc == TYPECODE('u', sizeof(u) * 8));
 
 	tc = typecodeof(f);
 	lux_print("float    -> '%c' %d\n", tc, tc >> 8);
-	A(tc == ('f' | (32 << 8)));
+	A(tc == TYPECODE('f', sizeof(f) * 8));
 
 	tc = typecodeof(d);
 	lux_print("double   -> '%c' %d\n", tc, tc >> 8);
-	A(tc == ('f' | (64 << 8)));
+	A(tc == TYPECODE('f', sizeof(d) * 8));
 
 	return 0;
 }
