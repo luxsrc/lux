@@ -90,6 +90,7 @@ getpa(int nbits, hid_t dims)
 static void
 close(Lux_file *ego)
 {
+	(void)H5Pclose(EGO->lcpl);
 	(void)H5Fclose(EGO->fid);
 	free(ego);
 }
@@ -97,22 +98,18 @@ close(Lux_file *ego)
 static void
 write_pa(Lux_file *ego, const char *key, int tc, const void *pa)
 {
-	hid_t lcpl, type, dims, dset;
-
-	lcpl = H5Pcreate(H5P_LINK_CREATE);
-	H5Pset_create_intermediate_group(lcpl, 1);
+	hid_t type, dims, dset;
 
 	type = h5t_from_tc(tc);
 	dims = getdims(tc, pa);
 
 	dset = H5Dcreate(EGO->fid, key, type, dims,
-	                 lcpl, H5P_DEFAULT, H5P_DEFAULT);
+	                 EGO->lcpl, H5P_DEFAULT, H5P_DEFAULT);
 
 	(void)H5Dwrite(dset, type, H5S_ALL, H5S_ALL, H5P_DEFAULT, pa);
 
 	(void)H5Dclose(dset);
 	(void)H5Sclose(dims);
-	(void)H5Pclose(lcpl);
 }
 
 static void *
@@ -152,6 +149,9 @@ LUX_MOD(const char *fname, unsigned flags)
 	}
 	if(EGO->fid < 0)
 		goto cleanup2;
+
+	EGO->lcpl = H5Pcreate(H5P_LINK_CREATE);
+	H5Pset_create_intermediate_group(EGO->lcpl, 1);
 
 	ego->close    = close;
 	ego->write_pa = write_pa;
