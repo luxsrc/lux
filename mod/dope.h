@@ -51,21 +51,21 @@ pkdope(ptrdiff_t stride_in_bytes, size_t d, size_t n)
 }
 
 static inline ptrdiff_t
-dope_gets(struct dope *d)
+dope_gets(struct dope *dp)
 {
-	return d->s;
+	return dp->s;
 }
 
 static inline size_t
-dope_getd(struct dope *d)
+dope_getd(struct dope *dp)
 {
-	return GETD(d->dn);
+	return GETD(dp->dn);
 }
 
 static inline size_t
-dope_getn(struct dope *d)
+dope_getn(struct dope *dp)
 {
-	return GETN(d->dn);
+	return GETN(dp->dn);
 }
 
 #define mkdope(T, a, ...) ({              \
