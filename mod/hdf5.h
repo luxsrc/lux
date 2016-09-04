@@ -29,6 +29,7 @@ typedef struct LuxShdf5 Lux_hdf5;
 struct LuxShdf5 {
 	Lux_file super;
 	hid_t    fid;
+	hid_t    lcpl;
 };
 
 static inline hid_t
