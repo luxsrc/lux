@@ -20,6 +20,8 @@
 #ifndef _LUX_DOPE_H_
 #define _LUX_DOPE_H_
 
+#include <lux/assert.h>
+
 #if HAVE_STDDEF_H
 #include <stddef.h> /* for size_t and ptrdiff_t */
 #else
@@ -77,12 +79,16 @@ dope_getn(struct dope *dp)
 static inline struct dope *
 mkdopedn(size_t esz, size_t a, size_t d, size_t *n)
 {
-	struct dope *dp = palloc(struct dope, d);
- 	size_t s, i;
-	for(s = esz, i = d-1; i < d /* works because size_t */; s *= n[i--]) {
-		if(i+1 == d-1)
-			s = ((s + a - 1) / a) * a;
-		dp[i] = pkdope(s, i, n[i]);
+	struct dope *dp;
+	lux_assert(d > 0);
+	dp = palloc(struct dope, d);
+	if(dp) {
+		size_t s, i;
+		for(s = esz, i = d-1; i < d; s *= n[i--]) {
+			if(i+1 == d-1)
+				s = ((s + a - 1) / a) * a;
+			dp[i] = pkdope(s, i, n[i]);
+		}
 	}
 	return dp;
 }
