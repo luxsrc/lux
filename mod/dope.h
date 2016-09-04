@@ -68,6 +68,12 @@ dope_getn(struct dope *dp)
 	return GETN(dp->dn);
 }
 
+static inline size_t
+dope_getsz(struct dope *dp)
+{
+	return dope_gets(dp) * dope_getn(dp);
+}
+
 #define mkdope(T, a, ...) ({              \
 	size_t _n_[] = {__VA_ARGS__};     \
 	size_t _d_   = countof(_n_);      \
