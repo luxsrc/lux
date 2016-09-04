@@ -21,7 +21,9 @@
 #define _LUX_DOPE_H_
 
 #include <lux/assert.h>
-
+#include <lux/parray.h> /* must be before mkdopedn() and rmdope() so
+                           that the palloc() and pfree() macros are
+                           defined.  */
 #if HAVE_STDDEF_H
 #include <stddef.h> /* for size_t and ptrdiff_t */
 #else
@@ -35,10 +37,6 @@ typedef long long ptrdiff_t;
 #define PKDN(d, n) (((d) << LUX_N_BIT) | (n))
 #define GETD(dn)   ((dn) >> LUX_N_BIT)
 #define GETN(dn)   ((dn) & DOPE_N_MAX)
-
-#include <lux/parray.h> /* must be before mkdopedn() and rmdope() so
-                           that the palloc() and pfree() macros are
-                           defined.  */
 
 struct dope {
 	ptrdiff_t s;  /* stride is in unit of bytes */
