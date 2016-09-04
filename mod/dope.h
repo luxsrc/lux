@@ -20,6 +20,10 @@
 #ifndef _LUX_DOPE_H_
 #define _LUX_DOPE_H_
 
+#include <lux/assert.h>
+#include <lux/parray.h> /* must be before mkdopedn() and rmdope() so
+                           that the palloc() and pfree() macros are
+                           defined.  */
 #if HAVE_STDDEF_H
 #include <stddef.h> /* for size_t and ptrdiff_t */
 #else
@@ -34,10 +38,6 @@ typedef long long ptrdiff_t;
 #define GETD(dn)   ((dn) >> LUX_N_BIT)
 #define GETN(dn)   ((dn) & DOPE_N_MAX)
 
-#include <lux/parray.h> /* must be before mkdopedn() and rmdope() so
-                           that the palloc() and pfree() macros are
-                           defined.  */
-
 struct dope {
 	ptrdiff_t s;  /* stride is in unit of bytes */
 	size_t    dn; /* bitwise-OR of dim and number of elements */
@@ -51,21 +51,27 @@ pkdope(ptrdiff_t stride_in_bytes, size_t d, size_t n)
 }
 
 static inline ptrdiff_t
-dope_gets(struct dope *d)
+dope_gets(struct dope *dp)
 {
-	return d->s;
+	return dp->s;
 }
 
 static inline size_t
-dope_getd(struct dope *d)
+dope_getd(struct dope *dp)
 {
-	return GETD(d->dn);
+	return GETD(dp->dn);
 }
 
 static inline size_t
-dope_getn(struct dope *d)
+dope_getn(struct dope *dp)
 {
-	return GETN(d->dn);
+	return GETN(dp->dn);
+}
+
+static inline size_t
+dope_getsz(struct dope *dp)
+{
+	return dope_gets(dp) * dope_getn(dp);
 }
 
 #define mkdope(T, a, ...) ({              \
@@ -77,12 +83,16 @@ dope_getn(struct dope *d)
 static inline struct dope *
 mkdopedn(size_t esz, size_t a, size_t d, size_t *n)
 {
-	struct dope *dp = palloc(struct dope, d);
- 	size_t s, i;
-	for(s = esz, i = d-1; i < d /* works because size_t */; s *= n[i--]) {
-		if(i+1 == d-1)
-			s = ((s + a - 1) / a) * a;
-		dp[i] = pkdope(s, i, n[i]);
+	struct dope *dp;
+	lux_assert(d > 0);
+	dp = palloc(struct dope, d);
+	if(dp) {
+		size_t s, i;
+		for(s = esz, i = d-1; i < d; s *= n[i--]) {
+			if(i+1 == d-1)
+				s = ((s + a - 1) / a) * a;
+			dp[i] = pkdope(s, i, n[i]);
+		}
 	}
 	return dp;
 }

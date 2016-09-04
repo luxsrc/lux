@@ -50,6 +50,10 @@ main()
 	A(dope_gets(dp+1) == ALIGN * 2);
 	A(dope_gets(dp+2) == sizeof(double [5]));
 
+	printf("size: %zu\n",
+	       dope_getsz(dp));
+	A(dope_getsz(dp) == ALIGN * 2 * N2 * N1);
+
 	rmdope(dp);
 	return 0;
 }
