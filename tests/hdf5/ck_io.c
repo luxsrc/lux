@@ -61,14 +61,14 @@ main(int argc, char *argv[])
 	file = hdf5(TESTFNAME, H5F_ACC_EXCL);
 	A(file);
 
-	file->write_pa(file, "/test", typecodeof(out[0]), out);
+	file->write_pa(file, "/test/data", typecodeof(out[0]), out);
 	file->close(file);
 
 	/* Test read existing file */
 	file = hdf5(TESTFNAME, H5F_ACC_RDONLY);
 	A(file);
 
-	in = file->read_pa(file, "/test");
+	in = file->read_pa(file, "/test/data");
 	A(in);
 
 	file->close(file);
