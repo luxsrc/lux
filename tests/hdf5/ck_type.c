@@ -24,7 +24,7 @@
 #define A(E) lux_always_assert(E)
 
 int
-main(int argc, char *argv[])
+main()
 {
 	int char_ct     = TYPECODE('i', sizeof(char)      * LUX_CHAR_BIT);
 	int short_ct    = TYPECODE('i', sizeof(short)     * LUX_CHAR_BIT);
