@@ -68,9 +68,11 @@ struct LuxOopencl {
 	void *base;
 
 	cl_context ctx;
-	unsigned   iplf;
-	unsigned   idev;
+
+	unsigned       iplf;
+	unsigned       idev;
 	cl_device_type devtype;
+
 	size_t         realsz;
 
 	const char  *flags;

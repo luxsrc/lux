@@ -76,6 +76,7 @@ extern int            lsdev(Lux_opencl *, unsigned, unsigned, cl_device_type);
 
 extern const char *getsrc(const char *, const char *);
 
+extern cl_context mkctx(unsigned, unsigned, cl_device_type);
 extern cl_program mkpro(struct opencl *, const struct LuxOopencl *, size_t, cl_device_id *);
 
 extern Lux_opencl_kernel *mkkern(Lux_opencl *, const char *);
