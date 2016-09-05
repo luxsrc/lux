@@ -36,16 +36,18 @@ struct LuxSopencl {
 	cl_device_id     dev; /* default device */
 	cl_command_queue que; /* default queue on default device */
 
-	Lux_opencl_kernel *(*mkkern)(Lux_opencl *, const char *);
-	double             (*exec  )(Lux_opencl *, Lux_opencl_kernel *, size_t, const size_t *);
-	void               (*rmkern)(Lux_opencl *, Lux_opencl_kernel *);
-
+	/* Memory related */
 	cl_mem (*mk    )(Lux_opencl *, size_t, unsigned);
 	void   (*rm    )(Lux_opencl *, cl_mem);
 	cl_mem (*h2d   )(Lux_opencl *, cl_mem, void *, size_t);
 	void  *(*d2h   )(Lux_opencl *, void *, cl_mem, size_t);
 	void  *(*mmap  )(Lux_opencl *, cl_mem, size_t);
 	void   (*munmap)(Lux_opencl *, cl_mem, void *);
+
+	/* Compute related */
+	Lux_opencl_kernel *(*mkkern)(Lux_opencl *, const char *);
+	double             (*exec  )(Lux_opencl *, Lux_opencl_kernel *, size_t, const size_t *);
+	void               (*rmkern)(Lux_opencl *, Lux_opencl_kernel *);
 };
 
 struct LuxSopencl_kernel {
