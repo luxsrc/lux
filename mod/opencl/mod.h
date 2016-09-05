@@ -55,16 +55,14 @@ l:                                                        \
 })
 
 struct opencl {
-	Lux_opencl super;
+	cl_program pro;
 
 	size_t integersz;
 	size_t fastsz;
 	size_t realsz;
 	size_t extendedsz;
 
-	cl_program       pro;
-	size_t           nqueue;
-	cl_command_queue queue[1]; /* flexible array element */
+	Lux_opencl super; /* last because it contains flexible array element */
 };
 
 extern void *LUX_MKMOD(const struct LuxOopencl *);

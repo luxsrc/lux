@@ -129,10 +129,8 @@ struct LuxOopencl {
 #define OPENCL_NULL {NULL, NULL, sizeof(float), NULL, 0, {{0, 0, CL_DEVICE_TYPE_ALL}}}
 
 struct LuxSopencl {
-	/* Make OpenCL context and queues public so they can be shared */
-	cl_context        ctx;
-	size_t            nque;
-	cl_command_queue *que;
+	/* Make OpenCL context public so they can be shared */
+	cl_context ctx;
 
 	/* Memory related */
 	cl_mem (*mk    )(Lux_opencl *, size_t, unsigned);
@@ -146,6 +144,10 @@ struct LuxSopencl {
 	Lux_opencl_kernel *(*mkkern)(Lux_opencl *, const char *);
 	double             (*exec  )(Lux_opencl *, Lux_opencl_kernel *, size_t, const size_t *);
 	void               (*rmkern)(Lux_opencl *, Lux_opencl_kernel *);
+
+	/* Make queues public so they can be shared */
+	size_t           nque;
+	cl_command_queue que[1]; /* flexible array element */
 };
 
 struct LuxSopencl_kernel {
