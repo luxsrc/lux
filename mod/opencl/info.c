@@ -23,7 +23,7 @@
 #include "mod.h"
 
 cl_platform_id
-lsplf(Lux_opencl *ego, unsigned iplf)
+lsplf(unsigned iplf)
 {
 	cl_platform_id p[PLF_COUNT];
 	cl_uint        i, n;
@@ -47,12 +47,10 @@ lsplf(Lux_opencl *ego, unsigned iplf)
 
 	lzfree(buf);
 	return p[iplf < n ? iplf : n];
-
-	(void)ego; /* silence unused variable warning */
 }
 
 int
-lsdev(Lux_opencl *ego, unsigned iplf, unsigned idev, cl_device_type devtype)
+lsdev(unsigned iplf, unsigned idev, cl_device_type devtype)
 {
 	cl_platform_id p[PLF_COUNT];
 	cl_device_id   d[DEV_COUNT];
@@ -85,6 +83,4 @@ lsdev(Lux_opencl *ego, unsigned iplf, unsigned idev, cl_device_type devtype)
 
 	lzfree(buf);
 	return EXIT_SUCCESS;
-
-	(void)ego; /* silence unused variable warning */
 }
