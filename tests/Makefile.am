@@ -39,12 +39,16 @@ ck_typecode_LDADD   = ../api/c/libux.la
 ck_ticks_timer_SOURCES = ck_ticks_timer.c ../mod/ticks.h ../mod/timer.h
 ck_ticks_timer_LDADD   = ../api/c/libux.la
 
-if USING_MPI
-SUBDIRS += mpi
-endif
-
 if USING_PTHREAD
 SUBDIRS += pthread
+endif
+
+if USING_OPENCL
+SUBDIRS += opencl
+endif
+
+if USING_MPI
+SUBDIRS += mpi
 endif
 
 if USING_HDF5
