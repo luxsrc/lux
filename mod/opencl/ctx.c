@@ -29,13 +29,14 @@ mkctx(unsigned iplf, unsigned idev, cl_device_type devtype)
 	cl_context_properties plf[] = {CL_CONTEXT_PLATFORM,
 	                               (cl_context_properties)NULL,
 	                               (cl_context_properties)NULL};
+	cl_device_id dev;
 
 	lux_print("\nGetting OpenCL platforms... ");
 	plf[1] = (cl_context_properties)lsplf(iplf);
 
 	lux_print("\nGetting OpenCL devices from platform %u... ", iplf);
-	(void)lsdev(iplf, idev, devtype);
-	lux_print("\n");
+	dev = lsdev(iplf, idev, devtype);
 
-	return safe(cl_context, CreateContextFromType, plf, devtype, NULL, NULL);
+	lux_print("\n");
+	return safe(cl_context, CreateContext, plf, 1, &dev, NULL, NULL);
 }
