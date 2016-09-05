@@ -78,15 +78,16 @@ LUX_MKMOD(const struct LuxOopencl *opts)
 	} else
 		pro = 0;
 
-	ego->mkkern = mkkern;
-	ego->exec   = exec;
-	ego->rmkern = rmkern;
 	ego->mk     = mk;
 	ego->rm     = rm;
 	ego->h2d    = h2d;
 	ego->d2h    = d2h;
 	ego->mmap   = mmap;
 	ego->munmap = munmap;
+
+	ego->mkkern = mkkern;
+	ego->exec   = exec;
+	ego->rmkern = rmkern;
 
 	EGO->pro    = pro;
 	EGO->nqueue = ndev;
