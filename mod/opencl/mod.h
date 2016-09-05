@@ -74,7 +74,6 @@ extern const char *strerr(cl_int);
 extern cl_platform_id lsplf(Lux_opencl *, unsigned);
 extern int            lsdev(Lux_opencl *, unsigned, unsigned, cl_device_type);
 
-extern const char  preamble_fmt[];
 extern const char *getsrc(const char *, const char *);
 
 extern cl_program mkpro(struct opencl *, const struct LuxOopencl *, size_t, cl_device_id *);
