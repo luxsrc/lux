@@ -26,15 +26,15 @@ cl_platform_id
 lsplf(unsigned iplf)
 {
 	cl_platform_id p[PLF_COUNT];
-	cl_uint        i, n;
+	cl_uint        i, np;
 
 	char   lazybuf[1024], *buf = lazybuf;
 	size_t sz = sizeof(lazybuf);
 
-	check(GetPlatformIDs, PLF_COUNT, p, &n);
+	check(GetPlatformIDs, PLF_COUNT, p, &np);
 
-	lux_print("%d platform%s found:\n", n, n > 1 ? "s are" : " is");
-	for(i = 0; i < n; ++i) {
+	lux_print("%d platform%s found:\n", np, np > 1 ? "s are" : " is");
+	for(i = 0; i < np; ++i) {
 		getinfo(Platform, retry_name,    p[i], CL_PLATFORM_NAME);
 		lux_print("%s\t%d. %s ", i == iplf ? "*" : "", i, buf);
 
@@ -46,7 +46,7 @@ lsplf(unsigned iplf)
 	}
 
 	lzfree(buf);
-	return p[iplf < n ? iplf : n];
+	return p[iplf < np ? iplf : np-1];
 }
 
 int
@@ -54,23 +54,16 @@ lsdev(unsigned iplf, unsigned idev, cl_device_type devtype)
 {
 	cl_platform_id p[PLF_COUNT];
 	cl_device_id   d[DEV_COUNT];
-	cl_uint        i, n;
+	cl_uint        i, np, nd;
 
 	char   lazybuf[1024], *buf = lazybuf;
 	size_t sz = sizeof(lazybuf);
 
-	check(GetPlatformIDs, PLF_COUNT, p, &n);
+	check(GetPlatformIDs, PLF_COUNT, p, &np);
+	check(GetDeviceIDs, p[iplf < np ? iplf : np-1], devtype, DEV_COUNT, d, &nd);
 
-	if(iplf >= n)
-		lux_fatal("iplf == %u >= %u == nplf", iplf, n);
-
-	check(GetDeviceIDs, p[iplf], devtype, DEV_COUNT, d, &n);
-
-	if(idev >= n)
-		lux_fatal("idev == %u >= %u == nplf", idev, n);
-
-	lux_print("%d device%s found:\n", n, n > 1 ? "s are" : " is");
-	for(i = 0; i < n; ++i) {
+	lux_print("%d device%s found:\n", nd, nd > 1 ? "s are" : " is");
+	for(i = 0; i < nd; ++i) {
 		getinfo(Device, retry_name,    d[i], CL_DEVICE_NAME);
 		lux_print("%s\t%d. %s ", i == idev ? "*" : "", i, buf);
 
