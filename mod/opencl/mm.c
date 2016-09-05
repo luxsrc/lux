@@ -39,7 +39,7 @@ rm(Lux_opencl *ego, cl_mem buf)
 cl_mem
 h2d(Lux_opencl *ego, cl_mem dst, void *src, size_t sz)
 {
-	check(EnqueueWriteBuffer, ego->que,
+	check(EnqueueWriteBuffer, ego->que[0],
 	      dst, CL_TRUE, 0, sz,
 	      src, 0, NULL, NULL);
 	return dst;
@@ -48,7 +48,7 @@ h2d(Lux_opencl *ego, cl_mem dst, void *src, size_t sz)
 void *
 d2h(Lux_opencl *ego, void *dst, cl_mem src, size_t sz)
 {
-	check(EnqueueReadBuffer, ego->que,
+	check(EnqueueReadBuffer, ego->que[0],
 	      src, CL_TRUE, 0, sz,
 	      dst, 0, NULL, NULL);
 	return dst;
@@ -58,7 +58,7 @@ void *
 mmap(Lux_opencl *ego, cl_mem buf, size_t sz)
 {
 	return safe(void *,
-	            EnqueueMapBuffer, ego->que, buf,
+	            EnqueueMapBuffer, ego->que[0], buf,
 	            CL_TRUE, CL_MAP_READ, 0, sz, 0, NULL, NULL);
 }
 
@@ -66,5 +66,5 @@ void
 munmap(Lux_opencl *ego, cl_mem buf, void *host)
 {
 	check(EnqueueUnmapMemObject,
-	      ego->que, buf, host, 0, NULL, NULL);
+	      ego->que[0], buf, host, 0, NULL, NULL);
 }
