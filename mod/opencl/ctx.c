@@ -23,7 +23,7 @@
 #include <stdlib.h> /* for NULL */
 #include "mod.h"
 
-cl_platform_id
+static cl_platform_id
 mkplf_dev(cl_platform_id plf, size_t ndev, cl_device_id *dev)
 {
 	size_t i;
