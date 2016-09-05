@@ -88,13 +88,51 @@
  * lux OpenCL module creation.
  */
 
+/* Forward declaration */
 typedef struct LuxSopencl        Lux_opencl;
 typedef struct LuxSopencl_kernel Lux_opencl_kernel;
 
+/* The options should setup a program */
+struct LuxOopencl {
+	/* Specify the OpenCL source codes */
+	const void  *base;
+	const char **src;
+
+	/* How the program should be built */
+	size_t      realsz;
+	const char *flags;
+
+	/* How to setup the context and queues:
+	   0 == no reuse, specified by i-values,
+	   1 == reuse by queues,
+	   2 == specified by device */
+	int reuse;
+	union {
+		struct {
+			unsigned       iplf;
+			unsigned       idev;
+			cl_device_type devtype;
+		} spec;
+		struct {
+			cl_context    ctx;
+			size_t        ndev;
+			cl_device_id *dev;
+		} dev;
+		struct {
+			cl_context        ctx;
+			size_t            nque;
+			cl_command_queue *que;
+		} que;
+	} settings;
+};
+
+#define OPENCL_NULL {NULL, NULL, sizeof(float), NULL, 0, {{0, 0, CL_DEVICE_TYPE_ALL}}}
+
 struct LuxSopencl {
-	cl_context       ctx; /* default opencl context */
-	cl_device_id     dev; /* default device */
-	cl_command_queue que; /* default queue on default device */
+	/* Make OpenCL context and queues public so they can be shared */
+	cl_context        ctx;
+	size_t            nque;
+	cl_command_queue *que;
 
 	/* Memory related */
 	cl_mem (*mk    )(Lux_opencl *, size_t, unsigned);
@@ -122,23 +160,6 @@ struct LuxSopencl_kernel {
 
 	Lux_opencl_kernel *(*with)(Lux_opencl_kernel *, ...);
 };
-
-struct LuxOopencl {
-	void *base;
-
-	cl_context ctx;
-
-	unsigned       iplf;
-	unsigned       idev;
-	cl_device_type devtype;
-
-	size_t         realsz;
-
-	const char  *flags;
-	const char **src;
-};
-
-#define OPENCL_NULL {NULL, 0, 0, 0, CL_DEVICE_TYPE_ALL, sizeof(float), NULL, NULL}
 
 static inline cl_device_type
 strtotype(const char *str)
