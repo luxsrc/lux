@@ -24,7 +24,7 @@
 #include "mod.h"
 
 cl_context
-mkctx(unsigned iplf, unsigned idev, cl_device_type devtype)
+mkctx_spec(unsigned iplf, unsigned idev, cl_device_type devtype)
 {
 	cl_context_properties plf[] = {CL_CONTEXT_PLATFORM,
 	                               (cl_context_properties)NULL,
@@ -39,4 +39,25 @@ mkctx(unsigned iplf, unsigned idev, cl_device_type devtype)
 
 	lux_print("\n");
 	return safe(cl_context, CreateContext, plf, 1, &dev, NULL, NULL);
+}
+
+cl_context
+mkctx_que(cl_context ctx, size_t nque, cl_command_queue *que)
+{
+	size_t i;
+	for(i = 0; que && i < nque; ++i) {
+		cl_context c;
+		check(GetCommandQueueInfo,
+		      que[i], CL_QUEUE_CONTEXT, sizeof(c), &c, NULL);
+
+		if(!ctx) {
+			lux_print("Infer context %p from queue[%zu] %p\n",
+			          c, i, que[i]);
+			ctx = c;
+		} else if(ctx != c)
+			lux_fatal("inferred context %p from queue[%zu] %p "
+			          "do not match context %p\n",
+			          c, i, que[i], ctx);
+	}
+	return ctx;
 }
