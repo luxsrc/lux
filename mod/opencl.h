@@ -67,8 +67,9 @@ struct LuxSopencl_kernel {
 struct LuxOopencl {
 	void *base;
 
-	unsigned iplf;
-	unsigned idev;
+	cl_context ctx;
+	unsigned   iplf;
+	unsigned   idev;
 	cl_device_type devtype;
 	size_t         realsz;
 
@@ -76,7 +77,7 @@ struct LuxOopencl {
 	const char **src;
 };
 
-#define OPENCL_NULL {NULL, 0, 0, CL_DEVICE_TYPE_ALL, sizeof(float), NULL, NULL}
+#define OPENCL_NULL {NULL, 0, 0, 0, CL_DEVICE_TYPE_ALL, sizeof(float), NULL, NULL}
 
 static inline cl_device_type
 strtotype(const char *str)
