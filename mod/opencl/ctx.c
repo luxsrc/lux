@@ -23,6 +23,28 @@
 #include <stdlib.h> /* for NULL */
 #include "mod.h"
 
+cl_platform_id
+mkplf_dev(cl_platform_id plf, size_t ndev, cl_device_id *dev)
+{
+	size_t i;
+	for(i = 0; dev && i < ndev; ++i) {
+		cl_platform_id p;
+		check(GetDeviceInfo,
+		      dev[i], CL_DEVICE_PLATFORM, sizeof(p), &p, NULL);
+
+		if(!plf) {
+			lux_print("Infer platform %p from device[%zu] %p\n",
+			          p, i, dev[i]);
+			plf = p;
+		} else if(plf != p)
+			lux_error("WARNING: "
+			          "inferred platform %p from device[%zu] %p "
+			          "do not match platform %p\n",
+			          p, i, dev[i], plf);
+	}
+	return plf;
+}
+
 cl_context
 mkctx_spec(unsigned iplf, unsigned idev, cl_device_type devtype)
 {
