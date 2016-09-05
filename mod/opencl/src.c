@@ -21,32 +21,6 @@
 #include <string.h>
 #include "mod.h"
 
-const char preamble_fmt[] = "\
-typedef unsigned whole;\n\
-typedef int      integer;\n\
-\n\
-typedef %s   fast;\n\
-typedef %s2  fast2;\n\
-typedef %s4  fast4;\n\
-typedef %s8  fast8;\n\
-typedef %s16 fast16;\n\
-\n\
-typedef %s   real;\n\
-typedef %s2  real2;\n\
-typedef %s4  real4;\n\
-typedef %s8  real8;\n\
-typedef %s16 real16;\n\
-\n\
-typedef %s   extended;\n\
-typedef %s2  extended2;\n\
-typedef %s4  extended4;\n\
-typedef %s8  extended8;\n\
-typedef %s16 extended16;\n\
-\n\
-#define K(x) x %s\n\
-\n\
-";
-
 static FILE *
 ftryopen(const char *name)
 {
