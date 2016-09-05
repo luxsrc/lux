@@ -49,7 +49,7 @@ lsplf(unsigned iplf)
 	return p[iplf < np ? iplf : np-1];
 }
 
-int
+cl_device_id
 lsdev(unsigned iplf, unsigned idev, cl_device_type devtype)
 {
 	cl_platform_id p[PLF_COUNT];
@@ -75,5 +75,5 @@ lsdev(unsigned iplf, unsigned idev, cl_device_type devtype)
 	}
 
 	lzfree(buf);
-	return EXIT_SUCCESS;
+	return d[idev < nd ? idev : nd-1];
 }
