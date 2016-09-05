@@ -50,7 +50,7 @@ typedef %s16 extended16;\n\
 ";
 
 cl_program
-mkpro(struct opencl *ego, const struct LuxOopencl *opts,
+mkpro(struct opencl *EGO, const struct LuxOopencl *opts,
       size_t ndev, cl_device_id *dev)
 {
 	cl_program pro;
@@ -62,16 +62,16 @@ mkpro(struct opencl *ego, const struct LuxOopencl *opts,
 	char buf[1024];
 	const char *src[16] = {buf, NULL};
 
-	const char *fn = prectostr(ego->fastsz);
-	const char *rn = prectostr(ego->realsz);
-	const char *xn = prectostr(ego->extendedsz);
+	const char *fn = prectostr(EGO->fastsz);
+	const char *rn = prectostr(EGO->realsz);
+	const char *xn = prectostr(EGO->extendedsz);
 	snprintf(buf, sizeof(buf), preamble_fmt,
 	         fn, fn, fn, fn, fn,
 	         rn, rn, rn, rn, rn,
 	         xn, xn, xn, xn, xn,
-	         ego->realsz>4 ? ego->realsz>8 ? "## L" : "" : "## f");
+	         EGO->realsz>4 ? EGO->realsz>8 ? "## L" : "" : "## f");
 
-	path = dlfname(opts->base ? opts->base : (void *)LUX_MKMOD);
+	path = dlfname(opts->base ? (void *)opts->base : (void *)LUX_MKMOD);
 	for(i = 0; opts->src[i]; ++i) {
 		if(strlen(opts->src[i]) < 64) { /* UGLY HACK */
 			const char *s = getsrc(path, opts->src[i]);
@@ -84,13 +84,13 @@ mkpro(struct opencl *ego, const struct LuxOopencl *opts,
 			src[i+1] = opts->src[i];
 	}
 
-	pro = clCreateProgramWithSource(ego->super.ctx, i+1, src, NULL, &err);
-	if(!pro || err) {
-		lux_error("Failed to create program\n");
+	pro = safe(cl_program, CreateProgramWithSource,
+	           EGO->super.ctx, i+1, src, NULL);
+	if(!pro)
 		exit(1);
-	}
 
-	snprintf(buf, sizeof(buf), "-cl-kernel-arg-info %s", opts->flags);
+	snprintf(buf, sizeof(buf),
+	         "-cl-kernel-arg-info %s", opts->flags ? opts->flags : "");
 	err = clBuildProgram(pro, ndev, dev, buf, NULL, NULL);
 	if(err != CL_SUCCESS) {
 		char   lazybuf[8192], *buf = lazybuf;
@@ -102,7 +102,6 @@ mkpro(struct opencl *ego, const struct LuxOopencl *opts,
 			        pro, dev[i], CL_PROGRAM_BUILD_LOG);
 			lux_error("%s\n", buf);
 		}
-
 		lzfree(buf);
 		exit(1);
 	}
