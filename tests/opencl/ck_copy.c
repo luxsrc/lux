@@ -35,10 +35,13 @@ main(int argc, char *argv[])
 	ocl1 = lux_load("../../mod/opencl/.libs/opencl", &opts);
 	A(ocl1);
 
-	opts.ctx = ocl1->ctx;
+	opts.reuse = 1;
+	opts.settings.que.ctx = ocl1->ctx;
 
 	ocl2 = lux_load("../../mod/opencl/.libs/opencl", &opts);
 	A(ocl2);
+
+	A(ocl1->ctx == ocl2->ctx);
 
 	lux_unload(ocl2);
 	lux_unload(ocl1);
