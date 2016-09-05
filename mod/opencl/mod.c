@@ -49,29 +49,33 @@ LUX_MKMOD(const struct LuxOopencl *opts)
 	if(!opts)
 		opts = &def;
 
-	lux_print("\nGetting OpenCL platforms... ");
-	plf[1] = (cl_context_properties)lsplf(NULL, opts->iplf);
-	lux_print("\nGetting OpenCL devices from platform %u... ", opts->iplf);
-	lsdev(NULL, opts->iplf, opts->idev, opts->devtype);
-	lux_print("\n");
+	if(opts->ctx)
+		(void)clRetainContext(ctx = opts->ctx);
+	else {
+		lux_print("\nGetting OpenCL platforms... ");
+		plf[1] = (cl_context_properties)lsplf(NULL, opts->iplf);
+		lux_print("\nGetting OpenCL devices from platform %u... ", opts->iplf);
+		lsdev(NULL, opts->iplf, opts->idev, opts->devtype);
+		lux_print("\n");
 
-	ctx = clCreateContextFromType(plf, opts->devtype, NULL, NULL, &err);
-	if(!ctx || err)
-		return NULL;
+		ctx = clCreateContextFromType(plf, opts->devtype, NULL, NULL, &err);
+		if(!ctx || err)
+			return NULL;
 
-	err = clGetContextInfo(ctx, CL_CONTEXT_DEVICES,
-	                       sizeof(dev), dev, &ndev);
-	if(err)
-		goto cleanup1;
+		err = clGetContextInfo(ctx, CL_CONTEXT_DEVICES,
+		                       sizeof(dev), dev, &ndev);
+		if(err)
+			goto cleanup1;
 
-	ndev /= sizeof(cl_device_id);
-	lux_print("OpenCL context %p contains device%s %s%p",
-	          ctx, ndev > 1 ? "s" : "",
-	          opts->idev == 0 ? "* " : "", dev[0]);
-	for(i = 1; i < ndev; ++i)
-		lux_print(", %s%p",
-		          opts->idev == i ? "* " : "", dev[i]);
-	lux_print("\n");
+		ndev /= sizeof(cl_device_id);
+		lux_print("OpenCL context %p contains device%s %s%p",
+		          ctx, ndev > 1 ? "s" : "",
+		          opts->idev == 0 ? "* " : "", dev[0]);
+		for(i = 1; i < ndev; ++i)
+			lux_print(", %s%p",
+			          opts->idev == i ? "* " : "", dev[i]);
+		lux_print("\n");
+	}
 
 	ego = (Lux_opencl *)malloc(sizeof(struct opencl) +
 	                           (ndev-1) * sizeof(cl_command_queue));
