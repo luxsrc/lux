@@ -28,6 +28,66 @@
 
 #include <lux/numeric.h>
 
+/* OpenCL context, device, program, kernel, queue, etc
+ *
+ * The OpenCL framework provides a flexible abstraction to manage
+ * resource and computing tasks on heterogeneous platforms.  While
+ * this lux OpenCL module should simplify the usage of OpenCL, it
+ * should be designed in a way to allow all the flexibility.
+ *
+ * An OpenCL context encapsulates computing resource (CPUs, GPUs) and
+ * memory.  It allows the computing resource to share memory.
+ * Multiple command queues and programs can be associated with a
+ * context.  While each program can be compiled on multiple devices,
+ * each queue can only be associated with one device.  Conceptually,
+ *
+ * +----------------------------------------------------------------+
+ * |                           Context 0                            |
+ * | +---------------------------+ +------------------------------+ |
+ * | | program 1                 | | program 2                    | |
+ * | +---------------------------+ +------------------------------+ |
+ * |           +--------------------------------------------------+ |
+ * |           | program 3                                        | |
+ * |           +--------------------------------------------------+ |
+ * |                               :                                |
+ * |                               :                                |
+ * |                               :                                |
+ * |                     +-----------------+                        |
+ * |                     | program p       |                        |
+ * |                     +-----------------+                        |
+ * | +-------+ +-------+ +-------+ +-------+              +-------+ |
+ * | |       | |       | |       | |       |              |       | |
+ * | | que 0 | | que 1 | | que 2 | | que 3 |     ....     | que n | |
+ * | |       | |       | |       | |       |              |       | |
+ * | +-------+ +-------+ +-------+ +-------+              +-------+ |
+ * | |       | |       | |       | |       |              |       | |
+ * | | dev 0 | | dev 1 | | dev 2 | | dev 3 |     ....     | dev n | |
+ * | |       | |       | |       | |       |              |       | |
+ * | +-------+ +-------+ +-------+ +-------+              +-------+ |
+ * | +------------------------------------------------------------+ |
+ * | | shared memory 0                                            | |
+ * | +------------------------------------------------------------+ |
+ * | +------------------------------------------------------------+ |
+ * | | shared memory 1                                            | |
+ * | +------------------------------------------------------------+ |
+ * | +------------------------------------------------------------+ |
+ * | | shared memory 2                                            | |
+ * | +------------------------------------------------------------+ |
+ * |                               :                                |
+ * |                               :                                |
+ * |                               :                                |
+ * | +------------------------------------------------------------+ |
+ * | | shared memory m                                            | |
+ * | +------------------------------------------------------------+ |
+ * +----------------------------------------------------------------+
+ *
+ * It is natural to map an OpenCL program to a lux module.  This means
+ * that multiple modules may share the same context with multiple
+ * queues and devices.  Because a device can be determined from a
+ * queue, we should provide options to share context and queues during
+ * lux OpenCL module creation.
+ */
+
 typedef struct LuxSopencl        Lux_opencl;
 typedef struct LuxSopencl_kernel Lux_opencl_kernel;
 
