@@ -32,10 +32,6 @@ LUX_MKMOD(const struct LuxOopencl *opts)
 	cl_context ctx;
 	cl_program pro;
 
-	cl_context_properties plf[] = {CL_CONTEXT_PLATFORM,
-	                               (cl_context_properties)NULL,
-	                               (cl_context_properties)NULL};
-
 	cl_device_id dev[DEV_COUNT];
 	size_t       i, ndev;
 	cl_int       err;
@@ -44,17 +40,12 @@ LUX_MKMOD(const struct LuxOopencl *opts)
 	if(!opts)
 		opts = &def;
 
-	if(opts->ctx)
-		(void)clRetainContext(ctx = opts->ctx);
-	else {
-		lux_print("\nGetting OpenCL platforms... ");
-		plf[1] = (cl_context_properties)lsplf(NULL, opts->iplf);
-		lux_print("\nGetting OpenCL devices from platform %u... ", opts->iplf);
-		lsdev(NULL, opts->iplf, opts->idev, opts->devtype);
-		lux_print("\n");
-
-		ctx = clCreateContextFromType(plf, opts->devtype, NULL, NULL, &err);
-		if(!ctx || err)
+	if(opts->ctx) {
+		(void)clRetainContext(opts->ctx);
+		ctx = opts->ctx;
+	} else {
+		ctx = mkctx(opts->iplf, opts->idev, opts->devtype);
+		if(!ctx)
 			return NULL;
 	}
 
