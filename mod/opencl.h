@@ -36,9 +36,6 @@ struct LuxSopencl {
 	cl_device_id     dev; /* default device */
 	cl_command_queue que; /* default queue on default device */
 
-	cl_platform_id (*lsplf)(Lux_opencl *, unsigned);
-	int            (*lsdev)(Lux_opencl *, unsigned, unsigned, cl_device_type);
-
 	Lux_opencl_kernel *(*mkkern)(Lux_opencl *, const char *);
 	double             (*exec  )(Lux_opencl *, Lux_opencl_kernel *, size_t, const size_t *);
 	void               (*rmkern)(Lux_opencl *, Lux_opencl_kernel *);
