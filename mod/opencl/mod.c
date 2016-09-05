@@ -97,41 +97,44 @@ LUX_MKMOD(const struct LuxOopencl *opts)
 		         EGO->realsz>4 ? EGO->realsz>8 ? "## L" : "" : "## f");
 	}
 
-	path = dlfname(opts->base ? opts->base : (void *)LUX_MKMOD);
-	for(i = 0; opts->src[i]; ++i) {
-		if(strlen(opts->src[i]) < 64) { /* UGLY HACK */
-			const char *s = getsrc(path, opts->src[i]);
-			if(!s) {
-				lux_error("Failed to load source\n");
-				exit(1);
-			}
-			src[i+1] = s;
-		} else
-			src[i+1] = opts->src[i];
-	}
-
-	pro = clCreateProgramWithSource(ctx, i+1, src, NULL, &err);
-	if(!pro || err) {
-		lux_error("Failed to create program\n");
-		exit(1);
-	}
-
-	snprintf(buf, sizeof(buf), "-cl-kernel-arg-info %s", opts->flags);
-	err = clBuildProgram(pro, ndev, dev, buf, NULL, NULL);
-	if(err != CL_SUCCESS) {
-		char   lazybuf[8192], *buf = lazybuf;
-		size_t sz = sizeof(lazybuf);
-
-		lux_error("Failed to build program\n");
-		for(i = 0; i < ndev; ++i) {
-			getinfo(ProgramBuild, retry,
-			        pro, dev[i], CL_PROGRAM_BUILD_LOG);
-			lux_error("%s\n", buf);
+	if(opts->src) {
+		path = dlfname(opts->base ? opts->base : (void *)LUX_MKMOD);
+		for(i = 0; opts->src[i]; ++i) {
+			if(strlen(opts->src[i]) < 64) { /* UGLY HACK */
+				const char *s = getsrc(path, opts->src[i]);
+				if(!s) {
+					lux_error("Failed to load source\n");
+					exit(1);
+				}
+				src[i+1] = s;
+			} else
+				src[i+1] = opts->src[i];
 		}
 
-		lzfree(buf);
-		exit(1);
-	}
+		pro = clCreateProgramWithSource(ctx, i+1, src, NULL, &err);
+		if(!pro || err) {
+			lux_error("Failed to create program\n");
+			exit(1);
+		}
+
+		snprintf(buf, sizeof(buf), "-cl-kernel-arg-info %s", opts->flags);
+		err = clBuildProgram(pro, ndev, dev, buf, NULL, NULL);
+		if(err != CL_SUCCESS) {
+			char   lazybuf[8192], *buf = lazybuf;
+			size_t sz = sizeof(lazybuf);
+
+			lux_error("Failed to build program\n");
+			for(i = 0; i < ndev; ++i) {
+				getinfo(ProgramBuild, retry,
+				        pro, dev[i], CL_PROGRAM_BUILD_LOG);
+				lux_error("%s\n", buf);
+			}
+
+			lzfree(buf);
+			exit(1);
+		}
+	} else
+		pro = 0;
 
 	ego->lsplf  = lsplf;
 	ego->lsdev  = lsdev;
