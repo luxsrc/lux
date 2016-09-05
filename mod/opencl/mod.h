@@ -72,7 +72,8 @@ extern const char *strerr(cl_int);
 extern cl_platform_id lsplf(unsigned);
 extern cl_device_id   lsdev(unsigned, unsigned, cl_device_type);
 
-extern const char *getsrc(const char *, const char *);
+extern cl_device_id getdev(cl_command_queue);
+extern const char  *getsrc(const char *, const char *);
 
 extern cl_context mkctx_spec(unsigned, unsigned, cl_device_type);
 extern cl_context mkctx_que(cl_context, size_t, cl_command_queue *);
