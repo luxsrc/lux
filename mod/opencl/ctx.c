@@ -26,9 +26,6 @@
 cl_context
 mkctx(unsigned iplf, unsigned idev, cl_device_type devtype)
 {
-	cl_context ctx;
-	cl_int     err;
-
 	cl_context_properties plf[] = {CL_CONTEXT_PLATFORM,
 	                               (cl_context_properties)NULL,
 	                               (cl_context_properties)NULL};
@@ -40,9 +37,5 @@ mkctx(unsigned iplf, unsigned idev, cl_device_type devtype)
 	(void)lsdev(NULL, iplf, idev, devtype);
 	lux_print("\n");
 
-	ctx = clCreateContextFromType(plf, devtype, NULL, NULL, &err);
-	if(!ctx || err)
-		return NULL;
-
-	return ctx;
+	return safe(cl_context, CreateContextFromType, plf, devtype, NULL, NULL);
 }
