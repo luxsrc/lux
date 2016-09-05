@@ -72,7 +72,7 @@ extern void *LUX_MKMOD(const struct LuxOopencl *);
 extern const char *strerr(cl_int);
 
 extern cl_platform_id lsplf(unsigned);
-extern int            lsdev(unsigned, unsigned, cl_device_type);
+extern cl_device_id   lsdev(unsigned, unsigned, cl_device_type);
 
 extern const char *getsrc(const char *, const char *);
 
