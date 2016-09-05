@@ -22,19 +22,16 @@
 #include <string.h> /* for strlen() */
 #include "mod.h"
 
-#define EGO ((struct opencl *)ego)
-
 void *
 LUX_MKMOD(const struct LuxOopencl *opts)
 {
-	Lux_opencl *ego = NULL;
+	struct opencl *EGO;
+	Lux_opencl    *ego;
 
 	cl_context ctx;
-	cl_program pro;
 
-	cl_device_id dev[DEV_COUNT];
 	size_t       i, ndev;
-	cl_int       err;
+	cl_device_id dev[DEV_COUNT];
 
 	struct LuxOopencl def = OPENCL_NULL;
 	if(!opts)
@@ -58,88 +55,72 @@ LUX_MKMOD(const struct LuxOopencl *opts)
 		break;
 	}
 
-	err = clGetContextInfo(ctx, CL_CONTEXT_DEVICES,
-	                       sizeof(dev), dev, &ndev);
-	if(err)
+	if(!ctx)
 		goto cleanup1;
 
-	ndev /= sizeof(cl_device_id);
-	lux_print("OpenCL context %p contains device%s %s%p",
-	          ctx, ndev > 1 ? "s" : "",
-	          opts->idev == 0 ? "* " : "", dev[0]);
-	for(i = 1; i < ndev; ++i)
-		lux_print(", %s%p",
-		          opts->idev == i ? "* " : "", dev[i]);
-	lux_print("\n");
+	check(GetContextInfo,
+	      ctx, CL_CONTEXT_DEVICES, sizeof(dev), dev, &i);
+	ndev = i / sizeof(dev[0]);
 
-	ego = (Lux_opencl *)malloc(sizeof(struct opencl) +
-	                           (ndev-1) * sizeof(cl_command_queue));
-	if(!ego)
-		goto cleanup1;
+	EGO = malloc(sizeof(struct opencl) - sizeof(cl_command_queue)
+	                            + ndev * sizeof(cl_command_queue));
+	if(!EGO)
+		goto cleanup2;
 
-	EGO->integersz  = sizeof(cl_int);
-	EGO->fastsz     = sizeof(float);
-	EGO->realsz     = opts->realsz;
-	EGO->extendedsz = sizeof(double);
+	ego = &EGO->super;
 
-	if(opts->src) {
-		pro = mkpro(EGO, opts, ndev, dev);
-	} else
-		pro = 0;
-
+	ego->ctx    = ctx;
 	ego->mk     = mk;
 	ego->rm     = rm;
 	ego->h2d    = h2d;
 	ego->d2h    = d2h;
 	ego->mmap   = mmap;
 	ego->munmap = munmap;
-
 	ego->mkkern = mkkern;
 	ego->exec   = exec;
 	ego->rmkern = rmkern;
 
-	EGO->pro    = pro;
-	EGO->nqueue = ndev;
+	ego->nque   = ndev;
 	for(i = 0; i < ndev; ++i) {
 		cl_command_queue q =
-			clCreateCommandQueue(ctx, dev[i],
-			                     CL_QUEUE_PROFILING_ENABLE,
-			                     &err);
-		if(!q || err)
-			goto cleanup2;
-		EGO->queue[i] = q;
-		if(i == opts->idev) {
-			ego->ctx = ctx;
-			ego->dev = dev[i];
-			ego->que = q;
-		}
+			safe(cl_command_queue, CreateCommandQueue,
+			     ctx, dev[i], CL_QUEUE_PROFILING_ENABLE);
+		if(!q)
+			goto cleanup3;
+
+		ego->que[i] = q;
 	}
+
+	EGO->integersz  = sizeof(cl_int);
+	EGO->fastsz     = sizeof(float);
+	EGO->realsz     = opts->realsz;
+	EGO->extendedsz = sizeof(double);
+
+	EGO->pro = opts->src ? mkpro(EGO, opts, ndev, dev) : 0;
+
 	return ego;
 
- cleanup2:
-	while(i--) {
-		err = clReleaseCommandQueue(ego->que);
-		/* TODO: check error */
-	}
- cleanup1:
-	err = clReleaseContext(ctx);
-	/* TODO: check error */
-	free(ego);
+cleanup3:
+	while(i--)
+		check(ReleaseCommandQueue, ego->que[i]);
+
+cleanup2:
+	free(EGO);
+
+cleanup1:
+	check(ReleaseContext, ctx);
+
 	return NULL;
 }
 
 void
 LUX_RMMOD(void *ego)
 {
-	cl_int err;
-	size_t i = EGO->nqueue;
-	while(i--) {
-		err = clReleaseCommandQueue(EGO->queue[i]);
-		/* TODO: check error */
-	}
-	err = clReleaseContext(EGO->super.ctx);
-	/* TODO: check error */
-	free(ego);
+	size_t i = ((Lux_opencl *)ego)->nque;
+	while(i--)
+		check(ReleaseCommandQueue, ((Lux_opencl *)ego)->que[i]);
 
-	(void)err; /* silence "set but not used" warning */
+	check(ReleaseContext, ((Lux_opencl *)ego)->ctx);
+
+	free(headerof(struct opencl, ego, super));
 }
