@@ -40,13 +40,22 @@ LUX_MKMOD(const struct LuxOopencl *opts)
 	if(!opts)
 		opts = &def;
 
-	if(opts->ctx) {
-		(void)clRetainContext(opts->ctx);
-		ctx = opts->ctx;
-	} else {
-		ctx = mkctx(opts->iplf, opts->idev, opts->devtype);
-		if(!ctx)
-			return NULL;
+	switch(opts->reuse) {
+	case  0:
+		ctx = mkctx_spec(opts->settings.spec.iplf,
+		                 opts->settings.spec.idev,
+		                 opts->settings.spec.devtype);
+		break;
+	case  1:
+		ctx = mkctx_que(opts->settings.que.ctx,
+		                opts->settings.que.nque,
+		                opts->settings.que.que);
+		break;
+	case 2:
+		ctx = mkctx_dev(opts->settings.dev.ctx,
+		                opts->settings.dev.ndev,
+		                opts->settings.dev.dev);
+		break;
 	}
 
 	err = clGetContextInfo(ctx, CL_CONTEXT_DEVICES,

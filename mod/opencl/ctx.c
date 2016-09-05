@@ -81,6 +81,7 @@ mkctx_que(cl_context ctx, size_t nque, cl_command_queue *que)
 			          "do not match context %p\n",
 			          c, i, que[i], ctx);
 	}
+	(void)clRetainContext(ctx);
 	return ctx;
 }
 
@@ -112,6 +113,7 @@ mkctx_dev(cl_context ctx, size_t ndev, cl_device_id *dev)
 			lux_fatal("Devices in context %p do not match input\n",
 			          ctx);
 
+		(void)clRetainContext(ctx);
 		return ctx;
 	} else { /* create new context */
 		cl_context_properties plf[] = {CL_CONTEXT_PLATFORM,
