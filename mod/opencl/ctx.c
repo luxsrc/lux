@@ -83,3 +83,15 @@ mkctx_que(cl_context ctx, size_t nque, cl_command_queue *que)
 	}
 	return ctx;
 }
+
+cl_context
+mkctx_dev(cl_context ctx, size_t ndev, cl_device_id *dev)
+{
+	cl_context_properties plf[] = {CL_CONTEXT_PLATFORM,
+	                               (cl_context_properties)NULL,
+	                               (cl_context_properties)NULL};
+	plf[1] = (cl_context_properties)mkplf_dev(0, ndev, dev);
+
+	return safe(cl_context, CreateContext,
+	            plf, ndev, dev, NULL, NULL);
+}
