@@ -61,21 +61,21 @@ LUX_MKMOD(const struct LuxOopencl *opts)
 		ctx = clCreateContextFromType(plf, opts->devtype, NULL, NULL, &err);
 		if(!ctx || err)
 			return NULL;
-
-		err = clGetContextInfo(ctx, CL_CONTEXT_DEVICES,
-		                       sizeof(dev), dev, &ndev);
-		if(err)
-			goto cleanup1;
-
-		ndev /= sizeof(cl_device_id);
-		lux_print("OpenCL context %p contains device%s %s%p",
-		          ctx, ndev > 1 ? "s" : "",
-		          opts->idev == 0 ? "* " : "", dev[0]);
-		for(i = 1; i < ndev; ++i)
-			lux_print(", %s%p",
-			          opts->idev == i ? "* " : "", dev[i]);
-		lux_print("\n");
 	}
+
+	err = clGetContextInfo(ctx, CL_CONTEXT_DEVICES,
+	                       sizeof(dev), dev, &ndev);
+	if(err)
+		goto cleanup1;
+
+	ndev /= sizeof(cl_device_id);
+	lux_print("OpenCL context %p contains device%s %s%p",
+	          ctx, ndev > 1 ? "s" : "",
+	          opts->idev == 0 ? "* " : "", dev[0]);
+	for(i = 1; i < ndev; ++i)
+		lux_print(", %s%p",
+		          opts->idev == i ? "* " : "", dev[i]);
+	lux_print("\n");
 
 	ego = (Lux_opencl *)malloc(sizeof(struct opencl) +
 	                           (ndev-1) * sizeof(cl_command_queue));
