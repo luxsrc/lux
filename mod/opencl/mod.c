@@ -18,8 +18,6 @@
  * along with lux.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include <lux.h>
-#include <lux/dlfcn.h>
-#include <lux/lazybuf.h>
 #include <stdlib.h> /* for malloc(), free(), and NULL */
 #include <string.h> /* for strlen() */
 #include "mod.h"
@@ -34,12 +32,9 @@ LUX_MKMOD(const struct LuxOopencl *opts)
 	cl_context ctx;
 	cl_program pro;
 
-	const char *path;
 	cl_context_properties plf[] = {CL_CONTEXT_PLATFORM,
 	                               (cl_context_properties)NULL,
 	                               (cl_context_properties)NULL};
-	char buf[1024];
-	const char *src[16] = {buf, NULL};
 
 	cl_device_id dev[DEV_COUNT];
 	size_t       i, ndev;
@@ -86,53 +81,9 @@ LUX_MKMOD(const struct LuxOopencl *opts)
 	EGO->fastsz     = sizeof(float);
 	EGO->realsz     = opts->realsz;
 	EGO->extendedsz = sizeof(double);
-	{
-		const char *fn = prectostr(EGO->fastsz);
-		const char *rn = prectostr(EGO->realsz);
-		const char *xn = prectostr(EGO->extendedsz);
-		snprintf(buf, sizeof(buf), preamble_fmt,
-		         fn, fn, fn, fn, fn,
-		         rn, rn, rn, rn, rn,
-		         xn, xn, xn, xn, xn,
-		         EGO->realsz>4 ? EGO->realsz>8 ? "## L" : "" : "## f");
-	}
 
 	if(opts->src) {
-		path = dlfname(opts->base ? opts->base : (void *)LUX_MKMOD);
-		for(i = 0; opts->src[i]; ++i) {
-			if(strlen(opts->src[i]) < 64) { /* UGLY HACK */
-				const char *s = getsrc(path, opts->src[i]);
-				if(!s) {
-					lux_error("Failed to load source\n");
-					exit(1);
-				}
-				src[i+1] = s;
-			} else
-				src[i+1] = opts->src[i];
-		}
-
-		pro = clCreateProgramWithSource(ctx, i+1, src, NULL, &err);
-		if(!pro || err) {
-			lux_error("Failed to create program\n");
-			exit(1);
-		}
-
-		snprintf(buf, sizeof(buf), "-cl-kernel-arg-info %s", opts->flags);
-		err = clBuildProgram(pro, ndev, dev, buf, NULL, NULL);
-		if(err != CL_SUCCESS) {
-			char   lazybuf[8192], *buf = lazybuf;
-			size_t sz = sizeof(lazybuf);
-
-			lux_error("Failed to build program\n");
-			for(i = 0; i < ndev; ++i) {
-				getinfo(ProgramBuild, retry,
-				        pro, dev[i], CL_PROGRAM_BUILD_LOG);
-				lux_error("%s\n", buf);
-			}
-
-			lzfree(buf);
-			exit(1);
-		}
+		pro = mkpro(EGO, opts, ndev, dev);
 	} else
 		pro = 0;
 
