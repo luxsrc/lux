@@ -61,8 +61,15 @@ lsdev(Lux_opencl *ego, unsigned iplf, unsigned idev, cl_device_type devtype)
 	char   lazybuf[1024], *buf = lazybuf;
 	size_t sz = sizeof(lazybuf);
 
-	check(GetPlatformIDs, PLF_COUNT, p, NULL);
+	check(GetPlatformIDs, PLF_COUNT, p, &n);
+
+	if(iplf >= n)
+		lux_fatal("iplf == %u >= %u == nplf", iplf, n);
+
 	check(GetDeviceIDs, p[iplf], devtype, DEV_COUNT, d, &n);
+
+	if(idev >= n)
+		lux_fatal("idev == %u >= %u == nplf", idev, n);
 
 	lux_print("%d device%s found:\n", n, n > 1 ? "s are" : " is");
 	for(i = 0; i < n; ++i) {
