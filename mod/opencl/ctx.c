@@ -23,8 +23,30 @@
 #include <stdlib.h> /* for NULL */
 #include "mod.h"
 
+static cl_platform_id
+mkplf_dev(cl_platform_id plf, size_t ndev, cl_device_id *dev)
+{
+	size_t i;
+	for(i = 0; dev && i < ndev; ++i) {
+		cl_platform_id p;
+		check(GetDeviceInfo,
+		      dev[i], CL_DEVICE_PLATFORM, sizeof(p), &p, NULL);
+
+		if(!plf) {
+			lux_print("Infer platform %p from device[%zu] %p\n",
+			          p, i, dev[i]);
+			plf = p;
+		} else if(plf != p)
+			lux_error("WARNING: "
+			          "inferred platform %p from device[%zu] %p "
+			          "do not match platform %p\n",
+			          p, i, dev[i], plf);
+	}
+	return plf;
+}
+
 cl_context
-mkctx(unsigned iplf, unsigned idev, cl_device_type devtype)
+mkctx_spec(unsigned iplf, unsigned idev, cl_device_type devtype)
 {
 	cl_context_properties plf[] = {CL_CONTEXT_PLATFORM,
 	                               (cl_context_properties)NULL,
@@ -39,4 +61,67 @@ mkctx(unsigned iplf, unsigned idev, cl_device_type devtype)
 
 	lux_print("\n");
 	return safe(cl_context, CreateContext, plf, 1, &dev, NULL, NULL);
+}
+
+cl_context
+mkctx_que(cl_context ctx, size_t nque, cl_command_queue *que)
+{
+	size_t i;
+	for(i = 0; que && i < nque; ++i) {
+		cl_context c;
+		check(GetCommandQueueInfo,
+		      que[i], CL_QUEUE_CONTEXT, sizeof(c), &c, NULL);
+
+		if(!ctx) {
+			lux_print("Infer context %p from queue[%zu] %p\n",
+			          c, i, que[i]);
+			ctx = c;
+		} else if(ctx != c)
+			lux_fatal("inferred context %p from queue[%zu] %p "
+			          "do not match context %p\n",
+			          c, i, que[i], ctx);
+	}
+	(void)clRetainContext(ctx);
+	return ctx;
+}
+
+cl_context
+mkctx_dev(cl_context ctx, size_t ndev, cl_device_id *dev)
+{
+	if(ctx) { /* check consistency */
+		unsigned match = 0;
+
+		size_t i, nd;
+		cl_device_id d[DEV_COUNT];
+		check(GetContextInfo,
+		      ctx, CL_CONTEXT_DEVICES, sizeof(d), d, &i);
+		nd = i / sizeof(d[0]);
+		if(ndev != nd)
+			lux_fatal("Number of devices in context %p, %zu, "
+			          "do not match ndev %zu\n",
+			          ctx, nd, ndev);
+
+		for(i = 0; i < ndev; ++i) {
+			size_t j;
+			for(j = 0; j < nd; ++j)
+				if(dev[i] == d[j]) {
+					match |= (1U << i);
+					break;
+				}
+		}
+		if(match != (1U << ndev) - 1)
+			lux_fatal("Devices in context %p do not match input\n",
+			          ctx);
+
+		(void)clRetainContext(ctx);
+		return ctx;
+	} else { /* create new context */
+		cl_context_properties plf[] = {CL_CONTEXT_PLATFORM,
+	                                       (cl_context_properties)NULL,
+	                                       (cl_context_properties)NULL};
+		plf[1] = (cl_context_properties)mkplf_dev(0, ndev, dev);
+
+		return safe(cl_context, CreateContext,
+		            plf, ndev, dev, NULL, NULL);
+	}
 }
