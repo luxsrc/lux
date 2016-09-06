@@ -24,7 +24,6 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <string.h>
-#include <stdio.h>
 
 #define A(E) lux_always_assert(E)
 
@@ -49,12 +48,12 @@ main(int argc, char *argv[])
 	v1 = mkmview(mp, 0, dp);
 	v2 = mkmview(mp, 0, dp);
 
-	printf("%p %p\n", v1, v2);
+	lux_print("%p %p\n", v1, v2);
 	A(v1 != v2);
 
 	(void)strcpy(v1, "testing");
-	printf("v1: \"%s\"\n", v1);
-	printf("v2: \"%s\"\n", v2);
+	lux_print("v1: \"%s\"\n", v1);
+	lux_print("v2: \"%s\"\n", v2);
 	A(!strcmp(v1, v2));
 
 	rmmview(mp, v1);

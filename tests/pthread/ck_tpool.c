@@ -35,8 +35,8 @@ struct task {
 void
 exec(Lux_task *t)
 {
-	printf("[%" PRIxPTR "] %d\n",
-	       (uintptr_t)pthread_self(), ((struct task *)t)->id);
+	lux_print("[%" PRIxPTR "] %d\n",
+	          (uintptr_t)pthread_self(), ((struct task *)t)->id);
 	usleep(1);
 }
 

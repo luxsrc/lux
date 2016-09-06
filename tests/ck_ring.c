@@ -22,7 +22,6 @@
 #include <lux/dynamic.h>
 #include <lux/ring.h>
 #include <stdlib.h>
-#include <stdio.h>
 
 #define A(E) lux_always_assert(E)
 
@@ -54,10 +53,10 @@ main(int argc, char *argv[])
 	for(i = 0; i < n+1; ++i) {
 		struct node *s = (struct node *)ring_pop(&h->super);
 		if(s == h) {
-			printf("empty\n");
+			lux_print("empty\n");
 			A(s->value == -1);
 		} else {
-			printf("%d ", s->value);
+			lux_print("%d ", s->value);
 			A(s->value == offset+(n-1-i));
 			free(s);
 		}
@@ -69,10 +68,10 @@ main(int argc, char *argv[])
 	for(i = 0; i < n+1; ++i) {
 		struct node *s = (struct node *)ring_pop(&h->super);
 		if(s == h) {
-			printf("empty\n");
+			lux_print("empty\n");
 			A(s->value == -1);
 		} else {
-			printf("%d ", s->value);
+			lux_print("%d ", s->value);
 			A(s->value == offset+(n-1-i));
 			free(s);
 		}

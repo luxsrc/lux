@@ -21,7 +21,6 @@
 #include <lux/assert.h>
 #include <lux/ticks.h>
 #include <lux/timer.h>
-#include <stdio.h>
 #include <unistd.h>
 
 #define A(E) lux_always_assert(E)
@@ -44,9 +43,9 @@ main(int argc, char *argv[])
 	dT = elapsed_time(T1, T0);
 	dt = elapsed(t1, t0);
 
-	printf("dtimestamps: %g\n", dT);
-	printf("dticks     : %g\n", dt);
-	printf("ticks/sec  : %g\n", dt/dT);
+	lux_print("dtimestamps: %g\n", dT);
+	lux_print("dticks     : %g\n", dt);
+	lux_print("ticks/sec  : %g\n", dt/dT);
 
 	/* TODO: use A() to check for errors at runtime */
 

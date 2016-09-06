@@ -22,7 +22,6 @@
 #include <lux/dynamic.h>
 #include <lux/stack.h>
 #include <stdlib.h>
-#include <stdio.h>
 
 #define A(E) lux_always_assert(E)
 
@@ -53,9 +52,9 @@ main(int argc, char *argv[])
 	for(i = 0; i < n+1; ++i) {
 		struct node *s = (struct node *)stack_pop(&h->super);
 		if(s == NULL)
-			printf("empty\n");
+			lux_print("empty\n");
 		else {
-			printf("%d ", s->value);
+			lux_print("%d ", s->value);
 			A(s->value == offset+(n-1-i));
 			free(s);
 		}
@@ -67,9 +66,9 @@ main(int argc, char *argv[])
 	for(i = 0; i < n+1; ++i) {
 		struct node *s = (struct node *)stack_pop(&h->super);
 		if(s == NULL)
-			printf("empty\n");
+			lux_print("empty\n");
 		else {
-			printf("%d ", s->value);
+			lux_print("%d ", s->value);
 			A(s->value == offset+(n-1-i));
 			free(s);
 		}

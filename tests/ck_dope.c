@@ -39,17 +39,17 @@ main(int argc, char *argv[])
 
 	dp = mkdope(double [5], ALIGN, N1, N2, N3);
 
-	printf("dim: %zu\n", pgetd(dp));
+	lux_print("dim: %zu\n", pgetd(dp));
 	A(pgetd(dp) == 1);
 
-	printf("shape: %zu %zu %zu\n",
-	       dope_getn(dp+0), dope_getn(dp+1), dope_getn(dp+2));
+	lux_print("shape: %zu %zu %zu\n",
+	          dope_getn(dp+0), dope_getn(dp+1), dope_getn(dp+2));
 	A(dope_getn(dp+0) == N1);
 	A(dope_getn(dp+1) == N2);
 	A(dope_getn(dp+2) == N3);
 
-	printf("strides: %zu %zu %zu\n",
-	       dope_gets(dp+0), dope_gets(dp+1), dope_gets(dp+2));
+	lux_print("strides: %zu %zu %zu\n",
+	          dope_gets(dp+0), dope_gets(dp+1), dope_gets(dp+2));
 	A(dope_gets(dp+0) == ALIGN * 2 * N2);
 	A(dope_gets(dp+1) == ALIGN * 2);
 	A(dope_gets(dp+2) == sizeof(double [5]));

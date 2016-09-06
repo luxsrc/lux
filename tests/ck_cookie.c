@@ -74,29 +74,29 @@ main(int argc, char *argv[])
 	f = fopencookie(&cookie, "w+", funcs);
 #if HAVE_FUNOPEN
 	A(f == NULL);
-	printf("Succeeded skipping read-only stream %p\n", f);
+	lux_print("Succeeded skipping read-only stream %p\n", f);
 #else
 	A(f != NULL);
-	printf("Succeeded opening read-only stream %p\n", f);
+	lux_print("Succeeded opening read-only stream %p\n", f);
 	fclose(f);
 #endif
 
 	funcs.write = write;
 	f = fopencookie(&cookie, "w+", funcs);
 	A(f != NULL);
-	printf("Succeeded opening read-write stream %p\n", f);
+	lux_print("Succeeded opening read-write stream %p\n", f);
 
 	fwrite("abc", 1, 4, f); fflush(f);
 	A(strcmp(cookie.data, "abc") == 0);
-	printf("Succeeded printing string \"%s\" to stream %p\n", cookie.data, f);
+	lux_print("Succeeded printing string \"%s\" to stream %p\n", cookie.data, f);
 
 	cookie.current = 0; /* reset position to head */
 	fread(out, 1, 4, f);
 	A(strcmp(out, "abc") == 0);
-	printf("Succeeded reading string \"%s\" from stream %p\n", out, f);
+	lux_print("Succeeded reading string \"%s\" from stream %p\n", out, f);
 
 	A(fclose(f) == 0);
-	printf("Succeeded closing stream %p\n", f);
+	lux_print("Succeeded closing stream %p\n", f);
 
 	return 0;
 }

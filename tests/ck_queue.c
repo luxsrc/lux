@@ -22,7 +22,6 @@
 #include <lux/dynamic.h>
 #include <lux/queue.h>
 #include <stdlib.h>
-#include <stdio.h>
 
 #define A(E) lux_always_assert(E)
 
@@ -56,11 +55,11 @@ main(int argc, char *argv[])
 	for(i = 0; i < n+1; ++i) {
 		struct node *s = (struct node *)dequeue(h);
 		if(s) {
-			printf("%d ", s->value);
+			lux_print("%d ", s->value);
 			A(s->value == i+offset);
 			free(s);
 		} else
-			printf("empty\n");
+			lux_print("empty\n");
 	}
 
 	offset = 110;
@@ -69,11 +68,11 @@ main(int argc, char *argv[])
 	for(i = 0; i < n+1; ++i) {
 		struct node *s = (struct node *)dequeue(h);
 		if(s) {
-			printf("%d ", s->value);
+			lux_print("%d ", s->value);
 			A(s->value == i+offset);
 			free(s);
 		} else
-			printf("empty\n");
+			lux_print("empty\n");
 	}
 
 	free(h);
