@@ -308,27 +308,27 @@ echo "With HDF5     : $with_hdf5"
 test "$with_hdf5" = "yes" && cat << EOF
 	H5CC="$H5CC"
 	HDF5_CC="$HDF5_CC"
+	HDF5_LIBS="$HDF5_LIBS"
 	HDF5_CFLAGS="$HDF5_CFLAGS"
 	HDF5_CPPFLAGS="$HDF5_CPPFLAGS"
 	HDF5_LDFLAGS="$HDF5_LDFLAGS"
-	HDF5_LIBS="$HDF5_LIBS"
 EOF
 echo "----------------------------------------------------------------"
 echo "With MPI      : $with_mpi"
 test "$with_mpi" = "yes" && cat << EOF
 	MPICC="$MPICC"
 	MPI_CC="$MPI_CC"
+	MPI_LIBS="$MPI_LIBS"
 	MPI_CFLAGS="$MPI_CFLAGS"
 	MPI_CPPFLAGS="$MPI_CPPFLAGS"
 	MPI_LDFLAGS="$MPI_LDFLAGS"
-	MPI_LIBS="$MPI_LIBS"
 EOF
 echo "----------------------------------------------------------------"
 echo "With OpenCL   : $with_opencl"
 test "$with_opencl" = "yes" && cat << EOF
+	OPENCL_LIBS="$OPENCL_LIBS"
 	OPENCL_CPPFLAGS="$OPENCL_CPPFLAGS"
 	OPENCL_LDFLAGS="$OPENCL_LDFLAGS"
-	OPENCL_LIBS="$OPENCL_LIBS"
 EOF
 echo "----------------------------------------------------------------"
 echo "With OpenMP   : $with_openmp"
@@ -339,17 +339,17 @@ echo "----------------------------------------------------------------"
 echo "With pthread  : $with_pthread"
 test "$with_pthread" = "yes" && cat << EOF
 	PTHREAD_CC="$PTHREAD_CC"
-	PTHREAD_CFLAGS="$PTHREAD_CFLAGS"
 	PTHREAD_LIBS="$PTHREAD_LIBS"
+	PTHREAD_CFLAGS="$PTHREAD_CFLAGS"
 EOF
 echo "----------------------------------------------------------------"
 echo "Combined flags:"
 cat << EOF
 	CC="$CC"
+	LIBS="$LIBS"
 	CFLAGS="$CFLAGS"
 	CPPFLAGS="$CPPFLAGS"
 	LDFLAGS="$LDFLAGS"
-	LIBS="$LIBS"
 EOF
 
 if test "$with_hdf5" = "yes"; then

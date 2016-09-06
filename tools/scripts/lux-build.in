@@ -35,12 +35,12 @@ Build and stage/install a lux module with lux's settings:
   LIBS="@LIBS@"
   OBJEXT="@OBJEXT@"
 
-  CPPFLAGS="@CPPFLAGS@"
   CFLAGS="@CFLAGS@"
+  CPPFLAGS="@CPPFLAGS@"
   LDFLAGS="@LDFLAGS@"
 
-  AM_CPPFLAGS=""
   AM_CFLAGS=""
+  AM_CPPFLAGS=""
   AM_LDFLAGS="-no-undefined -export-dynamic -module"
 EOF
 	exit 0
@@ -149,13 +149,13 @@ DEFAULT_RPATH="-rpath ${libdir}/lux"
 OBJEXT="@OBJEXT@"
 
 # Passed in by configure
-CPPFLAGS="@CPPFLAGS@"
 CFLAGS="@CFLAGS@"
+CPPFLAGS="@CPPFLAGS@"
 LDFLAGS="@LDFLAGS@"
 
 # Set in Makefile.am
-AM_CPPFLAGS=""
 AM_CFLAGS=""
+AM_CPPFLAGS=""
 AM_LDFLAGS="-no-undefined -export-dynamic -module"
 
 # Helper programs
@@ -172,9 +172,9 @@ for s in "${src[@]}"; do
 	o="${s%c}lo"
 	echo "Compile source file \"$s\" to object file \"$o\""
 	${LIBTOOL} --tag=CC --mode=compile ${CC} -c \
-		${DEFS} ${DEFAULT_INCLUDES}         \
+		${AM_CFLAGS}   ${CFLAGS}            \
 		${AM_CPPFLAGS} ${CPPFLAGS}          \
-		${AM_CFLAGS} ${CFLAGS}              \
+		${DEFS} ${DEFAULT_INCLUDES}         \
 		${mod_CPPFLAGS} ${cpp[@]}           \
 		"$s" -o "$o"
 	status=$?
@@ -198,7 +198,7 @@ done
 echo "to output module \"$mod\""
 
 ${LIBTOOL} --tag=CC --mode=link ${CCLD} \
-	${AM_CFLAGS} ${CFLAGS}          \
+	${AM_CFLAGS}  ${CFLAGS}         \
 	${AM_LDFLAGS} ${LDFLAGS}        \
 	${LIBS} ${DEFAULT_RPATH}        \
 	${mod_LIBADD} ${ld[@]}          \
