@@ -27,11 +27,13 @@
 #define A(E) lux_always_assert(E)
 
 int
-main()
+main(int argc, char *argv[])
 {
 	timestamp_t T0, T1;
 	ticks_t     t0, t1;
 	double      dt, dT;
+
+	lux_setup(&argc, &argv);
 
 	t0 = getticks();
 	T0 = gettimestamp();

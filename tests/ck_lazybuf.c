@@ -25,10 +25,12 @@
 #define A(E) lux_always_assert(E)
 
 int
-main()
+main(int argc, char *argv[])
 {
 	char  lazybuf[256] = "";
 	char *buf = lazybuf;
+
+	lux_setup(&argc, &argv);
 
 	buf = strcpy(lzmalloc(64), "lux");
 	A(buf == lazybuf && !strcmp(buf, "lux"));

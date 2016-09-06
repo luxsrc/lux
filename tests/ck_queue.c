@@ -40,11 +40,15 @@ mknode(int value)
 }
 
 int
-main()
+main(int argc, char *argv[])
 {
-	int i, n = 10, offset;
+	struct queue_head *h;
+	int i, n, offset;
 
-	struct queue_head *h = dynamic(struct queue_head, QUEUE_HEAD_INIT(_));
+	lux_setup(&argc, &argv);
+
+	h = dynamic(struct queue_head, QUEUE_HEAD_INIT(_));
+	n = 10;
 
 	offset = 100;
 	for(i = 0; i < n; ++i)

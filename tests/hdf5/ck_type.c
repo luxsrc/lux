@@ -24,7 +24,7 @@
 #define A(E) lux_always_assert(E)
 
 int
-main()
+main(int argc, char *argv[])
 {
 	int char_ct     = TYPECODE('i', sizeof(char)      * LUX_CHAR_BIT);
 	int short_ct    = TYPECODE('i', sizeof(short)     * LUX_CHAR_BIT);
@@ -41,6 +41,8 @@ main()
 	int float_ct    = TYPECODE('f', sizeof(float)       * LUX_CHAR_BIT);
 	int double_ct   = TYPECODE('f', sizeof(double)      * LUX_CHAR_BIT);
 	int ldouble_ct  = TYPECODE('f', sizeof(long double) * LUX_CHAR_BIT);
+
+	lux_setup(&argc, &argv);
 
 	A(h5t_from_tc(char_ct)  == H5T_NATIVE_CHAR);
 	A(h5t_from_tc(uchar_ct) == H5T_NATIVE_UCHAR);

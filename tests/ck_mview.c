@@ -34,12 +34,17 @@
 #define N3 11
 
 int
-main()
+main(int argc, char *argv[])
 {
 	char *v1, *v2;
 
-	struct mpool *mp = mkmpool(20000);
-	struct dope  *dp = mkdope(double [5], ALIGN, N1, N2, N3);
+	struct mpool *mp;
+	struct dope  *dp;
+
+	lux_setup(&argc, &argv);
+
+	mp = mkmpool(20000);
+	dp = mkdope(double [5], ALIGN, N1, N2, N3);
 
 	v1 = mkmview(mp, 0, dp);
 	v2 = mkmview(mp, 0, dp);

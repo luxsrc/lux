@@ -24,7 +24,7 @@
 #define A(E) lux_always_assert(E)
 
 int
-main()
+main(int argc, char *argv[])
 {
 	struct xyz {
 		float x, y, z;
@@ -32,6 +32,8 @@ main()
 
 	size_t n[] = {10, 11, 12, 13, 14, 15};
 	size_t i;
+
+	lux_setup(&argc, &argv);
 
 	a = pallocdn(struct xyz, 6, n);
 	A(a && pgetd(a) == 6);

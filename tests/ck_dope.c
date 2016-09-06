@@ -31,9 +31,13 @@
 #define N3 11
 
 int
-main()
+main(int argc, char *argv[])
 {
-	struct dope *dp = mkdope(double [5], ALIGN, N1, N2, N3);
+	struct dope *dp;
+
+	lux_setup(&argc, &argv);
+
+	dp = mkdope(double [5], ALIGN, N1, N2, N3);
 
 	printf("dim: %zu\n", pgetd(dp));
 	A(pgetd(dp) == 1);

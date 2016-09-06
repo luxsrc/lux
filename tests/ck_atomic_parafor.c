@@ -36,13 +36,17 @@ func(size_t n, size_t i, void *data)
 }
 
 int
-main()
+main(int argc, char *argv[])
 {
 	int i;
+
+	lux_setup(&argc, &argv);
+
 	for(i = 0; i < 32; ++i) {
 		atomic_t atomic = ATOMIC_NULL;
 		parafor(16, 15, func, (void *)&atomic);
 		A(atomic_get(&atomic) == 12000000);
 	}
+
 	return 0;
 }

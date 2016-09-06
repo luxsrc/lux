@@ -35,12 +35,15 @@ roundup(size_t sz, size_t psz)
 int
 main(int argc, char *argv[])
 {
+	struct mpool *mp;
 	size_t psz = getpagesize();
 	size_t sz  = argc > 1 ? atoi(argv[1]) : 5000;
 
-	struct mpool *mp = mkmpool(sz);
+	lux_setup(&argc, &argv);
 
-	printf("memory pool size: %zu -> %zu\n", sz, mp->sz);
+	mp = mkmpool(sz);
+
+	lux_print("memory pool size: %zu -> %zu\n", sz, mp->sz);
 	A(mp->sz == roundup(sz, psz));
 
 	rmmpool(mp);

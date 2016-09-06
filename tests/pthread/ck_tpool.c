@@ -41,12 +41,17 @@ exec(Lux_task *t)
 }
 
 int
-main()
+main(int argc, char *argv[])
 {
-	int i, n = 8;
+	struct tpool *q;
+	struct task  *t;
+	int i, n;
 
-	struct tpool *q = mktpool(4);
-	struct task  *t = malloc(n * sizeof(struct task));
+	lux_setup(&argc, &argv);
+
+	n = 8;
+	q = mktpool(4);
+	t = malloc(n * sizeof(struct task));
 	for(i = 0; i < n; ++i) {
 		t[i].super.exec = exec;
 		t[i].id         = i + 1;

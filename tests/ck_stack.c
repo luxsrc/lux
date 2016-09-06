@@ -38,11 +38,14 @@ mknode(int value)
 }
 
 int
-main()
+main(int argc, char *argv[])
 {
+	struct node *h;
 	int i, n = 10, offset;
 
-	struct node *h = mknode(-1);
+	lux_setup(&argc, &argv);
+
+	h = mknode(-1);
 
 	offset = 100;
 	for(i = 0; i < n; ++i)

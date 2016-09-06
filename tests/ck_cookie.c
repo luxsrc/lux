@@ -61,12 +61,14 @@ write(void *c, const char *buf, size_t sz)
 }
 
 int
-main()
+main(int argc, char *argv[])
 {
 	char out[1024];
 	cookie_t cookie = {0, 0, {0}};
 	cookie_io_functions_t funcs = {NULL, NULL, NULL, NULL};
 	FILE *f;
+
+	lux_setup(&argc, &argv);
 
 	funcs.read = read;
 	f = fopencookie(&cookie, "w+", funcs);
