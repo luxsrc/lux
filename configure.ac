@@ -295,6 +295,11 @@ if [[ ! -e tools/scripts/lux-libtool ]]; then
 	$LN_S ../../libtool tools/scripts/lux-libtool
 fi
 
+# Symlink the dummy OpenCL kernel so `makedist` works
+if [[ ! -e tests/opencl/dummy.cl ]]; then
+	$LN_S ../../$srcdir/tests/opencl/dummy.cl tests/opencl/dummy.cl
+fi
+
 # Print summary
 echo "================================================================"
 echo "Lux m4_esyscmd([tr -d '\n' < .version])"

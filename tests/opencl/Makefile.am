@@ -1,5 +1,7 @@
 AM_CPPFLAGS = -I$(top_builddir)
 
+EXTRA_DIST = dummy.cl
+
 check_PROGRAMS = ck_new ck_copy
 
 ck_new_SOURCES  = ck_new.c ../../mod/opencl.h
