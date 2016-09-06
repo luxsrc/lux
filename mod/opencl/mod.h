@@ -74,12 +74,14 @@ extern cl_device_id   lsdev(unsigned, unsigned, cl_device_type);
 
 extern const char *getsrc(const char *, const char *);
 
-extern cl_context mkctx(unsigned, unsigned, cl_device_type);
+extern cl_context mkctx_spec(unsigned, unsigned, cl_device_type);
+extern cl_context mkctx_que(cl_context, size_t, cl_command_queue *);
+extern cl_context mkctx_dev(cl_context, size_t, cl_device_id     *);
+
 extern cl_program mkpro(struct opencl *, const struct LuxOopencl *, size_t, cl_device_id *);
 
 extern Lux_opencl_kernel *mkkern(Lux_opencl *, const char *);
-extern double             exec  (Lux_opencl *, Lux_opencl_kernel *,
-                                 size_t, const size_t *);
+extern double             exec  (Lux_opencl *, Lux_opencl_kernel *, size_t, const size_t *);
 extern void               rmkern(Lux_opencl *, Lux_opencl_kernel *);
 
 extern cl_mem   mk(Lux_opencl *, size_t, unsigned);
