@@ -328,6 +328,7 @@ echo "With OpenCL   : $with_opencl"
 test "$with_opencl" = "yes" && cat << EOF
 	OPENCL_CPPFLAGS="$OPENCL_CPPFLAGS"
 	OPENCL_LDFLAGS="$OPENCL_LDFLAGS"
+	OPENCL_LIBS="$OPENCL_LIBS"
 EOF
 echo "----------------------------------------------------------------"
 echo "With OpenMP   : $with_openmp"
