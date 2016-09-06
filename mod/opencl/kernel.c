@@ -155,38 +155,25 @@ with(Lux_opencl_kernel *ego, ...)
 Lux_opencl_kernel *
 mkkern(Lux_opencl *ocl, const char *name)
 {
-	cl_int    err;
-	cl_kernel kernel;
-	size_t    bsz_max;
-	size_t    bml_pref;
-
 	Lux_opencl_kernel *ego;
 
-	kernel = clCreateKernel(OCL->pro, name, &err);
-	if(!kernel || err != CL_SUCCESS) {
-		lux_error("Failed to obtain compute kernel \"%s\"\n", name);
-		exit(1);
-	}
+	size_t bsz_max;
+	size_t bml_pref;
 
-	err = clGetKernelWorkGroupInfo(kernel, ocl->dev,
-	                               CL_KERNEL_WORK_GROUP_SIZE,
-	                               sizeof(size_t), &bsz_max, NULL);
-	if(err != CL_SUCCESS) {
-		lux_error("Failed to obtain workgroup size for \"%s\"\n", name);
-		exit(1);
-	}
+	cl_kernel    krn = safe(cl_kernel, CreateKernel, OCL->pro, name);
+	cl_device_id dev = getdev(ocl->que[0]);
 
-	err = clGetKernelWorkGroupInfo(kernel, ocl->dev,
-	                               CL_KERNEL_PREFERRED_WORK_GROUP_SIZE_MULTIPLE,
-	                               sizeof(size_t), &bml_pref, NULL);
-	if(err != CL_SUCCESS) {
-		lux_error("Failed to obtain preferred multiple for \"%s\"\n", name);
-		exit(1);
-	}
+	check(GetKernelWorkGroupInfo,
+	      krn, dev, CL_KERNEL_WORK_GROUP_SIZE,
+	      sizeof(size_t), &bsz_max, NULL);
+
+	check(GetKernelWorkGroupInfo,
+	      krn, dev, CL_KERNEL_PREFERRED_WORK_GROUP_SIZE_MULTIPLE,
+	      sizeof(size_t), &bml_pref, NULL);
 
 	ego = malloc(sizeof(struct kernel));
 	if(ego) {
-		ego->krn = kernel;
+		ego->krn = krn;
 
 		ego->set  = set;
 		ego->setS = setS;
@@ -223,7 +210,7 @@ exec(Lux_opencl *ocl, Lux_opencl_kernel *ego, size_t dim, const size_t *shape)
 
 	/* TODO: automatic load balancing across devices */
 	check(EnqueueNDRangeKernel,
-	      ocl->que, ego->krn,
+	      ocl->que[0], ego->krn,
 	      dim, NULL, shapeup, NULL, 0, NULL, &event);
 	check(WaitForEvents, 1, &event);
 
