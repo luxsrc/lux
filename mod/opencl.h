@@ -102,32 +102,22 @@ struct LuxOopencl {
 	size_t      realsz;
 	const char *flags;
 
-	/* How to setup the context and queues:
-	   0 == no reuse, specified by i-values,
-	   1 == reuse by queues,
-	   2 == specified by device */
-	int reuse;
-	union {
-		struct {
-			unsigned       iplf;
-			unsigned       idev;
-			cl_device_type devtype;
-		} spec;
-		struct {
-			cl_context    ctx;
-			size_t        ndev;
-			cl_device_id *dev;
-		} dev;
-		struct {
-			cl_context        ctx;
-			size_t            nque;
-			cl_command_queue *que;
-		} que;
-	} settings;
+	/* Copy queues, devices, and context from the que array */
+	size_t            nque;
+	cl_command_queue *que;
+
+	/* Create context on platform iplf with all devices with
+	   devtype only if nque == 0 or que == NULL, iplf and devtype
+	   are ignored if nque != 0 and que != NULL; idev always sets
+	   the default device. */
+	unsigned       iplf;
+	unsigned       idev;
+	cl_device_type devtype;
 };
 
-#define OPENCL_NULL {NULL, NULL, sizeof(float), NULL, 0, {{0, 0, CL_DEVICE_TYPE_ALL}}}
+#define OPENCL_NULL {NULL, NULL, sizeof(float), NULL, 0, NULL, 0, 0, CL_DEVICE_TYPE_ALL}
 
+/* lux OpenCL module interface */
 struct LuxSopencl {
 	/* Make OpenCL context public so they can be shared */
 	cl_context ctx;
@@ -150,6 +140,7 @@ struct LuxSopencl {
 	cl_command_queue que[1]; /* flexible array element */
 };
 
+/* lux OpenCL kernel module interface */
 struct LuxSopencl_kernel {
 	cl_kernel krn;
 
@@ -163,6 +154,7 @@ struct LuxSopencl_kernel {
 	Lux_opencl_kernel *(*with)(Lux_opencl_kernel *, ...);
 };
 
+/* Translate between different precision representations */
 static inline cl_device_type
 strtotype(const char *str)
 {
