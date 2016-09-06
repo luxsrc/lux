@@ -42,7 +42,7 @@ typedef union {
 	cl_double d;
 } cl_real;
 
-#define OCL ((struct opencl *)ocl)
+#define OCL headerof(struct opencl, ocl, super)
 #define EGO ((struct kernel *)ego)
 
 #define TYPE(s) CASE(!strcmp(type, s))
