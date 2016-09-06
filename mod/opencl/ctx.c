@@ -57,10 +57,10 @@ mkctx_spec(unsigned iplf, unsigned idev, cl_device_type devtype)
 	plf[1] = (cl_context_properties)lsplf(iplf);
 
 	lux_print("\nGetting OpenCL devices from platform %u... ", iplf);
-	dev = lsdev(iplf, idev, devtype);
+	(void)lsdev(iplf, idev, devtype);
 
 	lux_print("\n");
-	return safe(cl_context, CreateContext, plf, 1, &dev, NULL, NULL);
+	return safe(cl_context, CreateContextFromType, plf, devtype, NULL);
 }
 
 cl_context
