@@ -5,7 +5,8 @@ pkglib_LTLIBRARIES = hdf5.la
 
 CC=@HDF5_CC@
 
-hdf5_la_SOURCES  = ../io.h ../file.h ../hdf5.h mod.c
+hdf5_la_SOURCES  = ../hdf5.h mod.c
+hdf5_la_SOURCES += ../file.h ../io.h ../mangle.h
 hdf5_la_LIBADD   =                $(HDF5_LIBS)     ../../api/c/libux.la
 hdf5_la_CFLAGS   =                $(HDF5_CFLAGS)
 hdf5_la_CPPFLAGS = $(AM_CPPFLAGS) $(HDF5_CPPFLAGS) -DLUX_MOD_NAME=hdf5
