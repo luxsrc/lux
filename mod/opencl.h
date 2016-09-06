@@ -83,9 +83,9 @@
  *
  * It is natural to map an OpenCL program to a lux module.  This means
  * that multiple modules may share the same context with multiple
- * queues and devices.  Because a device can be determined from a
- * queue, we should provide options to share context and queues during
- * lux OpenCL module creation.
+ * queues and devices.  Because context and device can be determined
+ * from a queue, we should provide options to share queues during lux
+ * OpenCL module creation.
  */
 
 /* Forward declaration */
