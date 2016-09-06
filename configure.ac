@@ -303,7 +303,7 @@ fi
 # Print summary
 echo "================================================================"
 echo "Lux m4_esyscmd([tr -d '\n' < .version])"
-echo "----------------------------------------------------------------"
+echo "================================================================"
 echo "With HDF5     : $with_hdf5"
 test "$with_hdf5" = "yes" && cat << EOF
 	H5CC="$H5CC"
@@ -351,8 +351,11 @@ cat << EOF
 	CPPFLAGS="$CPPFLAGS"
 	LDFLAGS="$LDFLAGS"
 EOF
+echo "================================================================"
+warned=no
 
 if test "$with_hdf5" = "yes"; then
+	warned=yes
 	if test $(basename "$H5CC") = "h5cc"; then
 		test "$CC" != "$HDF5_CC" && cat << EOF
 WARNING CC="$CC" != HDF5_CC="$HDF5_CC"
@@ -365,9 +368,12 @@ EOF
 fi
 
 if test "$with_mpi" = "yes"; then
+	warned=yes
 	test "$CC" != "$MPI_CC" && cat << EOF
 WARNING CC="$CC" != MPI_CC="$MPI_CC"
 EOF
 fi
 
+if test "$warned" = "yes"; then
 echo "================================================================"
+fi
