@@ -29,9 +29,13 @@ main(int argc, char *argv[])
 {
 	Lux_opencl *ocl;
 
+	struct LuxOopencl opts  = OPENCL_NULL;
+	const  char      *src[] = {"dummy", NULL};
+	opts.src = src;
+
 	lux_setup(&argc, &argv);
 
-	ocl = lux_load("../../mod/opencl/.libs/opencl", NULL);
+	ocl = lux_load("../../mod/opencl/.libs/opencl", &opts);
 	A(ocl);
 
 	lux_unload(ocl);
