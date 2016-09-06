@@ -35,10 +35,15 @@ pkginclude_HEADERS += dlib.h dltry.h dmod.h load.h
 pkginclude_HEADERS += numeric.h shorthand.h
 
 #==============================================================================
-# Interfaces and implementations of dynamic modules
+# Interfaces
 pkginclude_HEADERS += file.h io.h job.h message.h resource.h
-SUBDIRS             =             job
 
+#==============================================================================
+# Implementations of dynamic modules
+SUBDIRS             = sim
+
+#==============================================================================
+# Optional packages
 if USING_OPENCL
 pkginclude_HEADERS += opencl.h
 SUBDIRS            += opencl
