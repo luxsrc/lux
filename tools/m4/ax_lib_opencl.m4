@@ -112,16 +112,17 @@ if test "$with_opencl" = "yes"; then
 
 	if test "$ac_cv_prog_cc_framework" = "yes"; then
 		if test -n "$OPENCL_PREFIX"; then
-			OPENCL_CPPFLAGS+=" -F${OPENCL_PREFIX}"
-			OPENCL_LDFLAGS+=" -F${OPENCL_PREFIX}"
+			OPENCL_CPPFLAGS="-F${OPENCL_PREFIX}"
+			OPENCL_LDFLAGS="-F${OPENCL_PREFIX} -framework OpenCL"
+		else
+			OPENCL_LDFLAGS="-framework OpenCL"
 		fi
-		OPENCL_LDFLAGS+=" -framework OpenCL"
 	else
 		if test -n "$OPENCL_PREFIX"; then
-			OPENCL_CPPFLAGS+=" -I${OPENCL_PREFIX}/include"
-			OPENCL_LDFLAGS+=" -L${OPENCL_PREFIX}/lib64 -L${OPENCL_PREFIX}/lib"
+			OPENCL_CPPFLAGS="-I${OPENCL_PREFIX}/include"
+			OPENCL_LDFLAGS="-L${OPENCL_PREFIX}/lib64 -L${OPENCL_PREFIX}/lib"
 		fi
-		OPENCL_LIBS+=" OpenCL"
+		OPENCL_LIBS="OpenCL"
 	fi
 
 	dnl Define variables
