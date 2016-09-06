@@ -43,10 +43,10 @@ main(int argc, char *argv[])
 	clGetContextInfo(ctx, CL_CONTEXT_REFERENCE_COUNT,
 	                 sizeof(count), &count, NULL);
 	lux_print("refcnt(%p) == %u\n", ctx, (unsigned)count);
-	A(count == 2);
+	A(count == 4);
 
-	opts.reuse = 1;
-	opts.settings.que.ctx = ctx;
+	opts.nque = ocl1->nque;
+	opts.que  = ocl1->que;
 
 	ocl2 = lux_load("../../mod/opencl/.libs/opencl", &opts);
 	A(ocl2);
@@ -56,13 +56,13 @@ main(int argc, char *argv[])
 	clGetContextInfo(ctx, CL_CONTEXT_REFERENCE_COUNT,
 	                 sizeof(count), &count, NULL);
 	lux_print("refcnt(%p) == %u\n", ctx, (unsigned)count);
-	A(count == 4);
+	A(count == 5);
 
 	lux_unload(ocl2);
 	clGetContextInfo(ctx, CL_CONTEXT_REFERENCE_COUNT,
 	                 sizeof(count), &count, NULL);
 	lux_print("refcnt(%p) == %u\n", ctx, (unsigned)count);
-	A(count == 2);
+	A(count == 4);
 
 	lux_unload(ocl1);
 
