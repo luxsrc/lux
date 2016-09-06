@@ -115,7 +115,6 @@ if test "$with_opencl" = "yes"; then
 			OPENCL_CPPFLAGS+=" -F${OPENCL_PREFIX}"
 			OPENCL_LDFLAGS+=" -F${OPENCL_PREFIX}"
 		fi
-		OPENCL_CPPFLAGS+=" -framework OpenCL"
 		OPENCL_LDFLAGS+=" -framework OpenCL"
 	else
 		if test -n "$OPENCL_PREFIX"; then
