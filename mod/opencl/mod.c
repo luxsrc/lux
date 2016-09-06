@@ -28,33 +28,38 @@ LUX_MKMOD(const struct LuxOopencl *opts)
 	struct opencl *EGO;
 	Lux_opencl    *ego;
 
-	cl_context ctx;
-
-	size_t       i, ndev;
+	int          new;
+	cl_context   ctx;
+	size_t       i, nque;
 	cl_device_id dev[DEV_COUNT];
 
 	struct LuxOopencl def = OPENCL_NULL;
 	if(!opts)
 		opts = &def;
 
-	if(opts->nque && opts->que)
-		/* Copy context, ... */
-		ctx = mkctx_que(0, opts->nque, opts->que);
-	else
-		/* Create new context, ... */
+	new = !(opts->nque && opts->que);
+
+	if(new) {
 		ctx = mkctx_spec(opts->iplf, opts->idev, opts->devtype);
+		check(GetContextInfo, ctx, CL_CONTEXT_DEVICES, sizeof(dev), dev, &i);
+		nque = i / sizeof(cl_device_id);
+	} else {
+		ctx  = mkctx_que(0, opts->nque, opts->que);
+		nque = opts->nque;
+		for(i = 0; i < nque && i < DEV_COUNT; ++i)
+			check(GetCommandQueueInfo,
+			      opts->que[i], CL_QUEUE_DEVICE,
+			      sizeof(dev[i]), dev+i, NULL);
+	}
 
 	if(!ctx)
 		goto cleanup1;
 
-	check(GetContextInfo,
-	      ctx, CL_CONTEXT_DEVICES, sizeof(dev), dev, &i);
-	ndev = i / sizeof(dev[0]);
-
-	EGO = malloc(sizeof(struct opencl) - sizeof(cl_command_queue)
-	                            + ndev * sizeof(cl_command_queue));
+	EGO = (struct opencl *)
+		malloc(sizeof(struct opencl) - sizeof(cl_command_queue)
+		                      + nque * sizeof(cl_command_queue));
 	if(!EGO)
-		goto cleanup2;
+		goto cleanup1;
 
 	ego = &EGO->super;
 
@@ -69,32 +74,37 @@ LUX_MKMOD(const struct LuxOopencl *opts)
 	ego->exec   = exec;
 	ego->rmkern = rmkern;
 
-	ego->nque   = ndev;
-	for(i = 0; i < ndev; ++i) {
-		cl_command_queue q =
-			safe(cl_command_queue, CreateCommandQueue,
-			     ctx, dev[i], CL_QUEUE_PROFILING_ENABLE);
-		if(!q)
-			goto cleanup3;
+	ego->nque   = nque;
+	if(new)
+		for(i = 0; i < nque; ++i) {
+			cl_command_queue q =
+				safe(cl_command_queue, CreateCommandQueue,
+				     ctx, dev[i], CL_QUEUE_PROFILING_ENABLE);
+			if(!q)
+				goto cleanup2;
 
-		ego->que[i] = q;
-	}
+			ego->que[i] = q;
+		}
+	else
+		for(i = 0; i < nque; ++i) {
+			clRetainCommandQueue(opts->que[i]);
+			ego->que[i] = opts->que[i];
+		}
 
 	EGO->integersz  = sizeof(cl_int);
 	EGO->fastsz     = sizeof(float);
 	EGO->realsz     = opts->realsz;
 	EGO->extendedsz = sizeof(double);
 
-	EGO->pro = opts->src ? mkpro(EGO, opts, ndev, dev) : 0;
+	EGO->pro = opts->src ? mkpro(EGO, opts, nque, dev) : 0;
 
 	return ego;
 
-cleanup3:
+cleanup2:
 	while(i--)
 		check(ReleaseCommandQueue, ego->que[i]);
 
-cleanup2:
-	free(EGO);
+	free(ego);
 
 cleanup1:
 	check(ReleaseContext, ctx);
