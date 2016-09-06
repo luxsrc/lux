@@ -27,10 +27,14 @@
 int
 main(int argc, char *argv[])
 {
-	struct LuxOopencl opts = OPENCL_NULL;
 	Lux_opencl *ocl1, *ocl2;
+
 	cl_context  ctx;
 	cl_uint     ndev, count;
+
+	struct LuxOopencl opts  = OPENCL_NULL;
+	const  char      *src[] = {"dummy", NULL};
+	opts.src = src;
 
 	lux_setup(&argc, &argv);
 
@@ -44,7 +48,7 @@ main(int argc, char *argv[])
 	                 sizeof(count), &count, NULL);
 	lux_print("refcnt(%p) == %u\n", ctx, (unsigned)count);
 	ndev = ocl1->nque;
-	A(count == 1 + ndev);
+	A(count == 2 + ndev);
 
 	opts.nque = ocl1->nque;
 	opts.que  = ocl1->que;
@@ -56,13 +60,13 @@ main(int argc, char *argv[])
 	clGetContextInfo(ctx, CL_CONTEXT_REFERENCE_COUNT,
 	                 sizeof(count), &count, NULL);
 	lux_print("refcnt(%p) == %u\n", ctx, (unsigned)count);
-	A(count == 2 + ndev);
+	A(count == 4 + ndev);
 
 	lux_unload(ocl2);
 	clGetContextInfo(ctx, CL_CONTEXT_REFERENCE_COUNT,
 	                 sizeof(count), &count, NULL);
 	lux_print("refcnt(%p) == %u\n", ctx, (unsigned)count);
-	A(count == 1 + ndev);
+	A(count == 2 + ndev);
 
 	lux_unload(ocl1);
 

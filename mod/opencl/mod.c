@@ -113,13 +113,17 @@ cleanup1:
 }
 
 void
-LUX_RMMOD(void *ego)
+LUX_RMMOD(void *p)
 {
-	size_t i = ((Lux_opencl *)ego)->nque;
+	Lux_opencl    *ego = p;
+	struct opencl *EGO = headerof(struct opencl, p, super);
+
+	size_t i = ego->nque;
 	while(i--)
-		check(ReleaseCommandQueue, ((Lux_opencl *)ego)->que[i]);
+		check(ReleaseCommandQueue, ego->que[i]);
 
-	check(ReleaseContext, ((Lux_opencl *)ego)->ctx);
+	check(ReleaseProgram, EGO->pro);
+	check(ReleaseContext, ego->ctx);
 
-	free(headerof(struct opencl, ego, super));
+	free(EGO);
 }
