@@ -52,10 +52,6 @@ AM_LDFLAGS="-no-undefined -export-dynamic -module"
 LIBTOOL="${bindir}/lux-libtool"
 INSTALL="@INSTALL@"
 
-# Module specific part of the toolchain
-mod_CPPFLAGS="-DLUX_MOD_NAME=${mod%.la}"
-mod_LIBADD="${libdir}/libux.la"
-
 # Automake conditions
 @USING_HDF5_TRUE@with_hdf5=yes
 @USING_MPI_TRUE@with_mpi=yes
@@ -277,6 +273,11 @@ echo "Inline CPP flags: \"${cpp[@]}\""
 echo "Inline LD  flags: \"${ld[@]}\""
 echo "Output module name: \"$mod\""
 echo "Install directory:  \"$dir\""
+
+#------------------------------------------------------------------------------
+# Module specific part of the toolchain
+mod_CPPFLAGS="-DLUX_MOD_NAME=${mod%.la}"
+mod_LIBADD="${libdir}/libux.la"
 
 #------------------------------------------------------------------------------
 # Compile the source file(s) to object(s)
