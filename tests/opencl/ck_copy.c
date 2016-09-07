@@ -34,11 +34,12 @@ main(int argc, char *argv[])
 
 	struct LuxOopencl opts  = OPENCL_NULL;
 	const  char      *src[] = {"dummy", NULL};
-	opts.src = src;
+	opts.base = main; /* this function to pin location */
+	opts.src  = src;
 
 	lux_setup(&argc, &argv);
 
-	ocl1 = lux_load("../../mod/opencl/.libs/opencl", &opts);
+	ocl1 = lux_load("../mod/opencl/.libs/opencl", &opts);
 	A(ocl1);
 
 	ctx = ocl1->ctx;
@@ -53,7 +54,7 @@ main(int argc, char *argv[])
 	opts.nque = ocl1->nque;
 	opts.que  = ocl1->que;
 
-	ocl2 = lux_load("../../mod/opencl/.libs/opencl", &opts);
+	ocl2 = lux_load("../mod/opencl/.libs/opencl", &opts);
 	A(ocl2);
 	A(ocl1->ctx == ocl2->ctx);
 

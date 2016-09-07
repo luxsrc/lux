@@ -9,5 +9,3 @@ ck_mpi_LDADD    = $(PTHREAD_LIBS)   $(MPI_LIBS)     ../../api/c/libux.la
 ck_mpi_CFLAGS   = $(PTHREAD_CFLAGS) $(MPI_CFLAGS)
 ck_mpi_CPPFLAGS = $(AM_CPPFLAGS)    $(MPI_CPPFLAGS)
 ck_mpi_LDFLAGS  =                   $(MPI_LDFLAGS)
-
-TESTS = $(check_PROGRAMS)

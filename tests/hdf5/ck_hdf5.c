@@ -43,7 +43,7 @@ main(int argc, char *argv[])
 	atexit(cleanup); /* in case some of the tests fail */
 	lux_setup(&argc, &argv);
 
-	hdf5 = lux_load("../../mod/hdf5/.libs/hdf5", NULL);
+	hdf5 = lux_load("../mod/hdf5/.libs/hdf5", NULL);
 	A(hdf5);
 
 	/* Test opening missing file */

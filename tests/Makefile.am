@@ -36,24 +36,29 @@ ck_typecode_LDADD   = ../api/c/libux.la
 ck_ticks_timer_SOURCES = ck_ticks_timer.c ../mod/ticks.h ../mod/timer.h
 ck_ticks_timer_LDADD   = ../api/c/libux.la
 
+TESTS = $(check_PROGRAMS)
+
 if USING_PTHREAD
 SUBDIRS += pthread
+TESTS   += pthread/ck_atomic_parafor pthread/ck_tpool
 endif
 
 if USING_OPENMP
 SUBDIRS += openmp
+TESTS   += openmp/ck_atomic_parafor
 endif
 
 if USING_OPENCL
 SUBDIRS += opencl
+TESTS   += opencl/ck_new opencl/ck_copy
 endif
 
 if USING_MPI
 SUBDIRS += mpi
+TESTS   += mpi/ck_mpi
 endif
 
 if USING_HDF5
 SUBDIRS += hdf5
+TESTS   += hdf5/ck_hdf5 hdf5/ck_type hdf5/ck_io
 endif
-
-TESTS = $(check_PROGRAMS)

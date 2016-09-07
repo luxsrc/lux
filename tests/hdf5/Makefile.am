@@ -21,5 +21,3 @@ ck_io_LDADD    =                $(HDF5_LIBS)     ../../api/c/libux.la
 ck_io_CFLAGS   =                $(HDF5_CFLAGS)
 ck_io_CPPFLAGS = $(AM_CPPFLAGS) $(HDF5_CPPFLAGS)
 ck_io_LDFLAGS  =                $(HDF5_LDFLAGS)
-
-TESTS = $(check_PROGRAMS)

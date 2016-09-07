@@ -15,5 +15,3 @@ ck_tpool_LDADD    = $(PTHREAD_LIBS) ../../api/c/libux.la
 ck_tpool_CFLAGS   = $(PTHREAD_CFLAGS)
 ck_tpool_CPPFLAGS = $(AM_CPPFLAGS) -DENFORCE_PTHREAD=1
 ck_tpool_LDFLAGS  =
-
-TESTS = $(check_PROGRAMS)

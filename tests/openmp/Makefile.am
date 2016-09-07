@@ -7,5 +7,3 @@ ck_atomic_parafor_LDADD    = ../../api/c/libux.la
 ck_atomic_parafor_CFLAGS   = $(OPENMP_CFLAGS)
 ck_atomic_parafor_CPPFLAGS = $(AM_CPPFLAGS) -DENFORCE_OPENMP=1
 ck_atomic_parafor_LDFLAGS  =
-
-TESTS = $(check_PROGRAMS)

@@ -13,5 +13,3 @@ ck_copy_SOURCES  = ck_copy.c ../../mod/opencl.h
 ck_copy_LDADD    =                $(OPENCL_LIBS) ../../api/c/libux.la
 ck_copy_CPPFLAGS = $(AM_CPPFLAGS) $(OPENCL_CPPFLAGS)
 ck_copy_LDFLAGS  =                $(OPENCL_LDFLAGS)
-
-TESTS = $(check_PROGRAMS)

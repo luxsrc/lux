@@ -31,11 +31,12 @@ main(int argc, char *argv[])
 
 	struct LuxOopencl opts  = OPENCL_NULL;
 	const  char      *src[] = {"dummy", NULL};
-	opts.src = src;
+	opts.base = main; /* this function to pin location */
+	opts.src  = src;
 
 	lux_setup(&argc, &argv);
 
-	ocl = lux_load("../../mod/opencl/.libs/opencl", &opts);
+	ocl = lux_load("../mod/opencl/.libs/opencl", &opts);
 	A(ocl);
 
 	lux_unload(ocl);
