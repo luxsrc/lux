@@ -29,6 +29,8 @@
 #include <lux/thread.h>
 #endif
 
+#include <stddef.h> /* for NULL */
+
 struct paratask {
 	void (*func)(size_t, size_t, void *);
 	void  *data;
