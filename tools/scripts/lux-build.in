@@ -19,9 +19,53 @@
 # You should have received a copy of the GNU General Public License
 # along with lux.  If not, see <http://www.gnu.org/licenses/>.
 
+#==============================================================================
+# Settings from `configure`
+#------------------------------------------------------------------------------
+# Installation paths
+prefix="@prefix@"
+exec_prefix="@exec_prefix@"
+bindir="@bindir@"
+includedir="@includedir@"
+libdir="@libdir@"
+
+# Compiler and standard flags
+CC="@CC@"
+CCLD="${CC}"
+DEFS="-DHAVE_CONFIG_H"
+DEFAULT_INCLUDES="-I. -I${includedir}"
+LIBS="@LIBS@"
+DEFAULT_RPATH="-rpath ${libdir}/lux"
+OBJEXT="@OBJEXT@"
+
+# Passed in by configure
+CFLAGS="@CFLAGS@"
+CPPFLAGS="@CPPFLAGS@"
+LDFLAGS="@LDFLAGS@"
+
+# Set in Makefile.am
+AM_CFLAGS=""
+AM_CPPFLAGS=""
+AM_LDFLAGS="-no-undefined -export-dynamic -module"
+
+# Helper programs
+LIBTOOL="${bindir}/lux-libtool"
+INSTALL="@INSTALL@"
+
+# Module specific part of the toolchain
+mod_CPPFLAGS="-DLUX_MOD_NAME=${mod%.la}"
+mod_LIBADD="${libdir}/libux.la"
+
+#==============================================================================
+# Helper functions
+#------------------------------------------------------------------------------
 function feature {
 	echo "Enabling lux feature \"${1}\" ..."
 	exit 1 # TODO: implement
+}
+
+function show {
+	echo "${1}=\"${!1}\""
 }
 
 function help {
@@ -29,31 +73,35 @@ function help {
 usage: ${0} SRC1.c SRC2.c ... [-f FEATURE] [-o OUTPUT/MOD.la] [-i INSTALL/DIR/]
 
 Build and stage/install a lux module with lux's settings.  FEATURE may be
-"pthread" (or "t"), "openmp" (or "omp"), "opencl" (or "cl'), "mpi", or
+"pthread" (or "pt"), "openmp" (or "omp"), "opencl" (or "cl'), "mpi", or
 "hdf5" (or "h5").
 
-  prefix="@prefix@"
-  exec_prefix="@exec_prefix@"
-  bindir="@bindir@"
-  includedir="@includedir@"
-  libdir="@libdir@"
+Lux settings from `configure` include:
 
-  OBJEXT="@OBJEXT@"
+  $(show prefix)
+  $(show exec_prefix)
+  $(show bindir)
+  $(show includedir)
+  $(show libdir)
 
-  CC="@CC@"
-  LIBS="@LIBS@"
-  CFLAGS="@CFLAGS@"
-  CPPFLAGS="@CPPFLAGS@"
-  LDFLAGS="@LDFLAGS@"
+  $(show OBJEXT)
 
-  AM_CFLAGS=""
-  AM_CPPFLAGS=""
-  AM_LDFLAGS="-no-undefined -export-dynamic -module"
+  $(show CC)
+  $(show LIBS)
+  $(show CFLAGS)
+  $(show CPPFLAGS)
+  $(show LDFLAGS)
+
+  $(show AM_CFLAGS)
+  $(show AM_CPPFLAGS)
+  $(show AM_LDFLAGS)
 EOF
 	exit 0
 }
 
 #==============================================================================
+# Main script
+#------------------------------------------------------------------------------
 # Set default installation directory
 dir="$PWD"
 
@@ -140,42 +188,7 @@ echo "Inline LD  flags: \"${ld[@]}\""
 echo "Output module name: \"$mod\""
 echo "Install directory:  \"$dir\""
 
-#==============================================================================
-# Installation paths
-prefix="@prefix@"
-exec_prefix="@exec_prefix@"
-bindir="@bindir@"
-includedir="@includedir@"
-libdir="@libdir@"
-
-# Compiler and standard flags
-CC="@CC@"
-CCLD="${CC}"
-DEFS="-DHAVE_CONFIG_H"
-DEFAULT_INCLUDES="-I. -I${includedir}"
-LIBS="@LIBS@"
-DEFAULT_RPATH="-rpath ${libdir}/lux"
-OBJEXT="@OBJEXT@"
-
-# Passed in by configure
-CFLAGS="@CFLAGS@"
-CPPFLAGS="@CPPFLAGS@"
-LDFLAGS="@LDFLAGS@"
-
-# Set in Makefile.am
-AM_CFLAGS=""
-AM_CPPFLAGS=""
-AM_LDFLAGS="-no-undefined -export-dynamic -module"
-
-# Helper programs
-LIBTOOL="${bindir}/lux-libtool"
-INSTALL="@INSTALL@"
-
-# Module specific part of the toolchain
-mod_CPPFLAGS="-DLUX_MOD_NAME=${mod%.la}"
-mod_LIBADD="${libdir}/libux.la"
-
-#==============================================================================
+#------------------------------------------------------------------------------
 # Compile the source file(s) to object(s)
 for s in "${src[@]}"; do
 	o="${s%c}lo"
@@ -194,7 +207,7 @@ for s in "${src[@]}"; do
 	obj+=("$o")
 done
 
-#==============================================================================
+#------------------------------------------------------------------------------
 # Link object(s) to the output module
 printf "Link object file "
 for i in "${!obj[@]}"; do
@@ -218,7 +231,7 @@ if test $status -ne 0; then
 	exit $status
 fi
 
-#==============================================================================
+#------------------------------------------------------------------------------
 # Stage/install output module to target directory
 echo "Install \"$mod\" to \"$dir\""
 mkdir -p "$dir"
