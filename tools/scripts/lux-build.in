@@ -56,6 +56,13 @@ INSTALL="@INSTALL@"
 mod_CPPFLAGS="-DLUX_MOD_NAME=${mod%.la}"
 mod_LIBADD="${libdir}/libux.la"
 
+# Automake conditions
+@USING_HDF5_TRUE@with_hdf5=yes
+@USING_MPI_TRUE@with_mpi=yes
+@USING_OPENCL_TRUE@with_opencl=yes
+@USING_OPENMP_TRUE@with_openmp=yes
+@USING_PTHREAD_TRUE@with_pthread=yes
+
 #==============================================================================
 # Helper functions
 #------------------------------------------------------------------------------
