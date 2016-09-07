@@ -63,6 +63,37 @@ mod_LIBADD="${libdir}/libux.la"
 @USING_OPENMP_TRUE@with_openmp=yes
 @USING_PTHREAD_TRUE@with_pthread=yes
 
+# Features
+PTHREAD_CC="@PTHREAD_CC@"
+PTHREAD_LIBS="@PTHREAD_LIBS@"
+PTHREAD_CFLAGS="@PTHREAD_CFLAGS@"
+#PTHREAD_CPPFLAGS="@PTHREAD_CPPFLAGS@"
+#PTHREAD_LDFLAGS="@PTHREAD_LDFLAGS@"
+
+#OPENMP_CC="@OPENMP_CC@"
+#OPENMP_LIBS="@OPENMP_LIBS@"
+OPENMP_CFLAGS="@OPENMP_CFLAGS@"
+#OPENMP_CPPFLAGS="@OPENMP_CPPFLAGS@"
+#OPENMP_LDFLAGS="@OPENMP_LDFLAGS@"
+
+#OPENCL_CC="@OPENCL_CC@"
+OPENCL_LIBS="@OPENCL_LIBS@"
+#OPENCL_CFLAGS="@OPENCL_CFLAGS@"
+OPENCL_CPPFLAGS="@OPENCL_CPPFLAGS@"
+OPENCL_LDFLAGS="@OPENCL_LDFLAGS@"
+
+MPI_CC="@MPI_CC@"
+MPI_LIBS="@MPI_LIBS@"
+MPI_CFLAGS="@MPI_CFLAGS@"
+MPI_CPPFLAGS="@MPI_CPPFLAGS@"
+MPI_LDFLAGS="@MPI_LDFLAGS@"
+
+HDF5_CC="@HDF5_CC@"
+HDF5_LIBS="@HDF5_LIBS@"
+HDF5_CFLAGS="@HDF5_CFLAGS@"
+HDF5_CPPFLAGS="@HDF5_CPPFLAGS@"
+HDF5_LDFLAGS="@HDF5_LDFLAGS@"
+
 #==============================================================================
 # Helper functions
 #------------------------------------------------------------------------------
@@ -83,18 +114,43 @@ function feature {
 	case "$1" in
 	"pthread" | "pt")
 		check "pthread"
+		CC="${PTHREAD_CC}"
+		LIBS="${PTHREAD_LIBS} ${LIBS}"
+		CFLAGS="${PTHREAD_CFLAGS} ${CFLAGS}"
+		#CPPFLAGS="${PTHREAD_CPPFLAGS} ${CPPFLAGS}"
+		#LDFLAGS="${PTHREAD_LDFLAGS} ${LDFLAGS}"
 		;;
 	"openmp" | "omp")
 		check "openmp"
+		#CC="${OPENMP_CC}"
+		#LIBS="${OPENMP_LIBS} ${LIBS}"
+		CFLAGS="${OPENMP_CFLAGS} ${CFLAGS}"
+		#CPPFLAGS="${OPENMP_CPPFLAGS} ${CPPFLAGS}"
+		#LDFLAGS="${OPENMP_LDFLAGS} ${LDFLAGS}"
 		;;
 	"opencl" | "cl")
 		check "opencl"
+		#CC="${OPENCL_CC}"
+		LIBS="${OPENCL_LIBS} ${LIBS}"
+		#CFLAGS="${OPENCL_CFLAGS} ${CFLAGS}"
+		CPPFLAGS="${OPENCL_CPPFLAGS} ${CPPFLAGS}"
+		LDFLAGS="${OPENCL_LDFLAGS} ${LDFLAGS}"
 		;;
 	"mpi")
 		check "mpi"
+		CC="${MPI_CC}"
+		LIBS="${MPI_LIBS} ${LIBS}"
+		CFLAGS="${MPI_CFLAGS} ${CFLAGS}"
+		CPPFLAGS="${MPI_CPPFLAGS} ${CPPFLAGS}"
+		LDFLAGS="${MPI_LDFLAGS} ${LDFLAGS}"
 		;;
 	"hdf5" | "h5")
 		check "hdf5"
+		CC="${HDF5_CC}"
+		LIBS="${HDF5_LIBS} ${LIBS}"
+		CFLAGS="${HDF5_CFLAGS} ${CFLAGS}"
+		CPPFLAGS="${HDF5_CPPFLAGS} ${CPPFLAGS}"
+		LDFLAGS="${HDF5_LDFLAGS} ${LDFLAGS}"
 		;;
 	*)
 		check "$1"
