@@ -66,13 +66,40 @@ mod_LIBADD="${libdir}/libux.la"
 #==============================================================================
 # Helper functions
 #------------------------------------------------------------------------------
-function feature {
-	echo "Enabling lux feature \"${1}\" ..."
-	exit 1 # TODO: implement
+function check {
+	wf="with_$1"
+	if test x"${!wf}" != x"yes"; then
+		echo 'not enabled; QUIT'
+		exit 1
+	fi
 }
 
 function show {
 	echo "${1}=\"${!1}\""
+}
+
+function feature {
+	printf "Enabling lux feature \"$1\"... "
+	case "$1" in
+	"pthread" | "pt")
+		check "pthread"
+		;;
+	"openmp" | "omp")
+		check "openmp"
+		;;
+	"opencl" | "cl")
+		check "opencl"
+		;;
+	"mpi")
+		check "mpi"
+		;;
+	"hdf5" | "h5")
+		check "hdf5"
+		;;
+	*)
+		check "$1"
+		;;
+	esac
 }
 
 function help {
