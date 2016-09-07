@@ -24,6 +24,12 @@
 #include <lux/parafor.h>
 #include <stdio.h>
 
+#if ENFORCE_PTHREAD && !LUX_THREAD
+#error Not using pthread while enforced; refuse to compile.
+#elif ENFORCE_OPENMP && !LUX_OPENMP
+#error Not using OpenMP while enforced; refuse to compile.
+#endif
+
 #define A(E) lux_always_assert(E)
 
 void
