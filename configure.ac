@@ -51,7 +51,7 @@ AX_LIB_OPENCL
 AM_CONDITIONAL(USING_OPENCL, [test "$with_opencl" = "yes"])
 
 dnl Check if we may use OpenMP
-AX_OPENMP([with_openmp=yes], [with_openmp=no])
+AX_OPENMP([with_openmp=yes; AC_SUBST([OPENMP_CFLAGS])], [with_openmp=no])
 AM_CONDITIONAL(USING_OPENMP, [test "$with_openmp" = "yes"])
 
 dnl Check if we may use pthread
