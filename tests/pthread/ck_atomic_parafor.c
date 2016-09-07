@@ -1,0 +1,1 @@
+../openmp/ck_atomic_parafor.c
