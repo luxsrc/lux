@@ -19,11 +19,18 @@
 # You should have received a copy of the GNU General Public License
 # along with lux.  If not, see <http://www.gnu.org/licenses/>.
 
+function feature {
+	echo "Enabling lux feature \"${1}\" ..."
+	exit 1 # TODO: implement
+}
+
 function help {
 	cat <<EOF
-usage: ${0} INPUT1.c INPUT2.c ... [-o OUTPUT/MOD.la] [-i INSTALL/DIR/]
+usage: ${0} SRC1.c SRC2.c ... [-f FEATURE] [-o OUTPUT/MOD.la] [-i INSTALL/DIR/]
 
-Build and stage/install a lux module with lux's settings:
+Build and stage/install a lux module with lux's settings.  FEATURE may be
+"pthread" (or "t"), "openmp" (or "omp"), "opencl" (or "cl'), "mpi", or
+"hdf5" (or "h5").
 
   prefix="@prefix@"
   exec_prefix="@exec_prefix@"
@@ -31,10 +38,10 @@ Build and stage/install a lux module with lux's settings:
   includedir="@includedir@"
   libdir="@libdir@"
 
-  CC="@CC@"
-  LIBS="@LIBS@"
   OBJEXT="@OBJEXT@"
 
+  CC="@CC@"
+  LIBS="@LIBS@"
   CFLAGS="@CFLAGS@"
   CPPFLAGS="@CPPFLAGS@"
   LDFLAGS="@LDFLAGS@"
@@ -52,15 +59,17 @@ dir="$PWD"
 
 # Separate the argument list "$@" into input array "$ina", output
 # module "$mod", and installation directory "$dir"
+kind=src
 while test "$#" -gt 0; do
 	a="$1"
 	shift
 	case "$a" in
-		"-h" | "--help")	help;;
-		"-o")	mod="$1";      shift;;
-		"-i")	dir="$1";      shift;;
-		"+i")	dir="$dir/$1"; shift;;
-		*)	ina+=("$a");;
+		"-f" | "--feature")	kind=feature;;
+		"-h" | "--help")	kind=src; help;;
+		"-o")	kind=src; mod="$1";      shift;;
+		"-i")	kind=src; dir="$1";      shift;;
+		"+i")	kind=src; dir="$dir/$1"; shift;;
+		*)	test "$kind" == "src" && ina+=("$a") || feature "$a";;
 	esac
 done
 
