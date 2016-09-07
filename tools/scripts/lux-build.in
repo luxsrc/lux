@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
 #
-# Copyright (C) 2009,2011 Chi-kwan Chan
+# Copyright (C) 2009,2011,2016 Chi-kwan Chan
 # Copyright (C) 2009 Harvard-Smithsonian Center for Astrophysics
 # Copyright (C) 2011 Nordic Institute for Theoretical Physics
+# Copyright (C) 2016 Steward Observatory
 #
 # This file is part of lux.
 #
@@ -107,7 +108,7 @@ function show {
 
 function feature {
 	printf "Enabling lux feature \"$1\"... "
-	case "$1" in
+	case "$1" in # TODO: always apply feature in a certain order
 	"pthread" | "pt")
 		check "pthread"
 		CC="${PTHREAD_CC}"
@@ -152,6 +153,7 @@ function feature {
 		check "$1"
 		;;
 	esac
+	echo 'DONE'
 }
 
 function help {
