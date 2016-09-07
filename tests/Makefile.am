@@ -1,10 +1,7 @@
 AM_CPPFLAGS = -I$(top_builddir)
 SUBDIRS =
 
-check_PROGRAMS = ck_atomic_parafor ck_cookie ck_dope ck_lazybuf ck_mpool ck_mview ck_parray ck_queue ck_ring ck_stack ck_typecode ck_ticks_timer
-
-ck_atomic_parafor_SOURCES = ck_atomic_parafor.c ../mod/atomic.h ../mod/parafor.h
-ck_atomic_parafor_LDADD   = ../api/c/libux.la
+check_PROGRAMS = ck_cookie ck_dope ck_lazybuf ck_mpool ck_mview ck_parray ck_queue ck_ring ck_stack ck_typecode ck_ticks_timer
 
 ck_cookie_SOURCES = ck_cookie.c ../mod/cookie.h
 ck_cookie_LDADD   = ../api/c/libux.la
@@ -41,6 +38,10 @@ ck_ticks_timer_LDADD   = ../api/c/libux.la
 
 if USING_PTHREAD
 SUBDIRS += pthread
+endif
+
+if USING_OPENMP
+SUBDIRS += openmp
 endif
 
 if USING_OPENCL
