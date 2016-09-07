@@ -26,7 +26,7 @@ if [ "x$1" != "xclean" ]; then
 
 		# Generate NEWS from git commit messages
 		printf 'lux framework NEWS\n\n' > NEWS
-		for t in $(git tag -l | tail -r); do
+		for t in $(git tag -l | sed '1!G;h;$!d'); do
 			T=$(echo "$t" | sed 's/^v//')
 			h="* Noteworthy changes in release ${T}"
 			git show -s --format="${h} (%ad)%n%n%b" \

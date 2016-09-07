@@ -303,29 +303,30 @@ fi
 # Print summary
 echo "================================================================"
 echo "Lux m4_esyscmd([tr -d '\n' < .version])"
-echo "----------------------------------------------------------------"
+echo "================================================================"
 echo "With HDF5     : $with_hdf5"
 test "$with_hdf5" = "yes" && cat << EOF
 	H5CC="$H5CC"
 	HDF5_CC="$HDF5_CC"
+	HDF5_LIBS="$HDF5_LIBS"
 	HDF5_CFLAGS="$HDF5_CFLAGS"
 	HDF5_CPPFLAGS="$HDF5_CPPFLAGS"
 	HDF5_LDFLAGS="$HDF5_LDFLAGS"
-	HDF5_LIBS="$HDF5_LIBS"
 EOF
 echo "----------------------------------------------------------------"
 echo "With MPI      : $with_mpi"
 test "$with_mpi" = "yes" && cat << EOF
 	MPICC="$MPICC"
 	MPI_CC="$MPI_CC"
+	MPI_LIBS="$MPI_LIBS"
 	MPI_CFLAGS="$MPI_CFLAGS"
 	MPI_CPPFLAGS="$MPI_CPPFLAGS"
 	MPI_LDFLAGS="$MPI_LDFLAGS"
-	MPI_LIBS="$MPI_LIBS"
 EOF
 echo "----------------------------------------------------------------"
 echo "With OpenCL   : $with_opencl"
 test "$with_opencl" = "yes" && cat << EOF
+	OPENCL_LIBS="$OPENCL_LIBS"
 	OPENCL_CPPFLAGS="$OPENCL_CPPFLAGS"
 	OPENCL_LDFLAGS="$OPENCL_LDFLAGS"
 EOF
@@ -338,20 +339,23 @@ echo "----------------------------------------------------------------"
 echo "With pthread  : $with_pthread"
 test "$with_pthread" = "yes" && cat << EOF
 	PTHREAD_CC="$PTHREAD_CC"
-	PTHREAD_CFLAGS="$PTHREAD_CFLAGS"
 	PTHREAD_LIBS="$PTHREAD_LIBS"
+	PTHREAD_CFLAGS="$PTHREAD_CFLAGS"
 EOF
 echo "----------------------------------------------------------------"
 echo "Combined flags:"
 cat << EOF
 	CC="$CC"
+	LIBS="$LIBS"
 	CFLAGS="$CFLAGS"
 	CPPFLAGS="$CPPFLAGS"
 	LDFLAGS="$LDFLAGS"
-	LIBS="$LIBS"
 EOF
+echo "================================================================"
+warned=no
 
 if test "$with_hdf5" = "yes"; then
+	warned=yes
 	if test $(basename "$H5CC") = "h5cc"; then
 		test "$CC" != "$HDF5_CC" && cat << EOF
 WARNING CC="$CC" != HDF5_CC="$HDF5_CC"
@@ -364,9 +368,12 @@ EOF
 fi
 
 if test "$with_mpi" = "yes"; then
+	warned=yes
 	test "$CC" != "$MPI_CC" && cat << EOF
 WARNING CC="$CC" != MPI_CC="$MPI_CC"
 EOF
 fi
 
+if test "$warned" = "yes"; then
 echo "================================================================"
+fi

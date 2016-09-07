@@ -21,8 +21,8 @@
 #define _MOD_H_
 
 #include <lux/mangle.h>
+#include <lux/opencl.h>
 #include <stdio.h> /* for sprintf() etc */
-#include "../opencl.h"
 
 #define PLF_COUNT 8  /* 3 bits */
 #define DEV_COUNT 32 /* 5 bits */
