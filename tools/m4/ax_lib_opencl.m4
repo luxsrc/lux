@@ -106,25 +106,56 @@ OPENCL_LDFLAGS=""
 OPENCL_LIBS=""
 
 dnl Determine compile/link flags
-if test "$with_opencl" = "yes"; then
+if test "$with_opencl" != "no"; then
 	dnl Determine if we are on Mac and need to compile/link OpenCL as Apple framework
 	AC_REQUIRE([AX_PROG_CC_FRAMEWORK])
-
 	if test "$ac_cv_prog_cc_framework" = "yes"; then
+		dnl Assume Mac
 		if test -n "$OPENCL_PREFIX"; then
 			OPENCL_CPPFLAGS="-F${OPENCL_PREFIX}"
 			OPENCL_LDFLAGS="-F${OPENCL_PREFIX} -framework OpenCL"
 		else
 			OPENCL_LDFLAGS="-framework OpenCL"
 		fi
+		AC_MSG_RESULT([assumed yes with "framework" support])
 	else
+		dnl Assume Unix
 		if test -n "$OPENCL_PREFIX"; then
 			OPENCL_CPPFLAGS="-I${OPENCL_PREFIX}/include"
 			OPENCL_LDFLAGS="-L${OPENCL_PREFIX}/lib64 -L${OPENCL_PREFIX}/lib"
 		fi
-		OPENCL_LIBS="OpenCL"
-	fi
+		OPENCL_LIBS="-lOpenCL"
 
+		# Check header and library
+		AC_LANG_PUSH([C])
+
+			ax_lib_opencl_save_CPPFLAGS=$CPPFLAGS
+			ax_lib_opencl_save_LDFLAGS=$LDFLAGS
+			ax_lib_opencl_save_LIBS=$LIBS
+
+			CPPFLAGS+=$OPENCL_CPPFLAGS
+			LDFLAGS+=$OPENCL_LDFLAGS
+			LIBS+=$OPENCL_LIBS
+
+			ac_cv_opencl_h=no # be overridden if one of the OpenCL headers is found
+			AC_CHECK_HEADERS([OpenCL/opencl.h CL/opencl.h], [ac_cv_opencl_h=yes])
+			AC_CHECK_LIB([OpenCL], [clCreateContext], [ac_cv_libopencl=yes], [ac_cv_libopencl=no])
+
+			CPPFLAGS=$ax_lib_opencl_save_CPPFLAGS
+			LDFLAGS=$ax_lib_opencl_save_LDFLAGS
+			LIBS=$ax_lib_opencl_save_LIBS
+
+		AC_LANG_POP([C])
+
+		if test "$ac_cv_opencl_h" = "no" || test "$ac_cv_libopencl" = "no" ; then
+			AC_MSG_WARN([Unable to find a working OpenCL library])
+			with_opencl=no
+		fi
+	fi
+fi
+
+dnl Submit flags
+if test "$with_opencl" != "no"; then
 	dnl Define variables
 	AC_SUBST([OPENCL_CPPFLAGS])
 	AC_SUBST([OPENCL_LDFLAGS])

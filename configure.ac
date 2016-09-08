@@ -355,21 +355,19 @@ echo "================================================================"
 warned=no
 
 if test "$with_hdf5" = "yes"; then
-	warned=yes
 	if test $(basename "$H5CC") = "h5cc"; then
-		test "$CC" != "$HDF5_CC" && cat << EOF
+		test "$CC" != "$HDF5_CC" && warned=yes && cat << EOF
 WARNING CC="$CC" != HDF5_CC="$HDF5_CC"
 EOF
 	else
-		test "$MPICC" != "$HDF5_CC" && cat << EOF
+		test "$MPICC" != "$HDF5_CC" && warned=yes && cat << EOF
 WARNING MPICC="$MPICC" != HDF5_CC="$HDF5_CC"
 EOF
 	fi
 fi
 
 if test "$with_mpi" = "yes"; then
-	warned=yes
-	test "$CC" != "$MPI_CC" && cat << EOF
+	test "$CC" != "$MPI_CC" && warned=yes && cat << EOF
 WARNING CC="$CC" != MPI_CC="$MPI_CC"
 EOF
 fi
