@@ -96,8 +96,17 @@ cleanup0:
 static void
 close(Lux_file *ego)
 {
-	(void)H5Pclose(EGO->lcpl);
-	(void)H5Fclose(EGO->fid);
+	herr_t status;
+	status = H5Pclose(EGO->lcpl);
+	if(status < 0)
+		lux_error("Failed to close link creation property list %p [%d]\n",
+		          EGO->lcpl, status);
+
+	status = H5Fclose(EGO->fid);
+	if(status < 0)
+		lux_error("Failed to close file or group identifier %p [%d]\n",
+		          EGO->fid, status);
+
 	free(ego);
 }
 
