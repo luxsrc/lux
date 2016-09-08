@@ -29,19 +29,18 @@
 
 #define EGO ((Lux_hdf5 *)ego)
 
-#define set_d_ns(T) do {                   \
-	int i;                             \
-	d  = pgetd((T *)pa);               \
-	ns = malloc(sizeof(hsize_t) * d);  \
-	for(i = 0; i < d; ++i)             \
-		ns[i] = pgetn((T *)pa, i); \
+#define set_d_ns(T) do {                           \
+	int i;                                     \
+	d  = pgetd((T *)pa);                       \
+	ns = malloc(sizeof(hsize_t) * d);          \
+	if(ns)                                     \
+		for(i = 0; i < d; ++i)             \
+			ns[i] = pgetn((T *)pa, i); \
 } while(0)
 
 static inline hid_t
 getdims(int tc, const void *pa)
 {
-	hid_t dims;
-
 	int      d;
 	hsize_t *ns;
 	switch(tc >> LUX_CHAR_BIT) {
@@ -51,10 +50,14 @@ getdims(int tc, const void *pa)
 	case 64: set_d_ns(int64_t); break;
 	default: return -1;         break;
 	}
-	dims = H5Screate_simple(d, ns, NULL);
-	free(ns);
 
-	return dims;
+	if(ns) {
+		hid_t dims = H5Screate_simple(d, ns, NULL);
+		free(ns);
+		return dims;
+	} else
+		return -1; /* follow HDF5 convention to use negative
+		              value for error */
 }
 
 static inline void *
