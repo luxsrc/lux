@@ -125,26 +125,26 @@
 	pallocdn(T, _d_, _n_);        \
 })
 
-#define pallocdn(T, D, Ns) ({                          \
-	size_t _i_, _c_, _o_, *_p_;                    \
-	lux_aver(D <= DOPE_D_MAX);                     \
-	for(_i_ = 0, _c_ = 1; _i_ < D; ++_i_) {        \
-		lux_assert(Ns[_i_] <= DOPE_N_MAX);     \
-		_c_ *= Ns[_i_];                        \
-	}                                              \
-	_o_ = OFFSETOF(T, D);                          \
-	_p_ = malloc(_o_ + sizeof(T) * _c_);           \
-	if(_p_)                                        \
-		for(_i_ = 0; _i_ < D; ++_i_)           \
-			_p_[_i_] = PKDN(_i_, Ns[_i_]); \
-	(T *)((char *)_p_ + (_p_ ? _o_ : 0));          \
+#define pallocdn(T, D, Ns) ({                                    \
+	size_t _i_, _c_, _o_, *_p_;                              \
+	lux_aver(0 < (size_t)(D) && (size_t)(D) <= DOPE_D_MAX);  \
+	for(_i_ = 0, _c_ = 1; _i_ < (size_t)(D); ++_i_) {        \
+		lux_assert((Ns)[_i_] <= DOPE_N_MAX);             \
+		_c_ *= (size_t)(Ns)[_i_];                        \
+	}                                                        \
+	_o_ = OFFSETOF(T, D);                                    \
+	_p_ = malloc(_o_ + sizeof(T) * _c_);                     \
+	if(_p_)                                                  \
+		for(_i_ = 0; _i_ < (size_t)(D); ++_i_)           \
+			_p_[_i_] = PKDN(_i_, (size_t)(Ns)[_i_]); \
+	(T *)((char *)_p_ + (_p_ ? _o_ : 0));                    \
 })
 
 #define pfree(P) free(HEADEROF(P, pgetd(P)))
 
 #define pgetd(P) (GETD(HEADEROF(P, 1)[0])+1)
 
-#define pgetn(P, J) ({	           \
+#define pgetn(P, J) ({             \
 	size_t _d_ = pgetd(P);     \
 	lux_assert(J < _d_);       \
 	GETN(HEADEROF(P, _d_)[J]); \
