@@ -140,20 +140,46 @@ write_pa(Lux_file *ego, const char *key, int tc, const void *pa)
 static void *
 read_pa(Lux_file *ego, const char *key)
 {
-	hid_t dset, dims, type;
-	void *pa;
+	void  *pa = NULL;
+	hid_t  dset, dims, type;
+	herr_t status;
 
 	dset = H5Dopen(EGO->fid, key, H5P_DEFAULT);
+	if(dset < 0)
+		goto cleanup0;
+
 	dims = H5Dget_space(dset);
+	if(dset < 0)
+		goto cleanup1;
+
 	type = H5Dget_type(dset);
+	if(type < 0)
+		goto cleanup2;
 
 	pa = mkpa(H5Tget_size(type) * LUX_CHAR_BIT, dims);
-	(void)H5Dread(dset, type, dims, dims, H5P_DEFAULT, pa);
+	if(!pa)
+		goto cleanup3;
 
-	(void)H5Tclose(type);
-	(void)H5Sclose(dims);
-	(void)H5Dclose(dset);
+	status = H5Dread(dset, type, dims, dims, H5P_DEFAULT, pa);
+	if(status < 0) {
+		lux_error("Failed to read data set [%s]\n", status);
+		free(pa);
+		goto cleanup0;
+	}
 
+cleanup3:
+	status = H5Tclose(type);
+	if(status < 0)
+		lux_error("Failed to close type %p [%s]\n", type, status);
+cleanup2:
+	status = H5Sclose(dims);
+	if(status < 0)
+		lux_error("Failed to close space %p [%s]\n", dims, status);
+cleanup1:
+	status = H5Dclose(dset);
+	if(status < 0)
+		lux_error("Failed to close data set %p [%s]\n", dset, status);
+cleanup0:
 	return pa;
 }
 
