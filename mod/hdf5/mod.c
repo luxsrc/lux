@@ -29,7 +29,7 @@
 
 #define EGO ((Lux_hdf5 *)ego)
 
-#define set_d_ns(T) do {                           \
+#define setdns(T) do {                           \
 	int i;                                     \
 	d  = pgetd((T *)pa);                       \
 	ns = malloc(sizeof(hsize_t) * d);          \
@@ -39,16 +39,16 @@
 } while(0)
 
 static inline hid_t
-getdims(int tc, const void *pa)
+mkdims(int tc, const void *pa)
 {
 	int      d;
 	hsize_t *ns;
 	switch(tc >> LUX_CHAR_BIT) {
-	case  8: set_d_ns(int8_t);  break;
-	case 16: set_d_ns(int16_t); break;
-	case 32: set_d_ns(int32_t); break;
-	case 64: set_d_ns(int64_t); break;
-	default: return -1;         break;
+	case  8: setdns(int8_t);  break;
+	case 16: setdns(int16_t); break;
+	case 32: setdns(int32_t); break;
+	case 64: setdns(int64_t); break;
+	default: return -1;       break;
 	}
 
 	if(ns) {
@@ -104,7 +104,7 @@ write_pa(Lux_file *ego, const char *key, int tc, const void *pa)
 	hid_t type, dims, dset;
 
 	type = h5t_from_tc(tc);
-	dims = getdims(tc, pa);
+	dims = mkdims(tc, pa);
 
 	dset = H5Dcreate(EGO->fid, key, type, dims,
 	                 EGO->lcpl, H5P_DEFAULT, H5P_DEFAULT);
