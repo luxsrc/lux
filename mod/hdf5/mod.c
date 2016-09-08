@@ -61,32 +61,35 @@ mkdims(int tc, const void *pa)
 }
 
 static inline void *
-getpa(int nbits, hid_t dims)
+mkpa(int nbits, hid_t dims)
 {
-	void *pa;
+	void    *pa = NULL;
+	int      d1, d2;
+	hsize_t *ns;
 
-	size_t   d  = H5Sget_simple_extent_ndims(dims);
-	hsize_t *ns = malloc(sizeof(hsize_t) * d);
-	size_t  *Ns = malloc(sizeof(size_t)  * d);
+	d1 = H5Sget_simple_extent_ndims(dims);
+	if(d1 <= 0)
+		goto cleanup0;
 
-	(void)H5Sget_simple_extent_dims(dims, ns, NULL);
-	do {
-		size_t i;
-		for(i = 0; i < d; ++i)
-			Ns[i] = ns[i];
-	} while(0);
+	ns = (hsize_t *)malloc(sizeof(hsize_t) * d1);
+	if(!ns)
+		goto cleanup0;
+
+	d2 = H5Sget_simple_extent_dims(dims, ns, NULL);
+	if(d2 <= 0 || d2 != d1)
+		goto cleanup1;
 
 	switch(nbits) {
-	case  8: pa = pallocdn(int8_t,  d, Ns); break;
-	case 16: pa = pallocdn(int16_t, d, Ns); break;
-	case 32: pa = pallocdn(int32_t, d, Ns); break;
-	case 64: pa = pallocdn(int64_t, d, Ns); break;
-	default: pa = NULL;                     break;
+	case  8: pa = pallocdn(int8_t,  d2, ns); break;
+	case 16: pa = pallocdn(int16_t, d2, ns); break;
+	case 32: pa = pallocdn(int32_t, d2, ns); break;
+	case 64: pa = pallocdn(int64_t, d2, ns); break;
+	default: pa = NULL;                      break;
 	}
 
-	free(Ns);
+cleanup1:
 	free(ns);
-
+cleanup0:
 	return pa;
 }
 
@@ -125,7 +128,7 @@ read_pa(Lux_file *ego, const char *key)
 	dims = H5Dget_space(dset);
 	type = H5Dget_type(dset);
 
-	pa = getpa(H5Tget_size(type) * LUX_CHAR_BIT, dims);
+	pa = mkpa(H5Tget_size(type) * LUX_CHAR_BIT, dims);
 	(void)H5Dread(dset, type, dims, dims, H5P_DEFAULT, pa);
 
 	(void)H5Tclose(type);
