@@ -187,6 +187,7 @@ Lux_file *
 LUX_MOD(const char *fname, unsigned flags)
 {
 	Lux_file *ego = NULL;
+	herr_t    status;
 
 	ego = (Lux_file *)malloc(sizeof(Lux_hdf5));
 	if(!ego)
@@ -202,13 +203,23 @@ LUX_MOD(const char *fname, unsigned flags)
 		goto cleanup2;
 
 	EGO->lcpl = H5Pcreate(H5P_LINK_CREATE);
-	H5Pset_create_intermediate_group(EGO->lcpl, 1);
+	if(EGO->lcpl < 0)
+		goto cleanup2;
+
+	status = H5Pset_create_intermediate_group(EGO->lcpl, 1);
+	if(status < 0)
+		goto cleanup3;
 
 	ego->close    = close;
 	ego->write_pa = write_pa;
 	ego->read_pa  = read_pa;
 	return ego;
 
+cleanup3:
+	status = H5Pclose(EGO->lcpl);
+	if(status < 0)
+		lux_error("Failed to close link creation property list %p [%d]\n",
+		          EGO->lcpl, status);
 cleanup2:
 	free(ego);
 cleanup1:
