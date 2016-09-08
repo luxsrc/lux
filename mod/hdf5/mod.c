@@ -113,18 +113,28 @@ close(Lux_file *ego)
 static void
 write_pa(Lux_file *ego, const char *key, int tc, const void *pa)
 {
-	hid_t type, dims, dset;
+	hid_t  type, dims, dset;
+	herr_t status;
 
 	type = h5t_from_tc(tc);
 	dims = mkdims(tc, pa);
 
 	dset = H5Dcreate(EGO->fid, key, type, dims,
 	                 EGO->lcpl, H5P_DEFAULT, H5P_DEFAULT);
+	if(dset < 0)
+		lux_error("Failed to create data set\n");
 
-	(void)H5Dwrite(dset, type, H5S_ALL, H5S_ALL, H5P_DEFAULT, pa);
+	status = H5Dwrite(dset, type, H5S_ALL, H5S_ALL, H5P_DEFAULT, pa);
+	if(status < 0)
+		lux_error("Failed to write data set [%d]\n", status);
 
-	(void)H5Dclose(dset);
-	(void)H5Sclose(dims);
+	status = H5Dclose(dset);
+	if(status < 0)
+		lux_error("Failed to close data set [%d]\n", status);
+
+	status = H5Sclose(dims);
+	if(status < 0)
+		lux_error("Failed to close dimensions [%d]\n", status);
 }
 
 static void *
