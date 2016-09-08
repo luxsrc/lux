@@ -173,10 +173,7 @@ MPI support is being disabled (equivalent to --with-mpi=no).
 			LIBS=$MPI_LIBS
 
 			AC_CHECK_HEADER([mpi.h], [ac_cv_mpi_h=yes], [ac_cv_mpi_h=no])
-			AC_CHECK_LIB([mpi], [MPI_Init], [ac_cv_libmpi=yes], [ac_cv_libmpi=no])
-			if test "$ac_cv_mpi_h" = "no" || test "$ac_cv_libmpi" = "no" ; then
-				AC_MSG_WARN([Unable to compile MPI test program])
-			fi
+			AC_SEARCH_LIBS([MPI_Init], [], [ac_cv_libmpi=yes], [ac_cv_libmpi=no])
 
 			CC=$ax_lib_mpi_save_CC
 			CFLAGS=$ax_lib_mpi_save_CFLAGS
@@ -186,13 +183,21 @@ MPI support is being disabled (equivalent to --with-mpi=no).
 
 		AC_LANG_POP([C])
 
-		# Define variables
-		AC_SUBST([MPI_CC])
-		AC_SUBST([MPI_CFLAGS])
-		AC_SUBST([MPI_CPPFLAGS])
-		AC_SUBST([MPI_LDFLAGS])
-		AC_SUBST([MPI_LIBS])
-		AC_DEFINE([HAVE_MPI], [1], [Defined if you have MPI support])
+		if test "$ac_cv_mpi_h" = "no" || test "$ac_cv_libmpi" = "no" ; then
+			AC_MSG_WARN([Unable to find a working MPI library])
+			with_mpi=no
+		fi
 	fi
+fi
+
+dnl Submit flags
+if test "$with_mpi" != "no"; then
+	dnl Define variables
+	AC_SUBST([MPI_CC])
+	AC_SUBST([MPI_CFLAGS])
+	AC_SUBST([MPI_CPPFLAGS])
+	AC_SUBST([MPI_LDFLAGS])
+	AC_SUBST([MPI_LIBS])
+	AC_DEFINE([HAVE_MPI], [1], [Defined if you have MPI support])
 fi
 ])
