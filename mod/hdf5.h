@@ -47,6 +47,7 @@ h5t_from_tc(int tc)
 		CASE(sz == sizeof(long))        return H5T_NATIVE_LONG;
 		CASE(sz == sizeof(long long))   return H5T_NATIVE_LLONG;
 		}
+		break;
 	case 'u':
 		SWITCH {
 		CASE(sz == sizeof(char))        return H5T_NATIVE_UCHAR;
@@ -55,12 +56,14 @@ h5t_from_tc(int tc)
 		CASE(sz == sizeof(long))        return H5T_NATIVE_ULONG;
 		CASE(sz == sizeof(long long))   return H5T_NATIVE_ULLONG;
 		}
+		break;
 	case 'f':
 		SWITCH {
 		CASE(sz == sizeof(float))       return H5T_NATIVE_FLOAT;
 		CASE(sz == sizeof(double))      return H5T_NATIVE_DOUBLE;
 		CASE(sz == sizeof(long double)) return H5T_NATIVE_LDOUBLE;
 		}
+		break;
 	};
 
 	return -1;
