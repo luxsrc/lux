@@ -31,3 +31,20 @@
 		for(i = 0; i < d; ++i)             \
 			ns[i] = pgetn((T *)pa, i); \
 } while(0)
+
+#define check(f, ...) do {	                              \
+	herr_t status;                                        \
+	status = H5##f(__VA_ARGS__);                          \
+	if(status < 0)                                        \
+		lux_error(LUX_STRING(H5##f) " failed (%d)\n", \
+		          status);                            \
+} while(0)
+
+#define safe(f, ...) ({                                       \
+	hid_t r;                                              \
+	r = H5##f(__VA_ARGS__);                               \
+	if(r < 0)                                             \
+		lux_error(LUX_STRING(H5##f) " failed (%d)\n", \
+		          r);                                 \
+	r;                                                    \
+})

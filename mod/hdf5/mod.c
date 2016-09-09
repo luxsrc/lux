@@ -42,7 +42,7 @@ mkdims(int tc, const void *pa)
 	}
 
 	if(ns) {
-		hid_t dims = H5Screate_simple(d, ns, NULL);
+		hid_t dims = safe(Screate_simple, d, ns, NULL);
 		free(ns);
 		return dims;
 	} else
@@ -57,7 +57,7 @@ mkpa(int nbits, hid_t dims)
 	int      d1, d2;
 	hsize_t *ns;
 
-	d1 = H5Sget_simple_extent_ndims(dims);
+	d1 = safe(Sget_simple_extent_ndims, dims);
 	if(d1 <= 0)
 		goto cleanup0;
 
@@ -65,7 +65,7 @@ mkpa(int nbits, hid_t dims)
 	if(!ns)
 		goto cleanup0;
 
-	d2 = H5Sget_simple_extent_dims(dims, ns, NULL);
+	d2 = safe(Sget_simple_extent_dims, dims, ns, NULL);
 	if(d2 <= 0 || d2 != d1)
 		goto cleanup1;
 
@@ -86,45 +86,24 @@ cleanup0:
 static void
 close(Lux_file *ego)
 {
-	herr_t status;
-	status = H5Pclose(EGO->lcpl);
-	if(status < 0)
-		lux_error("Failed to close link creation property list %p [%d]\n",
-		          EGO->lcpl, status);
-
-	status = H5Fclose(EGO->fid);
-	if(status < 0)
-		lux_error("Failed to close file or group identifier %p [%d]\n",
-		          EGO->fid, status);
-
+	check(Pclose, EGO->lcpl);
+	check(Fclose, EGO->fid);
 	free(ego);
 }
 
 static void
 write_pa(Lux_file *ego, const char *key, int tc, const void *pa)
 {
-	hid_t  type, dims, dset;
-	herr_t status;
+	hid_t type, dims, dset;
 
 	type = h5t_from_tc(tc);
 	dims = mkdims(tc, pa);
+	dset = safe(Dcreate, EGO->fid, key, type, dims,
+	                     EGO->lcpl, H5P_DEFAULT, H5P_DEFAULT);
 
-	dset = H5Dcreate(EGO->fid, key, type, dims,
-	                 EGO->lcpl, H5P_DEFAULT, H5P_DEFAULT);
-	if(dset < 0)
-		lux_error("Failed to create data set\n");
-
-	status = H5Dwrite(dset, type, H5S_ALL, H5S_ALL, H5P_DEFAULT, pa);
-	if(status < 0)
-		lux_error("Failed to write data set [%d]\n", status);
-
-	status = H5Dclose(dset);
-	if(status < 0)
-		lux_error("Failed to close data set [%d]\n", status);
-
-	status = H5Sclose(dims);
-	if(status < 0)
-		lux_error("Failed to close dimensions [%d]\n", status);
+	check(Dwrite, dset, type, H5S_ALL, H5S_ALL, H5P_DEFAULT, pa);
+	check(Dclose, dset);
+	check(Sclose, dims);
 }
 
 static void *
@@ -134,15 +113,15 @@ read_pa(Lux_file *ego, const char *key)
 	hid_t  dset, dims, type;
 	herr_t status;
 
-	dset = H5Dopen(EGO->fid, key, H5P_DEFAULT);
+	dset = safe(Dopen, EGO->fid, key, H5P_DEFAULT);
 	if(dset < 0)
 		goto cleanup0;
 
-	dims = H5Dget_space(dset);
+	dims = safe(Dget_space, dset);
 	if(dset < 0)
 		goto cleanup1;
 
-	type = H5Dget_type(dset);
+	type = safe(Dget_type, dset);
 	if(type < 0)
 		goto cleanup2;
 
@@ -158,17 +137,11 @@ read_pa(Lux_file *ego, const char *key)
 	}
 
 cleanup3:
-	status = H5Tclose(type);
-	if(status < 0)
-		lux_error("Failed to close type %p [%s]\n", type, status);
+	check(Tclose, type);
 cleanup2:
-	status = H5Sclose(dims);
-	if(status < 0)
-		lux_error("Failed to close space %p [%s]\n", dims, status);
+	check(Sclose, dims);
 cleanup1:
-	status = H5Dclose(dset);
-	if(status < 0)
-		lux_error("Failed to close data set %p [%s]\n", dset, status);
+	check(Dclose, dset);
 cleanup0:
 	return pa;
 }
@@ -185,18 +158,18 @@ LUX_MOD(const char *fname, unsigned flags)
 
 	SWITCH {
 	CASE(flags == H5F_ACC_EXCL || flags == H5F_ACC_TRUNC)
-		EGO->fid = H5Fcreate(fname, flags, H5P_DEFAULT, H5P_DEFAULT);
+		EGO->fid = safe(Fcreate, fname, flags, H5P_DEFAULT, H5P_DEFAULT);
 	CASE(flags == H5F_ACC_RDONLY || flags == H5F_ACC_RDWR)
-		EGO->fid = H5Fopen(fname, flags, H5P_DEFAULT);
+		EGO->fid = safe(Fopen, fname, flags, H5P_DEFAULT);
 	}
 	if(EGO->fid < 0)
 		goto cleanup2;
 
-	EGO->lcpl = H5Pcreate(H5P_LINK_CREATE);
+	EGO->lcpl = safe(Pcreate, H5P_LINK_CREATE);
 	if(EGO->lcpl < 0)
 		goto cleanup2;
 
-	status = H5Pset_create_intermediate_group(EGO->lcpl, 1);
+	status = safe(Pset_create_intermediate_group, EGO->lcpl, 1);
 	if(status < 0)
 		goto cleanup3;
 
@@ -206,10 +179,7 @@ LUX_MOD(const char *fname, unsigned flags)
 	return ego;
 
 cleanup3:
-	status = H5Pclose(EGO->lcpl);
-	if(status < 0)
-		lux_error("Failed to close link creation property list %p [%d]\n",
-		          EGO->lcpl, status);
+	check(Pclose, EGO->lcpl);
 cleanup2:
 	free(ego);
 cleanup1:
