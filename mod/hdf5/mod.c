@@ -18,25 +18,15 @@
  * along with lux.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include <lux.h>
-#include <lux/mangle.h>
-#include <lux/file.h>
-#include <lux/hdf5.h>
-#include <lux/io.h>
 #include <lux/parray.h>
 #include <lux/switch.h>
+
 #include <stdlib.h> /* for malloc(), free(), and NULL */
 #include <stdint.h> /* for int8_t, int16_t, ... */
 
-#define EGO ((Lux_hdf5 *)ego)
+#include "mod.h"
 
-#define setdns(T) do {                           \
-	int i;                                     \
-	d  = pgetd((T *)pa);                       \
-	ns = malloc(sizeof(hsize_t) * d);          \
-	if(ns)                                     \
-		for(i = 0; i < d; ++i)             \
-			ns[i] = pgetn((T *)pa, i); \
-} while(0)
+#define EGO ((Lux_hdf5 *)ego)
 
 static inline hid_t
 mkdims(int tc, const void *pa)
