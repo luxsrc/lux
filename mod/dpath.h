@@ -69,7 +69,7 @@ dpath(const char *name)
 	return mod;
 }
 
-static inline const char *
+static inline char *
 dsubmods(const char *path)
 /* List submoduels that can be loaded by lux_load() */
 {
