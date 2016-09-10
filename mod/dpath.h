@@ -25,14 +25,14 @@
 #include <sys/stat.h>
 #include <dirent.h>
 
-static int
+static inline int
 isdir(const char *path)
 {
 	struct stat s;
 	return stat(path, &s) ? 0 : S_ISDIR(s.st_mode);
 }
 
-static const char *
+static inline const char *
 dpath(const char *name)
 /* Given a module name "name", construct a colon seperated string of
    submodule names that can be load by lux_load() */
@@ -69,7 +69,7 @@ dpath(const char *name)
 	return mod;
 }
 
-static const char *
+static inline const char *
 dsubmods(const char *path)
 /* List submoduels that can be loaded by lux_load() */
 {
