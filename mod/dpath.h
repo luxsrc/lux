@@ -23,6 +23,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <sys/stat.h>
+#include <dirent.h>
 
 static int
 isdir(const char *path)
@@ -66,6 +67,34 @@ dpath(const char *name)
 		free(paths);
 	}
 	return mod;
+}
+
+static const char *
+dsubmods(const char *path)
+/* List submoduels that can be loaded by lux_load() */
+{
+	size_t sz   = 0;
+	char  *mods = NULL;
+
+	DIR *d = opendir(path); /* assume path is valid dir */
+
+	struct dirent *e;
+	while((e = readdir(d))) {
+		int slen = (int)strlen(e->d_name) - 3;
+		if(slen >= 0 && !strcmp(e->d_name + slen, ".la")) {
+			size_t newsz = sz + slen + 1;
+			mods = realloc(mods, newsz);
+			if(sz && mods)
+				mods[sz-1] = ':';
+			(void)memcpy(mods + sz, e->d_name, slen);
+			mods[newsz-1] = '\0';
+			sz = newsz;
+		}
+	}
+
+	closedir(d);
+
+	return mods;
 }
 
 #endif /* _LUX_DMOD_H_ */
