@@ -28,7 +28,7 @@ pkginclude_HEADERS += dope.h htab.h libux.h mpool.h mview.h tpool.h vlog.h
 pkginclude_HEADERS += measure.h planner.h solution.h solver.h task.h
 
 # Dynamic-module
-pkginclude_HEADERS += dlib.h dltry.h dmod.h load.h
+pkginclude_HEADERS += dlib.h dltry.h dmod.h dpath.h load.h
 
 #==============================================================================
 # Numerical analysis
