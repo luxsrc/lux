@@ -1,0 +1,135 @@
+#!/usr/bin/env bash
+#
+# Copyright (C) 2016 Chi-kwan Chan
+# Copyright (C) 2016 Steward Observatory
+#
+# This file is part of lux.
+#
+# lux is free software: you can redistribute it and/or modify it under
+# the terms of the GNU General Public License as published by the Free
+# Software Foundation, either version 3 of the License, or (at your
+# option) any later version.
+#
+# lux is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+# or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public
+# License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with lux.  If not, see <http://www.gnu.org/licenses/>.
+
+#==============================================================================
+# Print usage
+
+if test "$#" -eq 0 || test "x$1" == "x-h"; then
+	echo "usage: $0 input.rap"
+	exit 0
+fi
+
+#==============================================================================
+# Parse input and output file names
+
+rap="${1%.rap}" # always remove extension
+in="${rap}.rap" # ensure ".rap" extension for input
+out="${rap}.h"   # output file name
+
+printf "lux-rapgen: \"${in}\" -> \"${out}\"... "
+
+#==============================================================================
+# Parse input file
+
+parse() {
+	NAME=$1
+
+	SRC=$(grep ${NAME} ${in} | cut -f2)
+	DECLARE=
+	TYPES=
+	ARGS=
+	while read l; do
+		if test -z "$l"; then continue; fi # skip empty line
+		type="${l%% *}"
+		vars="${l#* }"
+		while read pv; do
+			v=$(echo "${pv}" | sed 's|\*||g') # non-pointer part
+			p="${pv: :-${#v}}"; if ! test -z "$p"; then p=" $p"; fi
+			TYPES="${TYPES}, ${type}${p}"
+			ARGS="${ARGS}, ${v}"
+		done < <(echo "$vars" | tr ',' '\n')
+	done < <(echo "$SRC" | tr ';' '\n')
+
+	eval DECLARE_${NAME}=\"${SRC}\"
+	eval TYPES_${NAME}=\"${TYPES}\"
+	eval ARGS_${NAME}=\"${ARGS}\"
+}
+
+parse XSPEC
+parse ISPEC
+parse PARAMS
+parse STATES
+
+#==============================================================================
+# Define the necessary c-struct's
+
+cat <<EOF > "${out}"
+/* ${out}.  Generated from ${rap}.rap by lux-rapgen.  */
+
+#ifndef _${rap^^}_H_
+#define _${rap^^}_H_ 1
+
+typedef struct LuxS${rap}_prob Lux_${rap}_prob;
+typedef struct LuxS${rap}_algo Lux_${rap}_algo;
+typedef struct LuxS${rap}_task Lux_${rap}_task;
+
+struct LuxS${rap}_prob {
+	/* \`xspec\` is external (input) specifications, which hold anything
+	   needed by the algorithm that would affect the performance (e.g.,
+	   array stride) */
+	$DECLARE_XSPEC
+
+	/* \`params\` are input parameters that would not affect performance
+	   (e.g., alpha in BLAS) */
+	$DECLARE_PARAMS
+
+	/* \`ro\`, \`rw\`, and \`wo\` are pointers to the read-only, read-write,
+	   and write-only storage data structures for input and/or output */
+	$DECLARE_STATES
+};
+
+struct LuxS${rap}_algo {
+	int apply(Lux_${rap}_algo *${TYPES_PARAMS}${TYPES_STATES});
+
+	/* \`xspec\` is external (input) specifications, which hold anything
+	   needed by the algorithm that would affect the performance (e.g.,
+	   array stride) */
+	$DECLARE_XSPEC
+
+	/* \`ispec\` is internal (derived) specifications, which hold anything
+	   needed by the algorithm that would affect the performance (e.g.,
+	   twiddle factors for FFT, pointers to codelets) */
+	$DECLARE_ISPEC
+};
+
+struct LuxS${rap}_task {
+	Lux_task super;
+	Lux_${rap}_algo *algo;
+
+	/* \`params\` are input parameters that would not affect performance
+	   (e.g., alpha in BLAS) */
+	$DECLARE_PARAMS
+
+	/* \`ro\`, \`rw\`, and \`wo\` are pointers to the read-only, read-write,
+	   and write-only storage data structures for input and/or output */
+	$DECLARE_STATES
+};
+
+static int
+${rap}_task_exec(Lux_task *t)
+{
+	Lux_${rap}_algo *algo = ((Lux_${rap}_task *)t)->algo;
+	return algo->apply(algo${ARGS_PARAMS}${ARGS_STATES});
+}
+
+#endif /* _${rap^^}_H_ */
+EOF
+
+printf "DONE\n"
