@@ -29,12 +29,7 @@ struct LuxStask {
 	void (*exec)(Lux_task *);
 
 	/* Internally, a Lux_task should embed the problem specific
-	   algo, params, ro, rw, and wo.
-
-	   algo;
-	   params;
-	   states;
-	*/
+	   algo, params, ro, rw, and wo.  */
 };
 
 #endif /* _LUX_TASK_H_ */
