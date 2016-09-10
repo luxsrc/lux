@@ -33,7 +33,7 @@ opts="${1%.opts}" # always remove extension
 in="${opts}.opts" # ensure ".opts" extension for input
 out="${opts}.h"   # output file name
 
-printf "lux-confgen: \"${in}\" -> \"${out}\"... "
+printf "lux-optgen: \"${in}\" -> \"${out}\"... "
 
 #==============================================================================
 # Define a c-struct; allocate, initialize, and configure the struct
