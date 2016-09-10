@@ -308,27 +308,28 @@ OPTIMIZATION: according to the README.hacks file in the fftw2 library,
   At the lowest level, a runtime-optimized algorithm can be executed
   by the following function call in C:
 
-	selected_driver(istate, xstate, params, ro, rw, wo);
+	selected_driver(ispec, xspec, params, ro, rw, wo);
 
   where `selected_driver` is a pointer to a driver function or to the
-  actual algorithm; `istate` and `xstate` are internal (derived) and
-  external (input) states, respectively, which hold anything needed by
-  the algorithm that would affect the performance (e.g., array stride,
-  twiddle factors for FFT, pointers to codelets); `params` are input
-  parameters that would not affect performance (e.g., alpha in BLAS);
-  and `ro`, `rw`, and `wo` are pointers to the read-only, read-write,
-  and write-only storage data structures for input and/or output.
+  actual algorithm; `ispec` and `xspec` are internal (derived) and
+  external (input) specifications, respectively, which hold anything
+  needed by the algorithm that would affect the performance (e.g.,
+  array stride, twiddle factors for FFT, pointers to codelets);
+  `params` are input parameters that would not affect performance
+  (e.g., alpha in BLAS); and `ro`, `rw`, and `wo` are pointers to the
+  read-only, read-write, and write-only storage data structures for
+  input and/or output, which form the state of the task.
 
-  In principle, we can pack istate, xstate, params, in, and out into a
-  single structure.  We call this a "task" in lux,
+  In principle, we can pack ispec, xspec, params, state into a single
+  structure.  We call this a "task" in lux,
 
 	typedef struct LuxStask Lux_task;
 	struct LuxStask {
 		void (*exec)(Lux_task *);
-		struct { ... } istate;
-		struct { ... } xstate;
+		struct { ... } ispec;
+		struct { ... } xspec;
 		struct { ... } params;
-		Lux_data *ro, *rw, *wo;
+		Lux_data *ro, *rw, *wo; /* state */
 	};
 
   which has a very simple and unified interface:
@@ -347,8 +348,8 @@ OPTIMIZATION: according to the README.hacks file in the fftw2 library,
 
 	struct algo {
 		void (*apply)(struct algo *, ...);
-		struct { ... } istate;
-		struct { ... } xstate;
+		struct { ... } ispec;
+		struct { ... } xspec;
 	};
 
   where apply() takes different arguments according to the algorithm.
@@ -368,13 +369,13 @@ OPTIMIZATION: according to the README.hacks file in the fftw2 library,
   need to store, and the solver and planner modules need to deliver,
   at least the following information:
 
-    problem:                  xstate, params, ro, rw, wo (problem specific)
-    algo:     driver, istate, xstate                     (problem specific)
-    task:     driver, istate, xstate, params, ro, rw, wo
-    solution: driver, istate, xstate, params, ro, rw, wo, opcnt, ecost, mcost
+    problem:                 xspec, params, ro, rw, wo (problem specific)
+    algo:     driver, ispec, xspec                     (problem specific)
+    task:     driver, ispec, xspec, params, ro, rw, wo
+    solution: driver, ispec, xspec, params, ro, rw, wo, opcnt, ecost, mcost
 
-    solver:   driver, istate, xstate,                     opcnt, ecost
-    planner:  solver[],                                                 mcost
+    solver:   driver, ispec, xspec,                     opcnt, ecost
+    planner:  solver[],                                               mcost
 
   In the above table, opcnt stands for floating-operation count, ecost
   stands for the estimated computation cost, and mcost stands for the

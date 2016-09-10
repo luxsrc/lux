@@ -26,13 +26,13 @@ typedef struct LuxSproblem Lux_problem;
 struct LuxSproblem {
 	int: 0; /* a hack for creating empty struct */
 
-	/* Internally, a Lux_problem should contain at least `xstate`
-	   and `params`, which are external input states such as array
+	/* Internally, a Lux_problem should contain at least `xspec`
+	   and `params`, which are external input specs such as array
 	   size that affect the performance and input parameters such
 	   as time step that do not affect the performance.  For
 	   example, for FFT, we may define
 
-	// xstate
+	// xspec
 	Lux_dope *in;
 	Lux_dope *out;
 

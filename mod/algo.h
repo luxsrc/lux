@@ -28,18 +28,18 @@ struct LuxSalgo {
 
 	/* Internally, a Lux_algo should contain everything, expect
 	   the actual pointer to memory, for performing an algorithm.
-	   These include the `driver`, `istate`, and `xstate`, for a
+	   These include the `driver`, `ispec`, and `xspec`, for a
 	   driver function or the actual algorithm, internal derived
-	   state, and external input state, respectively.  For
+	   spec, and external input spec, respectively.  For
 	   example, for FFT, we may define
 
 	// driver
 	int (*apply)(Lux_algo *, ...);
 
-	// istate
+	// ispec
 	Lux_mpi *mpi;
 
-	// xstate
+	// xspec
 	Lux_dope *in;
 	Lux_dope *out; */
 };
