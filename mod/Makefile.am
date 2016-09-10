@@ -25,7 +25,7 @@ pkginclude_HEADERS += dope.h htab.h libux.h mpool.h mview.h tpool.h vlog.h
 
 #==============================================================================
 # Adaptive performance
-pkginclude_HEADERS += algo.h measure.h planner.h problem.h solver.h task.h wisdom.h
+pkginclude_HEADERS += algo.h measure.h planner.h problem.h solution.h solver.h task.h
 
 # Dynamic-module
 pkginclude_HEADERS += dlib.h dltry.h dmod.h load.h
