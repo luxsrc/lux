@@ -20,6 +20,8 @@
 #ifndef _LUX_SOLUTION_H_
 #define _LUX_SOLUTION_H_
 
+#include <lux/task.h>
+
 /* Forward declaration */
 typedef struct LuxSsolution Lux_solution;
 

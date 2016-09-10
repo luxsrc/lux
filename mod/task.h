@@ -26,7 +26,7 @@ typedef struct LuxStask Lux_task;
 struct LuxStask {
 	/* Because problem and algo are problem specific, the implementation
 	   of exec() below is also problem specific.  */
-	void (*exec)(Lux_task *);
+	int (*exec)(Lux_task *);
 
 	/* Internally, a Lux_task should embed the problem specific
 	   algo, params, ro, rw, and wo.  */
