@@ -18,16 +18,37 @@
  * along with lux.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include "api.h"
+#include <lux/switch.h>
 #include <stdlib.h> /* for exit() and EXIT_FAILURE */
+#include <string.h> /* for strcmp() */
+
+#define DROP(n) do {	                     \
+	int j;                               \
+	*pargc -= n;                         \
+	for(j = i; j <= *pargc; ++j)         \
+		(*pargv)[j] = (*pargv)[j+n]; \
+} while(0)
+
+#define FLAG(s) CASE(!strcmp((*pargv)[i], s)) DROP(1);
 
 struct libux *LUX = NULL;
 
 static void
-setup(void)
+setup(int *pargc, char ***pargv)
 {
+	int i = 1;
+
 	LUX = mklibux();
 
 	/* Setup the lux environment */
+	while(i < *pargc) {
+		SWITCH {
+		FLAG("--debug")
+			LUX->vlog.levels[7] &= ~VLOG_SUSPEND;
+		DEFAULT
+			++i;
+		}
+	}
 }
 
 static void
@@ -39,15 +60,12 @@ cleanup(void)
 }
 
 void
-lux_setup(int *argc, char ***argv)
+lux_setup(int *pargc, char ***pargv)
 {
 	if(!atexit(cleanup))
-		setup();
+		setup(pargc, pargv);
 	else
 		lux_abort();
-
-	(void)argc; /* silence unused variable warning */
-	(void)argv; /* silence unused variable warning */
 }
 
 void
