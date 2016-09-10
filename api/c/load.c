@@ -37,3 +37,9 @@ lux_fname(void *ins)
 {
 	return load_fname(&LUX->load, ins);
 }
+
+const char *
+lux_mpaths(void)
+{
+	return LUX->load.paths;
+}
