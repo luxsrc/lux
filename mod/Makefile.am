@@ -40,7 +40,7 @@ pkginclude_HEADERS += file.h io.h job.h message.h resource.h
 
 #==============================================================================
 # Implementations of dynamic modules
-SUBDIRS             = sim
+SUBDIRS             = planner sim
 
 #==============================================================================
 # Optional packages
