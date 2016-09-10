@@ -46,8 +46,8 @@ mkdlib(Lmid_t namespace,
 	const size_t nlen = name ? strlen(name) : 0;
 
 	if(!name) {
-		/* If name is NULL, then the returned handle is for
-		   the main program */
+		/* If name is NULL, then return the handle of the main
+		   program */
 
 		l.hdl = dlmopen(namespace, NULL, mode);
 	} else if(name[0] == '/') {
