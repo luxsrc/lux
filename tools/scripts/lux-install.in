@@ -104,11 +104,11 @@ echo "Install directory: \"$dir\""
 
 #==============================================================================
 # Stage/install output module to target directory
-mkdir -p "$dir"
 
 for m in "${mod[@]}"; do
 	echo "Install \"$m\" to \"$dir\""
-	${LIBTOOL} --mode=install ${INSTALL} "$m" "$dir"
+	mkdir -p "$dir/$(dirname $m)"
+	${LIBTOOL} --mode=install ${INSTALL} "$m" "$dir/$(dirname $m)"
 	status=$?
 	if test $status -ne 0; then
 		echo "FAILED INSTALLING \"$m\" TO \"$dir\"; ABORT"
