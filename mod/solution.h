@@ -20,7 +20,7 @@
 #ifndef _LUX_SOLUTION_H_
 #define _LUX_SOLUTION_H_
 
-#include <lux/opcnt.h>
+#include <lux/estimate.h>
 #include <lux/task.h>
 
 #if HAVE_STDDEF_H

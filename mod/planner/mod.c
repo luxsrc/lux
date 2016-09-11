@@ -19,10 +19,10 @@
  */
 #include <lux.h>
 #include <lux/dpath.h>
+#include <lux/estimate.h>
 #include <lux/lazybuf.h>
 #include <lux/mangle.h>
 #include <lux/measure.h>
-#include <lux/opcnt.h>
 #include <lux/parray.h>
 #include <lux/solver.h>
 #include <lux/zalloc.h>

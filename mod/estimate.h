@@ -17,8 +17,8 @@
  * You should have received a copy of the GNU General Public License
  * along with lux.  If not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef _LUX_OPCNT_H_
-#define _LUX_OPCNT_H_
+#ifndef _LUX_ESTIMATE_H_
+#define _LUX_ESTIMATE_H_
 
 struct opcnt {
 	double add;
@@ -33,4 +33,4 @@ estimate(struct opcnt *oc)
 	return oc->add + oc->mul + oc->fma + oc->other;
 }
 
-#endif /* _LUX_OPCNT_H_ */
+#endif /* _LUX_ESTIMATE_H_ */
