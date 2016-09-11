@@ -21,13 +21,8 @@
 #define _LUX_SOLUTION_H_
 
 #include <lux/estimate.h>
+#include <lux/measure.h>
 #include <lux/task.h>
-
-#if HAVE_STDDEF_H
-#include <stddef.h> /* for size_t */
-#else
-#include <stdlib.h> /* for size_t */
-#endif
 
 /* Forward declaration */
 typedef struct LuxSsolution Lux_solution;
@@ -36,13 +31,7 @@ struct LuxSsolution {
 	Lux_task    *task;
 	struct opcnt opcnt; /* floating-point operation counts     */
 	double       ecost; /* estimated computation cost in ticks */
-
-	struct {
-		size_t n;
-		double tot;
-		double min;
-		double max;
-	} mcost; /* measured computation cost in ticks */
+	struct mcost mcost; /* measured computation cost in ticks  */
 };
 
 #endif /* _LUX_SOLUTION_H_ */

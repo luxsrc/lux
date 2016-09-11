@@ -23,7 +23,14 @@
 #include <lux/task.h>
 #include <lux/ticks.h>
 #include <lux/timer.h>
-#include <math.h>
+
+#if HAVE_STDDEF_H
+#include <stddef.h> /* for size_t */
+#else
+#include <stdlib.h> /* for size_t */
+#endif
+
+#include <math.h> /* for HUGE_VAL */
 
 #if !HAVE_TICK_COUNTER
 # error high resolution tick counter is not available on this platform
@@ -41,6 +48,13 @@
 # define TIME_LIM 2.0 /* from "fftw3/kernel/timer.c" */
 # define N_REPEAT 8   /* from "fftw3/kernel/timer.c" */
 #endif
+
+struct mcost {
+	double min;
+	double max;
+	double tot;
+	size_t n;
+};
 
 static inline double
 measure_ave(Lux_task *task, unsigned n)
