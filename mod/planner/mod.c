@@ -28,7 +28,7 @@
 #include <lux/zalloc.h>
 
 #include <stdlib.h>
-#include <float.h>
+#include <math.h>
 
 #include "../planner.h"
 
@@ -114,7 +114,7 @@ plan(Lux_planner *ego, void *prob, unsigned flags)
 	}
 
 	/* Find the best solution */
-	bestcost = DBL_MAX;
+	bestcost = HUGE_VAL;
 	best     = sols[0]->task;
 	for(i = 0; i < N; ++i) {
 		if(bestcost > sols[i]->mcost.min) {
