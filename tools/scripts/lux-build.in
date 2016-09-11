@@ -278,7 +278,7 @@ echo "Install directory:  \"$dir\""
 
 #------------------------------------------------------------------------------
 # Module specific part of the toolchain
-mod_CPPFLAGS="-DLUX_MOD_NAME=${mod%.la}"
+mod_CPPFLAGS="-DLUX_MOD_NAME=$(basename ${mod%.la})"
 mod_LIBADD="${libdir}/libux.la"
 
 #------------------------------------------------------------------------------
@@ -327,5 +327,5 @@ fi
 #------------------------------------------------------------------------------
 # Stage/install output module to target directory
 echo "Install \"$mod\" to \"$dir\""
-mkdir -p "$dir"
-${LIBTOOL} --mode=install ${INSTALL} "$mod" "$dir"
+mkdir -p "$dir/$(dirname $mod)"
+${LIBTOOL} --mode=install ${INSTALL} "$mod" "$dir/$(dirname $mod)"
