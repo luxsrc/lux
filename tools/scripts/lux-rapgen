@@ -29,9 +29,9 @@ fi
 #==============================================================================
 # Parse input and output file names
 
-rap="${1%.rap}" # always remove extension
-in="${rap}.rap" # ensure ".rap" extension for input
-out="${rap}.h"   # output file name
+rap="${1%.rap}"    # always remove extension
+in="${rap}.rap"    # ensure ".rap" extension for input
+out="${rap}_rap.h" # output file name
 
 printf "lux-rapgen: \"${in}\" -> \"${out}\"... "
 
@@ -53,7 +53,7 @@ parse() {
 			v=$(echo "${pv}" | sed 's|\*||g') # non-pointer part
 			p="${pv: :-${#v}}"; if ! test -z "$p"; then p=" $p"; fi
 			TYPES="${TYPES}, ${type}${p}"
-			ARGS="${ARGS}, ${v}"
+			ARGS="${ARGS}, T->${v}"
 		done < <(echo "$vars" | tr ',' '\n')
 	done < <(echo "$SRC" | tr ';' '\n')
 
@@ -73,8 +73,8 @@ parse STATES
 cat <<EOF > "${out}"
 /* ${out}.  Generated from ${rap}.rap by lux-rapgen.  */
 
-#ifndef _${rap^^}_H_
-#define _${rap^^}_H_ 1
+#ifndef _${rap^^}_RAP_H_
+#define _${rap^^}_RAP_H_ 1
 
 typedef struct LuxS${rap}_prob Lux_${rap}_prob;
 typedef struct LuxS${rap}_algo Lux_${rap}_algo;
@@ -96,7 +96,7 @@ struct LuxS${rap}_prob {
 };
 
 struct LuxS${rap}_algo {
-	int apply(Lux_${rap}_algo *${TYPES_PARAMS}${TYPES_STATES});
+	int (*apply)(Lux_${rap}_algo *${TYPES_PARAMS}${TYPES_STATES});
 
 	/* \`xspec\` is external (input) specifications, which hold anything
 	   needed by the algorithm that would affect the performance (e.g.,
@@ -111,6 +111,8 @@ struct LuxS${rap}_algo {
 
 struct LuxS${rap}_task {
 	Lux_task super;
+
+	/* The algorithm object under the hood */
 	Lux_${rap}_algo *algo;
 
 	/* \`params\` are input parameters that would not affect performance
@@ -122,14 +124,16 @@ struct LuxS${rap}_task {
 	$DECLARE_STATES
 };
 
-static int
+static inline int
 ${rap}_task_exec(Lux_task *t)
 {
-	Lux_${rap}_algo *algo = ((Lux_${rap}_task *)t)->algo;
-	return algo->apply(algo${ARGS_PARAMS}${ARGS_STATES});
+	#define T ((Lux_${rap}_task *)t)
+	Lux_${rap}_algo *algo = T->algo;
+	return algo->apply(T->algo${ARGS_PARAMS}${ARGS_STATES});
+	#undef T
 }
 
-#endif /* _${rap^^}_H_ */
+#endif /* _${rap^^}_RAP_H_ */
 EOF
 
 printf "DONE\n"
