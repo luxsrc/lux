@@ -29,9 +29,9 @@ fi
 #==============================================================================
 # Parse input and output file names
 
-opts="${1%.opts}" # always remove extension
-in="${opts}.opts" # ensure ".opts" extension for input
-out="${opts}.h"   # output file name
+opts="${1%.opts}"    # always remove extension
+in="${opts}.opts"    # ensure ".opts" extension for input
+out="${opts}_opts.h" # output file name
 
 printf "lux-optgen: \"${in}\" -> \"${out}\"... "
 
@@ -41,8 +41,8 @@ printf "lux-optgen: \"${in}\" -> \"${out}\"... "
 cat <<EOF > "${out}"
 /* ${out}.  Generated from ${opts}.opts by lux-optgen.  */
 
-#ifndef _${opts^^}_H_
-#define _${opts^^}_H_ 1
+#ifndef _${opts^^}_OPTS_H_
+#define _${opts^^}_OPTS_H_ 1
 
 #include <lux/failed.h>
 #include <lux/match.h>
@@ -51,7 +51,7 @@ cat <<EOF > "${out}"
 
 #define CONFIG(v, s) CASE((val = match(s, arg))) p->v
 
-struct ${opts} {
+struct ${opts}_opts {
 EOF
 
 awk -F '\t' '!/^($|[:space:]*#)/{
@@ -63,7 +63,7 @@ cat <<EOF >> "${out}"
 };
 
 static inline void
-${opts}_init(struct ${opts} *p)
+${opts}_init(struct ${opts}_opts *p)
 {
 EOF
 
@@ -76,7 +76,7 @@ cat <<EOF >> "${out}"
 }
 
 static inline int
-${opts}_config(struct ${opts} *p, const char *arg)
+${opts}_config(struct ${opts}_opts *p, const char *arg)
 {
 	const char *val = NULL;
 	char *rem;
@@ -103,23 +103,23 @@ cat <<EOF >> "${out}"
 	}
 }
 
-static inline struct ${opts} *
+static inline struct ${opts}_opts *
 mk${opts}(void)
 {
-	struct ${opts} *p = malloc(sizeof(struct ${opts}));
+	struct ${opts}_opts *p = malloc(sizeof(struct ${opts}_opts));
 	${opts}_init(p);
 	return p;
 }
 
 static inline void
-rm${opts}(struct ${opts} *p)
+rm${opts}(struct ${opts}_opts *p)
 {
 	free(p);
 }
 
 #undef CONFIG
 
-#endif /* _${opts^^}_H_ */
+#endif /* _${opts^^}_OPTS_H_ */
 EOF
 
 printf "DONE\n"
