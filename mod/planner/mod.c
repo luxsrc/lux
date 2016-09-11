@@ -22,6 +22,7 @@
 #include <lux/lazybuf.h>
 #include <lux/mangle.h>
 #include <lux/measure.h>
+#include <lux/opcnt.h>
 #include <lux/parray.h>
 #include <lux/solver.h>
 #include <lux/zalloc.h>
@@ -46,12 +47,6 @@ occur(const char *s, char c)
 	size_t n;
 	for(n = 0; *s; ++s) if(*s == c) ++n;
 	return n;
-}
-
-static void
-ecost(Lux_solution *s)
-{
-	s->ecost = s->opcnt.add + s->opcnt.mul + s->opcnt.fma + s->opcnt.other;
 }
 
 static int
@@ -96,7 +91,7 @@ plan(Lux_planner *ego, void *prob, unsigned flags)
 
 	/* Always estimate performance based on operation counts */
 	for(i = 0; i < n; ++i)
-		ecost(sols[i]);
+		sols[i]->ecost = estimate(&sols[i]->opcnt);
 
 	/* Sort according to estimated performance */
 	qsort(sols, n, sizeof(Lux_solution *), cmp);

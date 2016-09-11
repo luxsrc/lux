@@ -17,32 +17,20 @@
  * You should have received a copy of the GNU General Public License
  * along with lux.  If not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef _LUX_SOLUTION_H_
-#define _LUX_SOLUTION_H_
+#ifndef _LUX_OPCNT_H_
+#define _LUX_OPCNT_H_
 
-#include <lux/opcnt.h>
-#include <lux/task.h>
-
-#if HAVE_STDDEF_H
-#include <stddef.h> /* for size_t */
-#else
-#include <stdlib.h> /* for size_t */
-#endif
-
-/* Forward declaration */
-typedef struct LuxSsolution Lux_solution;
-
-struct LuxSsolution {
-	Lux_task    *task;
-	struct opcnt opcnt; /* floating-point operation counts     */
-	double       ecost; /* estimated computation cost in ticks */
-
-	struct {
-		size_t n;
-		double tot;
-		double min;
-		double max;
-	} mcost; /* measured computation cost in ticks */
+struct opcnt {
+	double add;
+	double mul;
+	double fma;
+	double other;
 };
 
-#endif /* _LUX_SOLUTION_H_ */
+static inline double
+estimate(struct opcnt *oc)
+{
+	return oc->add + oc->mul + oc->fma + oc->other;
+}
+
+#endif /* _LUX_OPCNT_H_ */
