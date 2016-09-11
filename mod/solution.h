@@ -22,6 +22,12 @@
 
 #include <lux/task.h>
 
+#if HAVE_STDDEF_H
+#include <stddef.h> /* for size_t */
+#else
+#include <stdlib.h> /* for size_t */
+#endif
+
 /* Forward declaration */
 typedef struct LuxSsolution Lux_solution;
 
