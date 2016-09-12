@@ -33,6 +33,8 @@ rap="${1%.rap}"    # always remove extension
 in="${rap}.rap"    # ensure ".rap" extension for input
 out="${rap}_rap.h" # output file name
 
+rap=$(basename $rap)
+
 printf "lux-rapgen: \"${in}\" -> \"${out}\"... "
 
 #==============================================================================

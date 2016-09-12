@@ -33,6 +33,8 @@ opts="${1%.opts}"    # always remove extension
 in="${opts}.opts"    # ensure ".opts" extension for input
 out="${opts}_opts.h" # output file name
 
+opts=$(basename $opts)
+
 printf "lux-optgen: \"${in}\" -> \"${out}\"... "
 
 #==============================================================================
