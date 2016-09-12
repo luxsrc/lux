@@ -301,6 +301,11 @@ if [[ ! -e tests/opencl/dummy.cl ]]; then
 	$LN_S ../../$srcdir/tests/opencl/dummy.cl tests/opencl/dummy.cl
 fi
 
+# Ensure that we have symlink the shared object for tests
+if [[ ! -e tests/planner_demo/demo.so ]]; then
+	$LN_S .libs/demo.so tests/planner_demo/demo.so
+fi
+
 # Print summary
 echo "================================================================"
 echo "Lux m4_esyscmd([tr -d '\n' < .version])"

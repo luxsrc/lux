@@ -23,6 +23,7 @@ ck_parray_LDADD   = ../api/c/libux.la
 
 ck_planner_SOURCES = ck_planner.c ../mod/planner.h
 ck_planner_LDADD   = ../api/c/libux.la
+SUBDIRS           += planner_demo
 
 ck_pvector_SOURCES = ck_pvector.c ../mod/pvector.h
 ck_pvector_LDADD   = ../api/c/libux.la

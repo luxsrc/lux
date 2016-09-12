@@ -18,23 +18,15 @@
  * along with lux.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include <lux.h>
-#include <lux/planner.h>
-#include <stdlib.h>
+#include <lux/mangle.h>
+#include <lux/pvector.h>
+#include <lux/solver.h>
 
-int
-main(int argc, char *argv[])
+Lux_solution **
+LUX_MOD(const void *prob, unsigned flags)
 {
-	Lux_planner *p;
+	return pvector(Lux_solution *, NULL);
 
-	lux_setup(&argc, &argv);
-
-	lux_print("1. Load solvers from \"planner_demo\" into planner... ");
-	p = lux_load("../mod/planner/.libs/planner", "planner_demo");
-	lux_print("%p DONE\n", p);
-
-	lux_print("2. Unload the planner... ");
-	lux_unload(p);
-	lux_print("DONE\n");
-
-	return 0;
+	(void)prob;  /* silence unused variable warning */
+	(void)flags; /* silence unused variable warning */
 }
