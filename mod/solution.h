@@ -23,6 +23,7 @@
 #include <lux/estimate.h>
 #include <lux/measure.h>
 #include <lux/task.h>
+#include <lux/zalloc.h>
 
 /* Forward declaration */
 typedef struct LuxSsolution Lux_solution;
@@ -33,5 +34,17 @@ struct LuxSsolution {
 	double       ecost; /* estimated computation cost in ticks */
 	struct mcost mcost; /* measured computation cost in ticks  */
 };
+
+static inline Lux_solution *
+mksolution(Lux_task *t, double add, double mul, double fma, double other)
+{
+	Lux_solution *s = zalloc(sizeof(Lux_solution));
+	s->task = t;
+	s->opcnt.add   = add;
+	s->opcnt.mul   = mul;
+	s->opcnt.fma   = fma;
+	s->opcnt.other = other;
+	return s;
+}
 
 #endif /* _LUX_SOLUTION_H_ */
