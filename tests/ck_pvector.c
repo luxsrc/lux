@@ -19,32 +19,22 @@
  */
 #include <lux.h>
 #include <lux/assert.h>
-#include <lux/parray.h>
+#include <lux/pvector.h>
 
 #define A(E) lux_always_assert(E)
 
 int
 main(int argc, char *argv[])
 {
-	struct xyz {
-		float x, y, z;
-	} *a;
-
-	size_t n[] = {10, 11, 12, 13, 14, 15};
-	size_t i;
+	double *a;
+	size_t  i;
 
 	lux_setup(&argc, &argv);
 
-	a = pallocdn(struct xyz, 6, n);
-	A(a && pgetd(a) == 6);
-	for(i = 0; i < pgetd(a); ++i)
-		A(pgetn(a, i) == n[i]);
-	pfree(a);
-
-	a = palloc(struct xyz, 20, 21, 22, 23, 24, 25);
-	A(a && pgetd(a) == 6);
-	for(i = 0; i < pgetd(a); ++i)
-		A(pgetn(a, i) == n[i] + 10);
+	a = pvector(double, 30, 31, 32, 33, 34, 35);
+	A(a && pgetd(a) == 1 && pgetn(a, 0) == 6);
+	for(i = 0; i < pgetn(a, 0); ++i)
+		A(a[i] == i + 30);
 	pfree(a);
 
 	return 0;
