@@ -21,9 +21,12 @@ ck_mview_LDADD   = ../api/c/libux.la
 ck_parray_SOURCES = ck_parray.c ../mod/parray.h
 ck_parray_LDADD   = ../api/c/libux.la
 
-ck_planner_SOURCES = ck_planner.c ../mod/planner.h
-ck_planner_LDADD   = ../api/c/libux.la
-SUBDIRS           += planner_demo
+ck_planner_SOURCES        = ck_planner.c ../mod/planner.h
+nodist_ck_planner_SOURCES = planner_demo_rap.h
+ck_planner_LDADD          = ../api/c/libux.la
+SUBDIRS                  += planner_demo
+EXTRA_DIST                = planner_demo.rap
+DISTCLEANFILES            = planner_demo_rap.h
 
 ck_pvector_SOURCES = ck_pvector.c ../mod/pvector.h
 ck_pvector_LDADD   = ../api/c/libux.la

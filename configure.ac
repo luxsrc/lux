@@ -301,6 +301,15 @@ if [[ ! -e tests/opencl/dummy.cl ]]; then
 	$LN_S ../../$srcdir/tests/opencl/dummy.cl tests/opencl/dummy.cl
 fi
 
+# Ensure that we have *_rap.h files to build tests
+if [[ ! -e tests/planner_demo.rap ]]; then
+	$LN_S $srcdir/../tests/planner_demo.rap tests/planner_demo.rap
+fi
+
+if [[ ! -e tests/planner_demo_rap.h ]]; then
+	$srcdir/tools/scripts/lux-rapgen tests/planner_demo.rap
+fi
+
 # Ensure that we have symlink the shared object for tests
 if [[ ! -e tests/planner_demo/demo.so ]]; then
 	$LN_S .libs/demo.so tests/planner_demo/demo.so
