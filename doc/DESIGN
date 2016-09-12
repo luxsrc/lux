@@ -369,25 +369,29 @@ OPTIMIZATION: according to the README.hacks file in the fftw2 library,
   need to store, and the solver and planner modules need to deliver,
   at least the following information:
 
+                          spec             args
+                       _____^____    ________^_______
+                      /          \  /                \
     problem:                 xspec, params, ro, rw, wo (problem specific)
     algo:     driver, ispec, xspec                     (problem specific)
     task:     driver, ispec, xspec, params, ro, rw, wo
     solution: driver, ispec, xspec, params, ro, rw, wo, opcnt, ecost, mcost
 
-    solver:   driver, ispec, xspec,                     opcnt, ecost
-    planner:  solver[],                                               mcost
+    solver:   driver, ispec, xspec,                     opcnt
+    planner:  solver[],                                        ecost, mcost
 
-  In the above table, opcnt stands for floating-operation count, ecost
-  stands for the estimated computation cost, and mcost stands for the
-  measured computation cost.  Simply put, a lux AP solver returns an
-  array of solutions; while a planner returns a single optimal algo
-  according to giving flags
+  In the above table, spec and args are two structure that holds
+  ispec+xspec and params+ro+rw+wo, respecitvely, opcnt stands for
+  floating-operation count, ecost stands for the estimated computation
+  cost, and mcost stands for the measured computation cost.  Simply
+  put, a lux RAP solver returns an array of solutions; while a planner
+  returns a single optimal algo according to giving flags.
 
-  Because problems and plans are problem-specific, they are typedefs
-  of `const void` and `void` respectively; while other AP types have
-  well defined interfaces.  Also, because the implementation of a task
-  is not known to libux, it is embedded as the last field in solution
-  for extendability.
+  Because problem, spec, and args are problem-specific, we provide a
+  tool `lux-rapgen` to generate them automatically from a table.
+  Other RAP types have well defined interfaces.  Also, because the
+  implementation of a task is not known to libux, it needs to be
+  embedded as the last field other structures for extendability.
 
 PLANNERS and TASKS: while planners and tasks are described above in
   terms of optimization, they are not restricted to small components
