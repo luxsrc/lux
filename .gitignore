@@ -4,9 +4,13 @@
 !*.cl
 !*.a[cm]
 !*.?*in
+!*.rap
+!*.opts
 
 !tools/m4/*.m4
 lux.h*
+*_rap.h
+*_opts.h
 
 conf*/
 conf*
