@@ -38,7 +38,7 @@ struct planner {
 	Lux_planner super;
 
 	size_t      n;
-	Lux_solver *solver[1];
+	Lux_solver *solve[1];
 };
 
 static inline size_t
@@ -75,8 +75,7 @@ plan(Lux_planner *ego, void *prob, unsigned flags)
 
 	/* Gather solutions from all the solvers */
 	for(i = 0; i < EGO->n; ++i) {
-		Lux_solver    *s  = EGO->solver[i];
-		Lux_solution **ss = s->solve(s, prob, flags);
+		Lux_solution **ss = EGO->solve[i](prob, flags);
 
 		size_t j, m = pgetn(ss, 0);
 
@@ -111,6 +110,8 @@ plan(Lux_planner *ego, void *prob, unsigned flags)
 		sols[i]->mcost.tot = t;
 		sols[i]->mcost.min = t;
 		sols[i]->mcost.max = t;
+		lux_debug("Measure %p: %g\n",
+		          sols[i]->task, sols[i]->mcost.tot/sols[i]->mcost.n);
 	}
 
 	/* Find the best solution */
@@ -160,7 +161,7 @@ LUX_MKMOD(const void *opts)
 			size_t mlen = strlen(m);
 			buf = lzrealloc(buf, plen + sizeof("/") + mlen);
 			strcpy(buf + plen + 1, m);
-			ego->solver[i] = lux_load(buf, NULL);
+			ego->solve[i] = lux_load(buf, NULL);
 		}
 
 		ego->super.plan = plan;
@@ -180,7 +181,7 @@ LUX_RMMOD(void *ego)
 {
 	size_t i;
 	for(i = 0; i < EGO->n; ++i)
-		lux_unload(EGO->solver[i]);
+		lux_unload(EGO->solve[i]);
 
 	free(ego);
 }

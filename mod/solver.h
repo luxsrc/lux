@@ -22,16 +22,6 @@
 
 #include <lux/solution.h>
 
-/* Forward declaration */
-typedef struct LuxSsolver Lux_solver;
-
-struct LuxSsolver {
-	/* A Lux_solver can solve a particular Lux_problem and return
-	   a <lux/parray.h> of pointers to Lux_task */
-	Lux_solution **(*solve)(Lux_solver *, void *, unsigned);
-
-	/* Internally, a Lux_solver should embed enough information to
-	   provide a list of reasonable solutions.  */
-};
+typedef Lux_solution **(Lux_solver)(void *, unsigned);
 
 #endif /* _LUX_SOLVER_H_ */
