@@ -20,12 +20,22 @@
 #include <lux.h>
 #include <lux/planner.h>
 #include <stdlib.h>
+#include <tests/planner_demo_rap.h>
 
 int
 main(int argc, char *argv[])
 {
 	Lux_planner *p;
 	Lux_task    *t;
+
+	size_t n = 1024 * 1024;
+	Lux_planner_demo_prob prob = {
+		n,
+		1.0,
+		malloc(sizeof(double) * n),
+		malloc(sizeof(double) * n),
+		malloc(sizeof(double) * n)
+	};
 
 	lux_setup(&argc, &argv);
 
@@ -34,12 +44,16 @@ main(int argc, char *argv[])
 	lux_print("%p DONE\n", p);
 
 	lux_print("2. Plan an algorithm... ");
-	t = p->plan(p, NULL, LUX_PLAN_EXHAUSTIVE);
+	t = p->plan(p, &prob, LUX_PLAN_EXHAUSTIVE);
 	lux_print("DONE\n");
 
 	lux_print("3. Unload the planner... ");
 	lux_unload(p);
 	lux_print("DONE\n");
+
+	free(prob.x);
+	free(prob.y);
+	free(prob.z);
 
 	return 0;
 }

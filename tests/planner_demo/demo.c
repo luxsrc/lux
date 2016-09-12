@@ -21,6 +21,7 @@
 #include <lux/mangle.h>
 #include <lux/pvector.h>
 #include <lux/solver.h>
+#include <tests/planner_demo_rap.h>
 
 static inline int
 exec(Lux_task *t)
