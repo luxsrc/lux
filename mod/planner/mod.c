@@ -23,7 +23,7 @@
 #include <lux/lazybuf.h>
 #include <lux/mangle.h>
 #include <lux/measure.h>
-#include <lux/parray.h>
+#include <lux/pvector.h>
 #include <lux/solver.h>
 #include <lux/zalloc.h>
 
@@ -139,19 +139,30 @@ plan(Lux_planner *ego, void *prob, unsigned flags)
 void *
 LUX_MKMOD(const void *opts)
 {
-	const char  *path = dpath(opts);
-	      char  *mods = path ? dsubmods(path) : NULL;
-	const size_t n    = mods ? occur(mods, ':') + 1 : 0;
+	struct planner *ego = NULL;
+	const  char    *path;
+	       char    *mods;
+	       size_t   n;
 
-	struct planner *ego = zalloc(      sizeof(struct planner)
-	                             -     sizeof(Lux_solver *)
-	                             + n * sizeof(Lux_solver *));
+	path = dpath(opts);
+	lux_debug("Lux_planner: path = \"%s\"\n", path);
+	if(!path)
+		goto cleanup0;
+
+	mods = dsubmods(path); /* is writable */
+	lux_debug("Lux_planner: mods = \"%s\"\n", mods);
+	if(!mods)
+		goto cleanup1;
+
+	n    = occur(mods, ':') + 1;
+	ego  = zalloc(      sizeof(struct planner)
+	              -     sizeof(Lux_solver *)
+	              + n * sizeof(Lux_solver *));
 	if(ego) {
-		size_t i;
-		const char *m;
+		      size_t i;
+		const char  *m;
 
 		char lazybuf[256], *buf;
-
 		size_t plen = strlen(path);
 		buf = lzmalloc(plen + sizeof("/"));
 		strcpy(buf, path);
@@ -161,6 +172,7 @@ LUX_MKMOD(const void *opts)
 			size_t mlen = strlen(m);
 			buf = lzrealloc(buf, plen + sizeof("/") + mlen);
 			strcpy(buf + plen + 1, m);
+			lux_debug("Lux_planner: submodule = \"%s\"\n", buf);
 			ego->solve[i] = lux_load(buf, NULL);
 		}
 
@@ -168,11 +180,10 @@ LUX_MKMOD(const void *opts)
 		ego->n          = n;
 	}
 
-	if(mods)
-		free(mods);
-	if(path)
-		free((void *)path);
-
+	free(mods);
+cleanup1:
+	free((void *)path);
+cleanup0:
 	return ego;
 }
 
