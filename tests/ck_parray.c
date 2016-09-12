@@ -29,6 +29,7 @@ main(int argc, char *argv[])
 	struct xyz {
 		float x, y, z;
 	} *a;
+	double *b;
 
 	size_t n[] = {10, 11, 12, 13, 14, 15};
 	size_t i;
@@ -46,6 +47,12 @@ main(int argc, char *argv[])
 	for(i = 0; i < pgetd(a); ++i)
 		A(pgetn(a, i) == n[i] + 10);
 	pfree(a);
+
+	b = pvector(double, 30, 31, 32, 33, 34, 35);
+	A(b && pgetd(b) == 1 && pgetn(b, 0) == 6);
+	for(i = 0; i < pgetn(b, 0); ++i)
+		A(b[i] == i + 30);
+	pfree(b);
 
 	return 0;
 }

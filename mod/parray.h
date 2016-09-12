@@ -150,6 +150,16 @@
 	GETN(HEADEROF(P, _d_)[J]); \
 })
 
+#define pvector(T, ...) ({                  \
+	T      _a_[] = {__VA_ARGS__};       \
+	size_t _n_[] = {countof(_a_)};      \
+	T     *_     = pallocdn(T, 1, _n_); \
+	size_t  _i_;                        \
+	for(_i_ = 0; _i_ < _n_[0]; ++_i_)   \
+		_[_i_] = _a_[_i_];          \
+	_;                                  \
+})
+
 #include <lux/dope.h> /* must be last so that the static inline
                          functions mkdopedn() and rmdope() in
                          <lux/dope.h> can see palloc() and pfree()
