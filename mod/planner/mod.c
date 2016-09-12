@@ -36,9 +36,14 @@
 
 struct planner {
 	Lux_planner super;
-
 	size_t      n;
 	Lux_solver *solve[1];
+};
+
+struct solution {
+	Lux_solution super;
+	double       ecost;
+	struct mcost mcost;
 };
 
 static inline size_t
@@ -50,11 +55,10 @@ occur(const char *s, char c)
 }
 
 static int
-cmp(const void *pa, const void *pb)
+cmp(const void *a, const void *b)
 {
-	Lux_solution *a = *(Lux_solution **)pa;
-	Lux_solution *b = *(Lux_solution **)pb;
-	return a->ecost - b->ecost;
+	return (((const struct solution *)a)->ecost -
+	        ((const struct solution *)b)->ecost);
 }
 
 static size_t
@@ -63,37 +67,36 @@ min(size_t a, size_t b)
 	return a < b ? a : b;
 }
 
-static Lux_task *
+static struct basetask
 plan(Lux_planner *ego, Lux_problem *prob, unsigned flags)
 {
 	size_t N = 8;
-	Lux_solution **sols = malloc(sizeof(Lux_solution *) * N);
+	struct solution *sols = malloc(sizeof(struct solution) * N);
 
 	size_t i, n = 0;
-	double    bestcost;
-	Lux_task *best;
+	double bestcost;
+	struct basetask best;
 
 	/* Gather solutions from all the solvers */
 	for(i = 0; i < EGO->n; ++i) {
-		Lux_solution **ss = EGO->solve[i](prob, flags);
+		Lux_solution *s = EGO->solve[i](prob, flags);
 
-		size_t j, m = pgetn(ss, 0);
-
+		size_t j, m = pgetn(s, 0);
 		while(n + m > N)
-			sols = realloc(sols, sizeof(Lux_solution *) * (N*=2));
+			sols = realloc(sols, sizeof(struct solution) * (N*=2));
 
 		for(j = 0; j < m; ++n, ++j)
-			sols[n] = ss[j];
+			sols[n].super = s[j];
 
-		pfree(ss);
+		pfree(s);
 	}
 
 	/* Always estimate performance based on operation counts */
 	for(i = 0; i < n; ++i)
-		sols[i]->ecost = estimate(&sols[i]->opcnt);
+		sols[i].ecost = estimate(&sols[i].super.opcnt);
 
 	/* Sort according to estimated performance */
-	qsort(sols, n, sizeof(Lux_solution *), cmp);
+	qsort(sols, n, sizeof(struct solution), cmp);
 
 	/* How many plans should we measure performance? */
 	switch(flags) {
@@ -105,30 +108,42 @@ plan(Lux_planner *ego, Lux_problem *prob, unsigned flags)
 
 	/* Measure performance */
 	for(i = 0; i < N; ++i) {
-		double t = measure(sols[i]->task);
-		sols[i]->mcost.n   = 1;
-		sols[i]->mcost.tot = t;
-		sols[i]->mcost.min = t;
-		sols[i]->mcost.max = t;
-		lux_debug("Measure %p: %g\n",
-		          sols[i]->task, sols[i]->mcost.tot/sols[i]->mcost.n);
+		Lux_task *task = mkluxbasetask(sols[i].super.task);
+		double    t    = measure(task);
+		free(task);
+		sols[i].mcost.n   = 1;
+		sols[i].mcost.tot = t;
+		sols[i].mcost.min = t;
+		sols[i].mcost.max = t;
+		lux_debug("Lux_planner.plan(): measure %p %p %p: %g\n",
+		          sols[i].super.task.algo.driver,
+		          sols[i].super.task.algo.spec,
+		          sols[i].super.task.args,
+		          sols[i].mcost.tot/sols[i].mcost.n);
 	}
 
 	/* Find the best solution */
 	bestcost = HUGE_VAL;
-	best     = sols[0]->task;
 	for(i = 0; i < N; ++i) {
-		if(bestcost > sols[i]->mcost.min) {
-			bestcost = sols[i]->mcost.min;
-			best     = sols[i]->task;
+		if(bestcost > sols[i].mcost.min) {
+			bestcost = sols[i].mcost.min;
+			best     = sols[i].super.task;
 		}
 	}
 
-	/* Free every solution and unused tasks */
-	for(i = 0; i < n; ++i) {
-		if(sols[i]->task != best)
-			free(sols[i]->task);
-		free(sols[i]);
+	/* Free unused specs, args, and the list of solutions */
+	for(i = 0; i < N; ++i) {
+		Lux_args *a = sols[i].super.task.args;
+		Lux_spec *s = sols[i].super.task.algo.spec;
+
+		int freed = 0;
+		for(n = 0; n < i; ++n)
+			freed = (a == sols[n].super.task.args);
+		if(!freed)
+			free(a);
+
+		if(s != best.spec)
+			free(s);
 	}
 	free(sols);
 
