@@ -20,8 +20,9 @@
 #ifndef _LUX_SOLVER_H_
 #define _LUX_SOLVER_H_
 
+#include <lux/problem.h>
 #include <lux/solution.h>
 
-typedef Lux_solution **(Lux_solver)(void *, unsigned);
+typedef Lux_solution *(Lux_solver)(Lux_problem *, unsigned);
 
 #endif /* _LUX_SOLVER_H_ */

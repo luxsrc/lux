@@ -64,7 +64,7 @@ min(size_t a, size_t b)
 }
 
 static Lux_task *
-plan(Lux_planner *ego, void *prob, unsigned flags)
+plan(Lux_planner *ego, Lux_problem *prob, unsigned flags)
 {
 	size_t N = 8;
 	Lux_solution **sols = malloc(sizeof(Lux_solution *) * N);
