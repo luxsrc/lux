@@ -52,7 +52,7 @@ struct LuxSbasealgo {
 };
 
 static inline int
-baseapply(Lux_algo *a, Lux_args *args)
+baapply(Lux_algo *a, Lux_args *args)
 {
 	#define A ((Lux_basealgo *)a)
 	return A->base.driver(A->base.spec, args);
@@ -64,7 +64,7 @@ mkluxbasealgo(struct basealgo b)
 {
 	Lux_basealgo *a = malloc(sizeof(Lux_basealgo));
 	if(a) {
-		a->super.apply = baseapply;
+		a->super.apply = baapply;
 		a->base = b;
 	}
 	return &a->super;

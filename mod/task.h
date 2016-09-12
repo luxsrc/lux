@@ -20,6 +20,7 @@
 #ifndef _LUX_TASK_H_
 #define _LUX_TASK_H_
 
+#include <lux/algo.h>
 #include <lux/args.h>
 #include <lux/spec.h>
 #include <stdlib.h> /* for malloc */
@@ -38,8 +39,7 @@ struct LuxStask {
 
 /* Base structure that can be returned from functions */
 struct basetask {
-	int (*driver)(Lux_spec *spec, Lux_args *args);
-	Lux_spec *spec;
+	struct basealgo algo;
 	Lux_args *args;
 };
 
@@ -52,10 +52,10 @@ struct LuxSbasetask {
 };
 
 static inline int
-baseexec(Lux_task *t)
+btexec(Lux_task *t)
 {
 	#define T ((Lux_basetask *)t)
-	return T->base.driver(T->base.spec, T->base.args);
+	return T->base.algo.driver(T->base.algo.spec, T->base.args);
 	#undef T
 }
 
@@ -64,7 +64,7 @@ mkluxbasetask(struct basetask b)
 {
 	Lux_basetask *t = malloc(sizeof(Lux_basetask));
 	if(t) {
-		t->super.exec = baseexec;
+		t->super.exec = btexec;
 		t->base = b;
 	};
 	return &t->super;
