@@ -20,7 +20,11 @@
 #ifndef _LUX_TASK_H_
 #define _LUX_TASK_H_
 
-/* Forward declaration */
+#include <lux/args.h>
+#include <lux/spec.h>
+#include <stdlib.h> /* for malloc */
+
+/* Forward declaration common interface */
 typedef struct LuxStask Lux_task;
 
 struct LuxStask {
@@ -31,5 +35,39 @@ struct LuxStask {
 	/* Internally, a Lux_task should embed the problem specific
 	   algo, params, ro, rw, and wo.  */
 };
+
+/* Base structure that can be returned from functions */
+struct basetask {
+	int (*driver)(Lux_spec *spec, Lux_args *args);
+	Lux_spec *spec;
+	Lux_args *args;
+};
+
+/* Forward declaration base implementation */
+typedef struct LuxSbasetask Lux_basetask;
+
+struct LuxSbasetask {
+	Lux_task        super;
+	struct basetask base;
+};
+
+static inline int
+baseexec(Lux_task *t)
+{
+	#define T ((Lux_basetask *)t)
+	return T->base.driver(T->base.spec, T->base.args);
+	#undef T
+}
+
+static inline Lux_task *
+mkluxbasetask(struct basetask b)
+{
+	Lux_basetask *t = malloc(sizeof(Lux_basetask));
+	if(t) {
+		t->super.exec = baseexec;
+		t->base = b;
+	};
+	return &t->super;
+}
 
 #endif /* _LUX_TASK_H_ */
