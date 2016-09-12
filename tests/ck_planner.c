@@ -25,6 +25,7 @@ int
 main(int argc, char *argv[])
 {
 	Lux_planner *p;
+	Lux_task    *t;
 
 	lux_setup(&argc, &argv);
 
@@ -32,7 +33,11 @@ main(int argc, char *argv[])
 	p = lux_load("../mod/planner/.libs/planner", "planner_demo");
 	lux_print("%p DONE\n", p);
 
-	lux_print("2. Unload the planner... ");
+	lux_print("2. Plan an algorithm... ");
+	t = p->plan(p, NULL, LUX_PLAN_EXHAUSTIVE);
+	lux_print("DONE\n");
+
+	lux_print("3. Unload the planner... ");
 	lux_unload(p);
 	lux_print("DONE\n");
 

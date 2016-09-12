@@ -22,10 +22,22 @@
 #include <lux/pvector.h>
 #include <lux/solver.h>
 
+static inline int
+exec(Lux_task *t)
+{
+	lux_print("executing %p\n", t);
+	return 0;
+}
+
 Lux_solution **
 LUX_MOD(const void *prob, unsigned flags)
 {
-	return pvector(Lux_solution *, NULL);
+	Lux_task *t = malloc(sizeof(Lux_task));
+	t->exec = exec;
+
+	return pvector(
+		Lux_solution *,
+		mksolution(t, 0, 0, 0, 0));
 
 	(void)prob;  /* silence unused variable warning */
 	(void)flags; /* silence unused variable warning */
