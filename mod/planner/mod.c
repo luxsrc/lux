@@ -67,7 +67,7 @@ min(size_t a, size_t b)
 	return a < b ? a : b;
 }
 
-static struct basetask
+static struct basealgo
 plan(Lux_planner *ego, Lux_problem *prob, unsigned flags)
 {
 	size_t N = 8;
@@ -75,7 +75,7 @@ plan(Lux_planner *ego, Lux_problem *prob, unsigned flags)
 
 	size_t i, n = 0;
 	double bestcost;
-	struct basetask best;
+	struct basealgo best;
 
 	/* Gather solutions from all the solvers */
 	for(i = 0; i < EGO->n; ++i) {
@@ -127,7 +127,7 @@ plan(Lux_planner *ego, Lux_problem *prob, unsigned flags)
 	for(i = 0; i < N; ++i) {
 		if(bestcost > sols[i].mcost.min) {
 			bestcost = sols[i].mcost.min;
-			best     = sols[i].super.task;
+			best     = sols[i].super.task.algo;
 		}
 	}
 

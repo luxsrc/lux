@@ -20,8 +20,8 @@
 #ifndef _LUX_PLANNER_H_
 #define _LUX_PLANNER_H_
 
+#include <lux/algo.h>
 #include <lux/problem.h>
-#include <lux/task.h>
 
 #define LUX_PLAN_DEFAULT    LUX_PLAN_MEASURE
 
@@ -36,7 +36,7 @@ typedef struct LuxSplanner Lux_planner;
 struct LuxSplanner {
         /* A Lux_planner can plan for a particular Lux_problem and
            return a single optimal plan */
-	struct basetask (*plan)(Lux_planner *, Lux_problem *, unsigned);
+	struct basealgo (*plan)(Lux_planner *, Lux_problem *, unsigned);
 };
 
 #endif /* _LUX_PLANNER_H_ */
