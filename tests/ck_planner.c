@@ -47,9 +47,14 @@ main(int argc, char *argv[])
 
 	lux_print("2. Plan an algorithm... ");
 	a = p->plan(p, &prob, LUX_PLAN_EXHAUSTIVE);
+	lux_print("%p %p DONE\n", a.driver, a.spec);
+
+	lux_print("3. Execlude the task... ");
+	lux_print("%zu %zu %zu ", a.spec->n, a.spec->n1, a.spec->n2);
+	a.driver(a.spec, (Lux_args *)&prob.alpha);
 	lux_print("DONE\n");
 
-	lux_print("3. Unload the planner... ");
+	lux_print("4. Unload the planner... ");
 	lux_unload(p);
 	lux_print("DONE\n");
 
