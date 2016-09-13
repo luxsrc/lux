@@ -20,11 +20,13 @@
 #ifndef _LUX_DYNAMIC_H_
 #define _LUX_DYNAMIC_H_ 1
 
-#define dynamic(T, ...) ({              \
-	T *_  = (T *)malloc(sizeof(T)); \
-	T _i_ = __VA_ARGS__;            \
-	  *_  = _i_;                    \
-	   _;                           \
+#define dynamic(T, ...) ({               \
+	T *_   = (T *)malloc(sizeof(T)); \
+	T  _s_ = __VA_ARGS__;            \
+	  *_   = _s_;                    \
+	   _;                            \
 })
+
+#define dstruct(T, ...) dynamic(T, {__VA_ARGS__})
 
 #endif /* _LUX_DYNAMIC_H_ */
