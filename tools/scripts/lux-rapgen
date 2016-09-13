@@ -42,10 +42,12 @@ printf "lux-rapgen: \"${in}\" -> \"${out}\"... "
 
 parse() {
 	NAME=$1
+	PREF=$2
 
 	SRC=$(grep ${NAME} ${in} | cut -f2)
 	DECLARE=
 	TYPES=
+	PROTO=
 	ARGS=
 	while read l; do
 		if test -z "$l"; then continue; fi # skip empty line
@@ -55,19 +57,21 @@ parse() {
 			v=$(echo "${pv}" | sed 's|\*||g') # non-pointer part
 			p="${pv: :-${#v}}"; if ! test -z "$p"; then p=" $p"; fi
 			TYPES="${TYPES}, ${type}${p}"
-			ARGS="${ARGS}, T->${v}"
+			PROTO="${PROTO}, ${type}${p} ${PREF}${v}"
+			ARGS="${ARGS}, ${PREF}${v}"
 		done < <(echo "$vars" | tr ',' '\n')
 	done < <(echo "$SRC" | tr ';' '\n')
 
 	eval DECLARE_${NAME}=\"${SRC}\"
 	eval TYPES_${NAME}=\"${TYPES}\"
+	eval PROTO_${NAME}=\"${PROTO}\"
 	eval ARGS_${NAME}=\"${ARGS}\"
 }
 
-parse XSPEC
+parse XSPEC  'p->'
 parse ISPEC
-parse PARAMS
-parse STATES
+parse PARAMS 'p->'
+parse STATES 'p->'
 
 #==============================================================================
 # Define the necessary c-struct's
@@ -78,11 +82,13 @@ cat <<EOF > "${out}"
 #ifndef _${rap^^}_RAP_H_
 #define _${rap^^}_RAP_H_ 1
 
-typedef struct LuxS${rap}_prob Lux_${rap}_prob;
-typedef struct LuxS${rap}_algo Lux_${rap}_algo;
-typedef struct LuxS${rap}_task Lux_${rap}_task;
+typedef struct LuxS${rap}_problem Lux_${rap}_problem;
+typedef struct LuxS${rap}_spec    Lux_${rap}_spec;
+typedef struct LuxS${rap}_args    Lux_${rap}_args;
 
-struct LuxS${rap}_prob {
+#include <lux/dynamic.h>
+
+struct LuxS${rap}_problem {
 	/* \`xspec\` is external (input) specifications, which hold anything
 	   needed by the algorithm that would affect the performance (e.g.,
 	   array stride) */
@@ -97,9 +103,7 @@ struct LuxS${rap}_prob {
 	$DECLARE_STATES
 };
 
-struct LuxS${rap}_algo {
-	int (*apply)(Lux_${rap}_algo *${TYPES_PARAMS}${TYPES_STATES});
-
+struct LuxS${rap}_spec {
 	/* \`xspec\` is external (input) specifications, which hold anything
 	   needed by the algorithm that would affect the performance (e.g.,
 	   array stride) */
@@ -111,12 +115,7 @@ struct LuxS${rap}_algo {
 	$DECLARE_ISPEC
 };
 
-struct LuxS${rap}_task {
-	Lux_task super;
-
-	/* The algorithm object under the hood */
-	Lux_${rap}_algo *algo;
-
+struct LuxS${rap}_args {
 	/* \`params\` are input parameters that would not affect performance
 	   (e.g., alpha in BLAS) */
 	$DECLARE_PARAMS
@@ -126,13 +125,16 @@ struct LuxS${rap}_task {
 	$DECLARE_STATES
 };
 
-static inline int
-${rap}_task_exec(Lux_task *t)
+static inline Lux_${rap}_spec *
+mk${rap}_spec(Lux_${rap}_problem *p${PROTO_ISPEC})
 {
-	#define T ((Lux_${rap}_task *)t)
-	Lux_${rap}_algo *algo = T->algo;
-	return algo->apply(T->algo${ARGS_PARAMS}${ARGS_STATES});
-	#undef T
+	return dstruct(Lux_${rap}_spec${ARGS_XSPEC}${ARGS_ISPEC});
+}
+
+static inline Lux_${rap}_args *
+mk${rap}_args(Lux_${rap}_problem *p)
+{
+	return dstruct(Lux_${rap}_args${ARGS_PARAMS}${ARGS_STATES});
 }
 
 #endif /* _${rap^^}_RAP_H_ */
