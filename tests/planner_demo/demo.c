@@ -24,22 +24,42 @@
 #include <tests/planner_demo_rap.h>
 
 static inline int
-exec(Lux_task *t)
+driver(Lux_planner_demo_spec *s, Lux_planner_demo_args *a)
 {
-	lux_print("executing %p\n", t);
+	size_t i, j;
+	for(i = 0; i < s->n1; ++i) {
+		for(j = 0; j < s->n2; ++j) {
+			size_t h = i * s->n2 + j;
+			if(h < s->n)
+				a->z[h] = a->x[h] + a->alpha * a->y[h];
+		}
+	}
 	return 0;
 }
 
-Lux_solution **
-LUX_MOD(const void *prob, unsigned flags)
+Lux_solution *
+LUX_MOD(Lux_planner_demo_problem *prob, unsigned flags)
 {
-	Lux_task *t = malloc(sizeof(Lux_task));
-	t->exec = exec;
+	Lux_planner_demo_spec *spec1 = mkplanner_demo_spec(prob, (prob->n+ 1-1)/ 1,  1);
+	Lux_planner_demo_spec *spec2 = mkplanner_demo_spec(prob, (prob->n+ 2-1)/ 2,  2);
+	Lux_planner_demo_spec *spec3 = mkplanner_demo_spec(prob, (prob->n+ 4-1)/ 4,  4);
+	Lux_planner_demo_spec *spec4 = mkplanner_demo_spec(prob, (prob->n+ 8-1)/ 8,  8);
+	Lux_planner_demo_spec *spec5 = mkplanner_demo_spec(prob, (prob->n+16-1)/16, 16);
+	Lux_planner_demo_spec *spec6 = mkplanner_demo_spec(prob, (prob->n+32-1)/32, 32);
+	Lux_planner_demo_spec *spec7 = mkplanner_demo_spec(prob, (prob->n+64-1)/64, 64);
+
+	Lux_args *args  = mkplanner_demo_args(prob);
 
 	return pvector(
-		Lux_solution *,
-		mksolution(t, 0, 0, 0, 0));
+		Lux_solution,
+		{{{driver, spec1}, args}, {0, 0, prob->n, 0}},
+		{{{driver, spec2}, args}, {0, 0, prob->n, 0}},
+		{{{driver, spec3}, args}, {0, 0, prob->n, 0}},
+		{{{driver, spec4}, args}, {0, 0, prob->n, 0}},
+		{{{driver, spec5}, args}, {0, 0, prob->n, 0}},
+		{{{driver, spec6}, args}, {0, 0, prob->n, 0}},
+		{{{driver, spec7}, args}, {0, 0, prob->n, 0}}
+	);
 
-	(void)prob;  /* silence unused variable warning */
 	(void)flags; /* silence unused variable warning */
 }
