@@ -50,10 +50,13 @@ LUX_MOD(Lux_problem *prob, unsigned flags)
 	Lux_spec *spec6 = mkspec(prob, (prob->n+32-1)/32, 32);
 	Lux_spec *spec7 = mkspec(prob, (prob->n+64-1)/64, 64);
 
-	Lux_args *args  = mkargs(prob);
+	Lux_args *args  = mkargs(prob); /* solutions share `args` */
 
 	return pvector(
 		Lux_solution,
+	/*       +struct basetask         +struct optcnt
+                 |+struct basealgo        |
+		 VV                       V                 */
 		{{{driver, spec1}, args}, {0, 0, prob->n, 0}},
 		{{{driver, spec2}, args}, {0, 0, prob->n, 0}},
 		{{{driver, spec3}, args}, {0, 0, prob->n, 0}},

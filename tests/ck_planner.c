@@ -54,7 +54,11 @@ main(int argc, char *argv[])
 	a.driver(a.spec, (Lux_args *)&prob.alpha);
 	lux_print("DONE\n");
 
-	lux_print("4. Unload the planner... ");
+	lux_print("4. Free the algo... ");
+	free(a.spec);
+	lux_print("DONE\n");
+
+	lux_print("5. Unload the planner... ");
 	lux_unload(p);
 	lux_print("DONE\n");
 
