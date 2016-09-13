@@ -19,8 +19,10 @@
  */
 #include <lux.h>
 #include <lux/planner.h>
-#include <tests/planner_demo_rap.h>
 #include <stdlib.h>
+
+#define LUX_RAP_CASTING 1
+#include <tests/planner_demo_rap.h>
 
 int
 main(int argc, char *argv[])
@@ -29,7 +31,7 @@ main(int argc, char *argv[])
 	struct basealgo a;
 
 	size_t n = 1024 * 1024;
-	Lux_planner_demo_problem prob = {
+	Lux_problem prob = {
 		n,
 		1.0,
 		malloc(sizeof(double) * n),
@@ -44,7 +46,7 @@ main(int argc, char *argv[])
 	lux_print("%p DONE\n", p);
 
 	lux_print("2. Plan an algorithm... ");
-	a = p->plan(p, (Lux_problem *)&prob, LUX_PLAN_EXHAUSTIVE);
+	a = p->plan(p, &prob, LUX_PLAN_EXHAUSTIVE);
 	lux_print("DONE\n");
 
 	lux_print("3. Unload the planner... ");

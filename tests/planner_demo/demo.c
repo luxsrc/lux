@@ -21,10 +21,12 @@
 #include <lux/mangle.h>
 #include <lux/pvector.h>
 #include <lux/solver.h>
+
+#define LUX_RAP_CASTING 1
 #include <tests/planner_demo_rap.h>
 
 static inline int
-driver(Lux_planner_demo_spec *s, Lux_planner_demo_args *a)
+driver(Lux_spec *s, Lux_args *a)
 {
 	size_t i, j;
 	for(i = 0; i < s->n1; ++i) {
@@ -38,17 +40,17 @@ driver(Lux_planner_demo_spec *s, Lux_planner_demo_args *a)
 }
 
 Lux_solution *
-LUX_MOD(Lux_planner_demo_problem *prob, unsigned flags)
+LUX_MOD(Lux_problem *prob, unsigned flags)
 {
-	Lux_planner_demo_spec *spec1 = mkplanner_demo_spec(prob, (prob->n+ 1-1)/ 1,  1);
-	Lux_planner_demo_spec *spec2 = mkplanner_demo_spec(prob, (prob->n+ 2-1)/ 2,  2);
-	Lux_planner_demo_spec *spec3 = mkplanner_demo_spec(prob, (prob->n+ 4-1)/ 4,  4);
-	Lux_planner_demo_spec *spec4 = mkplanner_demo_spec(prob, (prob->n+ 8-1)/ 8,  8);
-	Lux_planner_demo_spec *spec5 = mkplanner_demo_spec(prob, (prob->n+16-1)/16, 16);
-	Lux_planner_demo_spec *spec6 = mkplanner_demo_spec(prob, (prob->n+32-1)/32, 32);
-	Lux_planner_demo_spec *spec7 = mkplanner_demo_spec(prob, (prob->n+64-1)/64, 64);
+	Lux_spec *spec1 = mkspec(prob, (prob->n+ 1-1)/ 1,  1);
+	Lux_spec *spec2 = mkspec(prob, (prob->n+ 2-1)/ 2,  2);
+	Lux_spec *spec3 = mkspec(prob, (prob->n+ 4-1)/ 4,  4);
+	Lux_spec *spec4 = mkspec(prob, (prob->n+ 8-1)/ 8,  8);
+	Lux_spec *spec5 = mkspec(prob, (prob->n+16-1)/16, 16);
+	Lux_spec *spec6 = mkspec(prob, (prob->n+32-1)/32, 32);
+	Lux_spec *spec7 = mkspec(prob, (prob->n+64-1)/64, 64);
 
-	Lux_args *args  = mkplanner_demo_args(prob);
+	Lux_args *args  = mkargs(prob);
 
 	return pvector(
 		Lux_solution,
