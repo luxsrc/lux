@@ -82,9 +82,20 @@ cat <<EOF > "${out}"
 #ifndef _${rap^^}_RAP_H_
 #define _${rap^^}_RAP_H_ 1
 
+#if LUX_RAP_CASTING
+#define LuxS${rap}_problem LuxSproblem
+#define LuxS${rap}_spec    LuxSspec
+#define LuxS${rap}_args    LuxSargs
+#define Lux_${rap}_problem Lux_problem
+#define Lux_${rap}_spec    Lux_spec
+#define Lux_${rap}_args    Lux_args
+#define mk${rap}_spec      mkspec
+#define mk${rap}_args      mkargs
+#else
 typedef struct LuxS${rap}_problem Lux_${rap}_problem;
 typedef struct LuxS${rap}_spec    Lux_${rap}_spec;
 typedef struct LuxS${rap}_args    Lux_${rap}_args;
+#endif
 
 #include <lux/dynamic.h>
 
