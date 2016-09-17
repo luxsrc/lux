@@ -88,6 +88,8 @@
  * OpenCL module creation.
  */
 
+#define LUX_OPENCL_ALIGNMENT 16
+
 /* Forward declaration */
 typedef struct LuxSopencl        Lux_opencl;
 typedef struct LuxSopencl_kernel Lux_opencl_kernel;

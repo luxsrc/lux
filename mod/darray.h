@@ -34,11 +34,11 @@ struct darray {
 	dallocdn(a, T, _d_, _n_);     \
 })
 
-#define dallocdn(a, T, D, Ns) ({                       \
-	struct darray darray;                          \
-	darray.dope = mkdopedn(sizeof(T), a, D, Ns);   \
-	darray.data = malloc(dope_getsz(darray.dope)); \
-	darray;                                        \
+#define dallocdn(a, T, D, Ns) ({                 \
+	struct darray da;                        \
+	da.dope = mkdopedn(sizeof(T), a, D, Ns); \
+	da.data = malloc(dope_getsz(da.dope));   \
+	da;                                      \
 })
 
 #define dfree(da) do {   \
@@ -54,17 +54,16 @@ struct darray {
 	dmkdn(o, T, _d_, _n_);        \
 })
 
-#define dmkdn(o, T, D, Ns) ({                           \
-	struct darray darray;                           \
-	darray.dope = mkdopedn(sizeof(T), 16, D, Ns);   \
-	darray.data = o->mk(o, dope_getsz(darray.dope), \
-	                    CL_MEM_READ_WRITE);         \
-	darray;                                         \
+#define dmkdn(o, T, D, Ns) ({                                         \
+	struct darray da;                                             \
+	da.dope = mkdopedn(sizeof(T), LUX_OPENCL_ALIGNMENT, D, Ns);   \
+	da.data = (o)->mk(o, dope_getsz(da.dope), CL_MEM_READ_WRITE); \
+	da;                                                           \
 })
 
-#define drm(da) do {       \
-	rmdope(da.dope);   \
-	o->rm(o, da.data); \
+#define drm(o, da) do {      \
+	rmdope(da.dope);     \
+	(o)->rm(o, da.data); \
 } while(0)
 
 #endif
