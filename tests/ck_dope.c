@@ -26,9 +26,9 @@
 #define A(E) lux_always_assert(E)
 
 #define ALIGN 256
-#define N1 5
-#define N2 7
-#define N3 11
+#define N1 7
+#define N2 11
+#define N3 13
 
 int
 main(int argc, char *argv[])
@@ -53,13 +53,13 @@ main(int argc, char *argv[])
 
 	lux_print("strides: %zu %zu %zu\n",
 	          dope_gets(dp+0), dope_gets(dp+1), dope_gets(dp+2));
-	A(dope_gets(dp+0) == ALIGN * 2 * N2);
-	A(dope_gets(dp+1) == ALIGN * 2);
+	A(dope_gets(dp+0) == ALIGN * 3 * N2);
+	A(dope_gets(dp+1) == ALIGN * 3);
 	A(dope_gets(dp+2) == sizeof(double [5]));
 
 	lux_print("size: %zu\n",
 	          dope_getsz(dp));
-	A(dope_getsz(dp) == ALIGN * 2 * N2 * N1);
+	A(dope_getsz(dp) == ALIGN * 3 * N2 * N1);
 
 	rmdope(dp);
 	return 0;
