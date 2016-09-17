@@ -46,6 +46,29 @@ struct darray {
 	free(da.data);   \
 } while(0)
 
+#ifdef _LUX_OPENCL_H_
+
+#define dmk(o, T, ...) ({             \
+	size_t _n_[] = {__VA_ARGS__}; \
+	size_t _d_   = countof(_n_);  \
+	dmkdn(o, T, _d_, _n_);        \
+})
+
+#define dmkdn(o, T, D, Ns) ({                           \
+	struct darray darray;                           \
+	darray.dope = mkdopedn(sizeof(T), 16, D, Ns);   \
+	darray.data = o->mk(o, dope_getsz(darray.dope), \
+	                      CL_MEM_READ_WRITE);       \
+	darray;                                         \
+})
+
+#define drm(da) do {       \
+	rmdope(da.dope);   \
+	o->rm(o, da.data); \
+} while(0)
+
+#endif
+
 #define dgetd(da) pgetn(da.dope, 0)
 
 #define dgetn(da, j) dope_getn(da.dope+j)
