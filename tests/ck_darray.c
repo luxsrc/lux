@@ -19,48 +19,35 @@
  */
 #include <lux.h>
 #include <lux/assert.h>
-#include <lux/dope.h>
-#include <lux/parray.h>
-#include <stdio.h>
+#include <lux/darray.h>
 
 #define A(E) lux_always_assert(E)
-
-#define ALIGN 256
-#define N1 7
-#define N2 11
-#define N3 13
 
 int
 main(int argc, char *argv[])
 {
-	struct dope *dp;
+	struct xyz {
+		float x, y, z;
+	};
+
+	struct darray da;
+
+	size_t n[] = {10, 11, 12, 13, 14, 15};
+	size_t i;
 
 	lux_setup(&argc, &argv);
 
-	dp = mkdope(double [5], ALIGN, N1, N2, N3);
+	da = dallocdn(1, struct xyz, 6, n);
+	A(da.data && dgetd(da) == 6);
+	for(i = 0; i < dgetd(da); ++i)
+		A(dgetn(da, i) == n[i]);
+	dfree(da);
 
-	lux_print("dim(dope): %zu\n", pgetd(dp));
-	A(pgetd(dp) == 1);
+	da = dalloc(1, struct xyz, 20, 21, 22, 23, 24, 25);
+	A(da.data && dgetd(da) == 6);
+	for(i = 0; i < dgetd(da); ++i)
+		A(dgetn(da, i) == n[i] + 10);
+	dfree(da);
 
-	lux_print("dim: %zu\n", pgetn(dp, 0));
-	A(pgetn(dp, 0) == 3);
-
-	lux_print("shape: %zu %zu %zu\n",
-	          dope_getn(dp+0), dope_getn(dp+1), dope_getn(dp+2));
-	A(dope_getn(dp+0) == N1);
-	A(dope_getn(dp+1) == N2);
-	A(dope_getn(dp+2) == N3);
-
-	lux_print("strides: %zu %zu %zu\n",
-	          dope_gets(dp+0), dope_gets(dp+1), dope_gets(dp+2));
-	A(dope_gets(dp+0) == ALIGN * 3 * N2);
-	A(dope_gets(dp+1) == ALIGN * 3);
-	A(dope_gets(dp+2) == sizeof(double [5]));
-
-	lux_print("size: %zu\n",
-	          dope_getsz(dp));
-	A(dope_getsz(dp) == ALIGN * 3 * N2 * N1);
-
-	rmdope(dp);
 	return 0;
 }
