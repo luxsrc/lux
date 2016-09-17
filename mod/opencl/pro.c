@@ -73,7 +73,7 @@ mkpro(struct opencl *ego, const struct LuxOopencl *opts,
 
 	path = dlfname(opts->base ? (void *)opts->base : (void *)LUX_MKMOD);
 	for(i = 0; opts->src[i]; ++i) {
-		if(strlen(opts->src[i]) < 64) { /* UGLY HACK */
+		if(strlen(opts->src[i]) < 256) { /* UGLY HACK */
 			const char *s = getsrc(path, opts->src[i]);
 			if(!s) {
 				lux_error("Failed to load source \"%s/%s\"\n",
