@@ -22,14 +22,15 @@
 
 #include <lux/parray.h>
 
-#define pvector(T, ...) ({                  \
-	T      _a_[] = {__VA_ARGS__};       \
-	size_t _n_[] = {countof(_a_)};      \
-	T     *_     = pallocdn(T, 1, _n_); \
-	size_t  _i_;                        \
-	for(_i_ = 0; _i_ < _n_[0]; ++_i_)   \
-		_[_i_] = _a_[_i_];          \
-	_;                                  \
+#define pvector(T, ...) ({                      \
+	T      _a_[] = {__VA_ARGS__};           \
+	size_t _n_[] = {countof(_a_)};          \
+	T     *_p_   = pallocdn(T, 1, _n_);     \
+	size_t _i_;                             \
+	if(_p_)                                 \
+		for(_i_ = 0; _i_ < *_n_; ++_i_) \
+			_p_[_i_] = _a_[_i_];    \
+	_p_;                                    \
 })
 
 #endif /* _LUX_PVECTOR_H_ */
