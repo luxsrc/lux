@@ -37,7 +37,8 @@ ftryopen(const char *name)
 		if(f) {
 			lux_print("Loaded kernel \"%s\"\n", buf);
 			return f;
-		}
+		} else
+			lux_debug("Failed loading kernel \"%s\"\n", buf);
 	}
 	return NULL;
 }
