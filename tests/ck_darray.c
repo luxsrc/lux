@@ -37,13 +37,13 @@ main(int argc, char *argv[])
 
 	lux_setup(&argc, &argv);
 
-	da = dallocdn(struct xyz, 1, 6, n);
+	da = dallocdn(1, struct xyz, 6, n);
 	A(da.data && dgetd(da) == 6);
 	for(i = 0; i < dgetd(da); ++i)
 		A(dgetn(da, i) == n[i]);
 	dfree(da);
 
-	da = dalloc(struct xyz, 1, 20, 21, 22, 23, 24, 25);
+	da = dalloc(1, struct xyz, 20, 21, 22, 23, 24, 25);
 	A(da.data && dgetd(da) == 6);
 	for(i = 0; i < dgetd(da); ++i)
 		A(dgetn(da, i) == n[i] + 10);

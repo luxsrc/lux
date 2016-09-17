@@ -28,13 +28,13 @@ struct darray {
 	void        *data;
 };
 
-#define dalloc(T, a, ...) ({          \
+#define dalloc(a, T, ...) ({          \
 	size_t _n_[] = {__VA_ARGS__}; \
 	size_t _d_   = countof(_n_);  \
-	dallocdn(T, a, _d_, _n_);     \
+	dallocdn(a, T, _d_, _n_);     \
 })
 
-#define dallocdn(T, a, D, Ns) ({                       \
+#define dallocdn(a, T, D, Ns) ({                       \
 	struct darray darray;                          \
 	darray.dope = mkdopedn(sizeof(T), a, D, Ns);   \
 	darray.data = malloc(dope_getsz(darray.dope)); \
@@ -58,7 +58,7 @@ struct darray {
 	struct darray darray;                           \
 	darray.dope = mkdopedn(sizeof(T), 16, D, Ns);   \
 	darray.data = o->mk(o, dope_getsz(darray.dope), \
-	                      CL_MEM_READ_WRITE);       \
+	                    CL_MEM_READ_WRITE);         \
 	darray;                                         \
 })
 
