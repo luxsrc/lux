@@ -39,8 +39,11 @@ main(int argc, char *argv[])
 
 	dp = mkdope(double [5], ALIGN, N1, N2, N3);
 
-	lux_print("dim: %zu\n", pgetd(dp));
+	lux_print("dim(dope): %zu\n", pgetd(dp));
 	A(pgetd(dp) == 1);
+
+	lux_print("dim: %zu\n", pgetn(dp, 0));
+	A(pgetn(dp, 0) == 3);
 
 	lux_print("shape: %zu %zu %zu\n",
 	          dope_getn(dp+0), dope_getn(dp+1), dope_getn(dp+2));
@@ -54,8 +57,8 @@ main(int argc, char *argv[])
 	A(dope_gets(dp+1) == ALIGN * 2);
 	A(dope_gets(dp+2) == sizeof(double [5]));
 
-	printf("size: %zu\n",
-	       dope_getsz(dp));
+	lux_print("size: %zu\n",
+	          dope_getsz(dp));
 	A(dope_getsz(dp) == ALIGN * 2 * N2 * N1);
 
 	rmdope(dp);
