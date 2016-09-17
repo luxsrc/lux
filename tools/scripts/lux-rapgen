@@ -68,6 +68,7 @@ parse() {
 	eval ARGS_${NAME}=\"${ARGS}\"
 }
 
+parse OPTS   'p->'
 parse XSPEC  'p->'
 parse ISPEC
 parse PARAMS 'p->'
@@ -100,6 +101,11 @@ typedef struct LuxS${rap}_args    Lux_${rap}_args;
 #include <lux/dynamic.h>
 
 struct LuxS${rap}_problem {
+	/* \`opts\` is external (input) specifications, which will be
+	   translated to part of `ispec` to hold anything needed by the
+	   algorithm that would affect the performance (e.g., OpenCL context) */
+	$DECLARE_OPTS
+
 	/* \`xspec\` is external (input) specifications, which hold anything
 	   needed by the algorithm that would affect the performance (e.g.,
 	   array stride) */
