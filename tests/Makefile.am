@@ -1,10 +1,13 @@
 AM_CPPFLAGS = -I$(top_builddir)
 SUBDIRS =
 
-check_PROGRAMS = ck_cookie ck_dope ck_lazybuf ck_mpool ck_mview ck_parray ck_pvector ck_queue ck_ring ck_stack ck_typecode ck_ticks_timer
+check_PROGRAMS = ck_cookie ck_darray ck_dope ck_lazybuf ck_mpool ck_mview ck_parray ck_pvector ck_queue ck_ring ck_stack ck_typecode ck_ticks_timer
 
 ck_cookie_SOURCES = ck_cookie.c ../mod/cookie.h
 ck_cookie_LDADD   = ../api/c/libux.la
+
+ck_darray_SOURCES = ck_darray.c ../mod/darray.h
+ck_darray_LDADD   = ../api/c/libux.la
 
 ck_dope_SOURCES = ck_dope.c ../mod/dope.h
 ck_dope_LDADD   = ../api/c/libux.la
