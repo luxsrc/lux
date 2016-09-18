@@ -253,13 +253,14 @@ if test "x${dir::1}" != "x/"; then
 	echo "Directory is not absolute path, prepend current directory"
 fi
 
-# Define module name by removing the ".la" extension; abort if module
-# name is invalid
+# Check output name
 case "$mod" in
-	*.la)	;;
-	*)	echo "Invalid output module \"$mod\"; ABORT"
-		exit 1
-		;;
+*.la)	echo "Output is a lux module \"$mod\""
+	stage=yes
+	;;
+*)	echo "Output is assumed binary \"$mod\""
+	stage=no
+	;;
 esac
 
 # Finally done parsing arguments; print a summary
@@ -326,6 +327,8 @@ fi
 
 #------------------------------------------------------------------------------
 # Stage/install output module to target directory
-echo "Install \"$mod\" to \"$dir\""
-mkdir -p "$dir/$(dirname $mod)"
-${LIBTOOL} --mode=install ${INSTALL} "$mod" "$dir/$(dirname $mod)"
+if test x"$stage" == x"yes"; then
+	echo "Install \"$mod\" to \"$dir\""
+	mkdir -p "$dir/$(dirname $mod)"
+	${LIBTOOL} --mode=install ${INSTALL} "$mod" "$dir/$(dirname $mod)"
+fi
