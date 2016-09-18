@@ -51,10 +51,10 @@ while test "$#" -gt 0; do
 	a="$1"
 	shift
 	case "$a" in
-		"-h" | "--help")	help;;
-		"-i")	dir="$1";      shift;;
-		"+i")	dir="$dir/$1"; shift;;
-		*)	ina+=("$a");;
+	"-h" | "--help")	help;;
+	"-i")	dir="$1";      shift;;
+	"+i")	dir="$dir/$1"; shift;;
+	*)	ina+=("$a");;
 	esac
 done
 
@@ -63,11 +63,11 @@ done
 for i in "${ina[@]}"; do
 	if test -f "$i"; then
 		case "$i" in
-			*.la)	mod+=("$i");;
-			*.cl)	mod+=("$i");;
-			*)	echo "Invalid module \"$i\"; ABORT"
-				exit 1
-				;;
+		*.la)	mod+=("$i");;
+		*.cl)	mod+=("$i");;
+		*)	echo "Invalid module \"$i\"; ABORT"
+			exit 1
+			;;
 		esac
 	else
 		echo "Input module \"$i\" not found; ABORT"

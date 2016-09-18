@@ -200,12 +200,12 @@ while test "$#" -gt 0; do
 	a="$1"
 	shift
 	case "$a" in
-		"-f" | "--feature")	kind=feature;;
-		"-h" | "--help")	kind=src; help;;
-		"-o")	kind=src; mod="$1";      shift;;
-		"-i")	kind=src; dir="$1";      shift;;
-		"+i")	kind=src; dir="$dir/$1"; shift;;
-		*)	test "$kind" == "src" && ina+=("$a") || feature "$a";;
+	"-f" | "--feature")	kind=feature;;
+	"-h" | "--help")	kind=src; help;;
+	"-o")	kind=src; mod="$1";      shift;;
+	"-i")	kind=src; dir="$1";      shift;;
+	"+i")	kind=src; dir="$dir/$1"; shift;;
+	*)	test "$kind" == "src" && ina+=("$a") || feature "$a";;
 	esac
 done
 
@@ -214,19 +214,19 @@ done
 for i in "${ina[@]}"; do
 	if test -f "$i"; then
 		case "$i" in
-			*.c)	src+=("$i");;
-			*.h)	echo "\"$i\" is a header file; SKIP";;
-			*)	echo "Invalid input file \"$i\"; ABORT"
-				exit 1
-				;;
+		*.c)	src+=("$i");;
+		*.h)	echo "\"$i\" is a header file; SKIP";;
+		*)	echo "Invalid input file \"$i\"; ABORT"
+			exit 1
+			;;
 		esac
 	else
 		case "$i" in
-			-I*)	cpp+=("$i");;
-			-[Ll]*)	ld+=("$i");;
-			*)	echo "Input flag \"$i\"; ABORT"
-				exit 1
-				;;
+		-I*)	cpp+=("$i");;
+		-[Ll]*)	ld+=("$i");;
+		*)	echo "Input flag \"$i\"; ABORT"
+			exit 1
+			;;
 		esac
 	fi
 done
