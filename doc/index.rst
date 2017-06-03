@@ -8,8 +8,8 @@
 ``lux`` Documentation
 #####################
 
-``lux`` is a framework for developing portable high performance
-scientific computing software.
+``lux`` is a framework for developing portable high-performance
+computing software on heterogeneous distributed systems.
 
 Based on a generic performance model, ``lux`` provides resources and
 task abstractions to support run time optimization.
