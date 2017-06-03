@@ -1,4 +1,4 @@
-SUBDIRS = api
+SUBDIRS = api tools
 
 EXTRA_DIST = .autom4te.cfg .version bootstrap
 
