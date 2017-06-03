@@ -28,6 +28,8 @@ This makes ``lux`` lightweight but powerful.
    :maxdepth: 2
    :caption: Contents:
 
+   design
+
 
 ******************
 Indices and Tables
