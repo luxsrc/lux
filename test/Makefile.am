@@ -1,0 +1,1 @@
+TESTS = ../api/sh/lux
