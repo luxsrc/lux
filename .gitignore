@@ -2,6 +2,9 @@
 *
 !*/
 
+# Source codes
+!*.[ch]
+
 # Build system
 !*.a[cm]
 lux.h*
