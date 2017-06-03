@@ -1,1 +1,1 @@
-pkginclude_HEADERS = task.h
+pkginclude_HEADERS = task.h instance.h
