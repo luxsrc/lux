@@ -1,6 +1,6 @@
 dnl Initialization for autoconf
 AC_PREREQ([2.64])
-AC_INIT([lux framework], m4_esyscmd([git describe --always --tags --dirty | sed 's/^v//' | tr -d '\n']), [ckchan@cfa.harvard.edu], [lux], [http://luxsrc.org/])
+AC_INIT([lux framework], m4_esyscmd([tr -d '\n' < .version]), [ckchan@cfa.harvard.edu], [lux], [http://luxsrc.org/])
 AC_CONFIG_AUX_DIR([.build-aux])
 AC_CONFIG_SRCDIR([lux.hin])
 

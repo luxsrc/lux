@@ -1,0 +1,64 @@
+#!/bin/sh
+#
+# NOTE: If you just want to build lux, do not use this file.  Simply
+# run the ordinary `./configure && make` commands.  To clean up all
+# the auto-generated files, use `./bootstrap clean`.  To speed up
+# bootstrapping (with the risk that autoconf doesn't get things
+# right), use `./bootstrap fast`.
+
+if [ -f Makefile ]; then
+	make distclean
+fi
+
+rm -fr .autom4te.cache .build-aux
+rm -f  aclocal.m4 configure lux.hin INSTALL
+find . -name 'Makefile.in' -type f -exec rm {} \;
+[ -d .git ] && rm -f .version AUTHORS NEWS ChangeLog
+
+if [ "x$1" != "xclean" ]; then
+	if [ -d .git ]; then
+		# Generate .version from git tags
+		git describe --always --tags --dirty | sed 's/^v//' > .version
+
+		# Generate AUTHORS from git log
+		printf 'Author(s) of lux:\n\n' >  AUTHORS
+		git shortlog -nse  | cut -c7-  >> AUTHORS
+
+		# Generate NEWS from git commit messages
+		printf 'lux framework NEWS\n\n' > NEWS
+		for t in $(git tag -l | sed '1!G;h;$!d'); do
+			T=$(echo "$t" | sed 's/^v//')
+			h="* Noteworthy changes in release ${T}"
+			git show -s --format="${h} (%ad)%n%n%b" \
+				--date=short "${t}"
+		done >> NEWS
+
+		# Generate ChangeLog from git commit messages
+		printf 'lux framework Change Log\n\n' > ChangeLog
+		git log --format='%ad    %an <%ae>%n%n%w(76,4,8)* %B' \
+			--date=short |\
+		awk '
+		/^[0-9]{4}-[0-9]{2}-[0-9]{2}.*<.*@.*>$/ {
+			if(h!=$0) { h=$0 } else { getline; next }
+		}
+		{ print $0 }' >> ChangeLog
+	fi
+	mkdir .build-aux
+
+	# Paranoia: sometimes autoconf doesn't get things right the first time
+	for i in $([ "x$1" = "xfast" ] && seq 1 || seq 3); do
+		autoreconf --install --force --verbose
+	done
+
+	# Rename PACKAGE_* to LUX_* and hacks to drop unwanted macros
+	sed -i~	-e's/\#define\ PACKAGE_/#define LUX_/g' \
+		configure
+	sed -i~	-e's/by\ autoheader/by autoheader, edited by bootstrap/' \
+		-e'/libtool stores uninstalled libraries/{N;N;d;}' \
+		-e'/Name of package/{N;N;d;}' \
+		-e'/Version number of package/{N;N;d;}' \
+		-e's/this\ package/lux/g' \
+		-e's/PACKAGE_/LUX_/g' \
+		lux.hin
+	find . -type f -name '*~' -exec rm {} \;
+fi
