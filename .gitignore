@@ -2,5 +2,9 @@
 *
 !*/
 
+# Build system
+!*.a[cm]
+lux.h*
+
 # Documentations
 _build/
