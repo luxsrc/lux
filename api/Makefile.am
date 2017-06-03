@@ -1,1 +1,1 @@
-SUBDIRS = sh
+SUBDIRS = c sh
