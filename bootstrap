@@ -54,6 +54,7 @@ if [ "x$1" != "xclean" ]; then
 	sed -i~	-e's/\#define\ PACKAGE_/#define LUX_/g' \
 		configure
 	sed -i~	-e's/by\ autoheader/by autoheader, edited by bootstrap/' \
+		-e'2d' \
 		-e'/libtool stores uninstalled libraries/{N;N;d;}' \
 		-e'/Name of package/{N;N;d;}' \
 		-e'/Version number of package/{N;N;d;}' \
