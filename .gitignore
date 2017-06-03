@@ -11,3 +11,4 @@ lux.h*
 
 # Documentations
 _build/
+!*.rst
