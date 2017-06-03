@@ -1,0 +1,21 @@
+dnl Initialization for autoconf
+AC_PREREQ([2.64])
+AC_INIT([lux framework], m4_esyscmd([git describe --always --tags --dirty | sed 's/^v//' | tr -d '\n']), [ckchan@cfa.harvard.edu], [lux], [http://luxsrc.org/])
+AC_CONFIG_AUX_DIR([.build-aux])
+AC_CONFIG_SRCDIR([lux.hin])
+
+dnl Initialization for automake
+AM_INIT_AUTOMAKE([1.11.6 -Wall -Werror gnu nostdinc]) dnl cannot use gnits because of version number and the missing "THANKS" file
+AM_PROG_AR
+
+dnl Customize "config.h" and rename it to "lux.h"
+# The `configure` script produces a customized public header "lux.h"
+# instead of the standard configuration header "config.h".  This
+# header is installed into "$prefix/include" to allow additional
+# modules to be compiled using the exact same configuration as lux
+# without rerunning `configure`.
+AC_CONFIG_HEADERS([lux.h:lux.hin])
+
+dnl Output files
+AC_CONFIG_FILES(m4_esyscmd([find . -name 'Makefile.am' -type f | sed 's|\./\(.*\).am|\1|']))
+AC_OUTPUT
