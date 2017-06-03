@@ -9,6 +9,7 @@ AM_INIT_AUTOMAKE([1.11.6 -Wall -Werror gnu nostdinc]) dnl cannot use gnits becau
 AM_PROG_AR
 
 dnl Check for programs and compiler characteristics
+AC_PROG_RANLIB
 AC_PROG_LN_S
 
 dnl Customize "config.h" and rename it to "lux.h"
@@ -44,6 +45,8 @@ extern "C" {
 /*===========================================================================*/])
 
 AH_BOTTOM([/*===========================================================================*/
+
+extern void lux_print(const char *, ...);
 
 #ifdef __cplusplus
 }
