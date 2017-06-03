@@ -1,1 +1,1 @@
-pkginclude_HEADERS = libux.h
+pkginclude_HEADERS = task.h libux.h

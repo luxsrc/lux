@@ -13,27 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef _LUX_LIBUX_H_
-#define _LUX_LIBUX_H_
-
-#include <lux/task.h>
-
-#include <stdarg.h>
+#ifndef _LUX_TASK_H_
+#define _LUX_TASK_H_
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-typedef struct Lux_libux_s *Lux_libux;
+typedef struct Lux_task_s *Lux_task;
 
-struct Lux_libux_s {
-	void  (*vlog)(Lux_libux, unsigned, const char *, va_list);
-	void *(*load)(Lux_libux, const char *, const void *);
-	int   (*exec)(Lux_libux, Lux_task);
+struct Lux_task_s {
+	int (*exec)(Lux_task);
 };
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* _LUX_LIBUX_H_ */
+#endif /* _LUX_TASK_H_ */
