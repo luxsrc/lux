@@ -55,7 +55,8 @@ extern void lux_print(const char *, ...);
 #endif /* _LUX_H_ */])
 
 dnl Output files
-AC_CONFIG_FILES(m4_esyscmd([find . -name 'Makefile.am' -type f | sed 's|\./\(.*\).am|\1|']))
+AC_CONFIG_FILES(m4_esyscmd([find . -name 'Makefile.am'                 -type f | sed 's|\./\(.*\).am|\1|'    ]))
+AC_CONFIG_FILES(m4_esyscmd([find . -name '*.?*in' -not -name 'lux.hin' -type f | sed 's|\./\(.*\)in|\1:\1in|']))
 AC_OUTPUT
 
 dnl Hack: in terms of source and build paths, there are only two
