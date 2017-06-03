@@ -26,7 +26,7 @@ static const char banner[] = "\
 int
 main(int argc, char *argv[])
 {
-	(void)puts(banner);
+	lux_print("%s\n", banner);
 
 	return 0;
 
