@@ -1,4 +1,4 @@
-pkginclude_HEADERS  = task.h
+pkginclude_HEADERS  = exception.h task.h
 SUBDIRS             =
 
 pkginclude_HEADERS += instance.h
