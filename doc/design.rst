@@ -48,11 +48,12 @@ This module defines the macro
    	#define exception errno
 
 which, expands to ``errno``, is an lvalue and has type ``int``.
-The maximum defined system exception code (``ELAST`` for BSD,
-``ERFKILL`` for Linux on most architectures,
-``_LAST_ERRNO`` for Linux/PowerPC and
-``EDQUOT`` for Linux/MIPS,
-which are all unified as ``ELAST`` in lux)
+The maximum defined system exception code (unified as ``LUX_ELAST`` in
+``lux``, which is equal to
+``ELAST`` for BSD and Darwin,
+``EHWPOISON`` for current Linux on most architectures,
+``ERFKILL`` for old Linux, and
+``EDQUOT`` for Linux/MIPS)
 is usually only a few hundreds.
 Hence, in addition to the system exception codes, ``exception`` can
 encode additional information.
@@ -61,17 +62,16 @@ How many bits can we use to encode the additional information?
 It is architecture and platform dependent.
 As far as we can tell, BSD-based systems have ``ELAST`` up to 106
 (Darwin).
-For Linux, ``ERFKILL`` is 132 on generic architectures.
-It can take larger values on SPARC (134), Alpha (138), MIPS (167), and
-PARISC (256).
-For Linux/PowerPC and Linux/MIPS, ``_LAST_ERRNO`` is 516 and
-``EDQUOT`` is 1133, respectively.
+For Linux, ``EHWPOISON`` is 133 on generic architectures.
+It can take larger values on SPARC (135), Alpha (139), MIPS (168), and
+PA-RISC (257).
+For Linux/MIPS, ``EDQUOT`` is 1133.
 Nevertheless, all these architectures (except generic) are 32-bit or
 64-bit so there are at least 21 remaining bits.
 If we want ``lux`` to support all the platforms that have C compilers,
 our constraint really comes from the size of ``int``, which is only
 guaranteed to be 16-bit.
-As long as we only allow 123 = 255 - 132 customized exception codes,
+As long as we only allow 122 = 255 - 133 customized exception codes,
 we have at least 8 bits to encode additional information even for the
 ancient 16-bit systems.
 

@@ -16,20 +16,23 @@ dnl Initialization for libtool
 LT_PREREQ([2.2.10])
 LT_INIT([dlopen disable-static]) dnl must be call after AM_PROG_AR
 
-dnl Find out the number of bits required to hold all error codes
-AC_COMPUTE_INT([elast], [ELAST],       [#include <errno.h>], [
-AC_COMPUTE_INT([elast], [_LAST_ERRNO], [#include <errno.h>], [
-AC_COMPUTE_INT([elast], [EDQUOT],      [#include <errno.h>], [
-AC_COMPUTE_INT([elast], [ERFKILL],     [#include <errno.h>], [
+dnl Find out the largest errno/exception
+AC_COMPUTE_INT([elast],  [ELAST],     [#include <errno.h>], [
+AC_COMPUTE_INT([elast],  [EHWPOISON], [#include <errno.h>], [
+AC_COMPUTE_INT([elast],  [ERFKILL],   [#include <errno.h>], [
 	AC_MSG_ERROR([Failed to obtain the last error code; please describe your platform to <$PACKAGE_BUGREPORT>])
-])])])])
+])])
+AC_COMPUTE_INT([edquot], [EDQUOT],    [#include <errno.h>], [edquot=0])
+if test $elast -le $edquot; then elast=$edquot; fi
+])
 
-if   test $elast -le  132; then ebits=8  # ERFKILL == 132 on generic architectures
-elif test $elast -le  388; then ebits=9  # ERFKILL == 134, 138, and 167 on SPARC, Alpha, and MIPS, respectively
-elif test $elast -le  900; then ebits=10 # _LAST_ERRNO ==  516 on PowerPC
-elif test $elast -le 1924; then ebits=11 # EDQUOT == 1133 on MIPS
+dnl Find out the number of bits required to hold all error codes
+if   test $elast -le  133; then ebits=8  # EHWPOISON == 133 on generic architectures
+elif test $elast -le  389; then ebits=9  # EHWPOISON == 135, 139, 168, 257 on SPARC, Alpha, MIPS, and PA-RISC, respectively
+elif test $elast -le  901; then ebits=10 # No known system
+elif test $elast -le 1925; then ebits=11 # EDQUOT == 1133 on MIPS
 else
-	AC_MSG_ERROR([ELAST == $elast is unexpectedly large; please describe your platform to <$PACKAGE_BUGREPORT>])
+	AC_MSG_ERROR([LUX_ELAST == $elast is unexpectedly large; please describe your platform to <$PACKAGE_BUGREPORT>])
 fi
 
 dnl Customize "config.h" and rename it to "lux.h"
