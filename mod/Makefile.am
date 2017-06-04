@@ -1,1 +1,1 @@
-pkginclude_HEADERS = algo.h
+pkginclude_HEADERS = algo.h plan.h
