@@ -2,6 +2,7 @@ dnl Initialization for autoconf
 AC_PREREQ([2.64])
 AC_INIT([lux framework], m4_esyscmd([tr -d '\n' < .version]), [ckchan@cfa.harvard.edu], [lux], [http://luxsrc.org/])
 AC_CONFIG_AUX_DIR([.build-aux])
+AC_CONFIG_MACRO_DIR([.build-m4])
 AC_CONFIG_SRCDIR([lux.hin])
 
 dnl Initialization for automake
@@ -9,8 +10,11 @@ AM_INIT_AUTOMAKE([1.11.6 -Wall -Werror gnu nostdinc]) dnl cannot use gnits becau
 AM_PROG_AR
 
 dnl Check for programs and compiler characteristics
-AC_PROG_RANLIB
 AC_PROG_LN_S
+
+dnl Initialization for libtool
+LT_PREREQ([2.2.10])
+LT_INIT([dlopen disable-static]) dnl must be call after AM_PROG_AR
 
 dnl Customize "config.h" and rename it to "lux.h"
 # The `configure` script produces a customized public header "lux.h"
