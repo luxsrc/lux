@@ -29,6 +29,7 @@ This makes ``lux`` lightweight but powerful.
    :caption: Contents:
 
    design
+   pattern
 
 
 ******************
