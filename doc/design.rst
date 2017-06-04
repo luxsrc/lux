@@ -77,11 +77,10 @@ ancient 16-bit systems.
 
 For most applications in high-performance computing, we need a
 detailed content dependent message to help debugging the algorithm.
-We suggest using a unique string id (e.g., message count, hash key) to
+We suggest using a unique id (e.g., message count, hash key) to
 identify a cached message, and bitwise-OR-ing the id with an optional
 facility key and the exception code described in this section.
-This string id can be architecture, platform, and implementation
-dependent.
+This id can be architecture, platform, and implementation dependent.
 
 
 Resource Abstraction

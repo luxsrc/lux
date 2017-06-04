@@ -16,6 +16,9 @@ dnl Initialization for libtool
 LT_PREREQ([2.2.10])
 LT_INIT([dlopen disable-static]) dnl must be call after AM_PROG_AR
 
+dnl Find out the number of bits in int type
+AC_COMPUTE_INT([ibits], [sizeof(int) * CHAR_BIT], [#include <limits.h>], [AC_MSG_ERROR([failed to compute the size of int in bits])])
+
 dnl Find out the largest errno/exception
 AC_COMPUTE_INT([elast],  [ELAST],     [#include <errno.h>], [
 AC_COMPUTE_INT([elast],  [EHWPOISON], [#include <errno.h>], [
@@ -32,7 +35,17 @@ elif test $elast -le  389; then ebits=9  # EHWPOISON == 135, 139, 168, 257 on SP
 elif test $elast -le  901; then ebits=10 # No known system
 elif test $elast -le 1925; then ebits=11 # EDQUOT == 1133 on MIPS
 else
-	AC_MSG_ERROR([LUX_ELAST == $elast is unexpectedly large; please describe your platform to <$PACKAGE_BUGREPORT>])
+	AC_MSG_ERROR([LUX_ELAST == $elast is unexpectedly large; please report your platform to <$PACKAGE_BUGREPORT>])
+fi
+
+mbits=`expr \( $ibits - $ebits \) / 4 + 4`
+if test $mbits -lt 6; then
+	AC_MSG_ERROR([LUX_MESSAGE_BIT == $mbits is unexpectedly small; please report your platform to <$PACKAGE_BUGREPORT>])
+fi
+
+fbits=`expr $ibits - $mbits - $ebits`
+if test $fbits -lt 2; then
+	AC_MSG_ERROR([LUX_FACILITY_BIT == $fbits is unexpectedly small; please report your platform to <$PACKAGE_BUGREPORT>])
 fi
 
 dnl Customize "config.h" and rename it to "lux.h"
@@ -68,7 +81,9 @@ extern "C" {
 /*===========================================================================*/])
 
 AC_DEFINE_UNQUOTED(LUX_ELAST,         $elast, [Define to the largest system error code.])
-AC_DEFINE_UNQUOTED(LUX_EXCEPTION_BIT, $ebits, [Define to the required bits to hold a lux exception code.])
+AC_DEFINE_UNQUOTED(LUX_FACILITY_BIT,  $fbits, [Define to the number of required bits to hold a facility id.])
+AC_DEFINE_UNQUOTED(LUX_MESSAGE_BIT,   $mbits, [Define to the number of required bits to hold a message id.])
+AC_DEFINE_UNQUOTED(LUX_EXCEPTION_BIT, $ebits, [Define to the number of required bits to hold a lux exception code.])
 
 AH_BOTTOM([/*===========================================================================*/
 
