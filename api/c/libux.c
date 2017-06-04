@@ -15,6 +15,7 @@
  */
 #include <stdarg.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 void
 lux_print(const char *restrict fmt, ...)
@@ -24,4 +25,16 @@ lux_print(const char *restrict fmt, ...)
 	va_start(ap, fmt);
 	(void)vprintf(fmt, ap);
 	va_end(ap);
+}
+
+void
+lux_fatal(const char *restrict fmt, ...)
+{
+	va_list ap;
+
+	va_start(ap, fmt);
+	(void)vfprintf(stderr, fmt, ap);
+	va_end(ap);
+
+	abort();
 }

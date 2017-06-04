@@ -98,6 +98,7 @@ AC_DEFINE_UNQUOTED(LUX_EXCEPTION_BIT, $ebits, [Define to the number of required 
 AH_BOTTOM([/*===========================================================================*/
 
 extern void lux_print(const char *, ...);
+extern void lux_fatal(const char *, ...);
 
 #ifdef __cplusplus
 }
