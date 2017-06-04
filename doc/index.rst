@@ -30,6 +30,7 @@ This makes ``lux`` lightweight but powerful.
 
    design
    pattern
+   style
 
 
 ******************
