@@ -43,7 +43,8 @@ dynamic memory management may cause significant overhead.
 There are two solutions to reduce memory indirectness:
 *i*) to embed :code:`struct point_s` directly in :code:`struct
 task_s`, or
-*ii*) to always pass :code:`struct task_s` by value.
+*ii*) to treat :code:`struct task_s t` as a variable and always pass
+it by value.
 
 
 Structure Embedding
@@ -68,3 +69,25 @@ It is how ``C++`` implements inheritance under-the-hood, and hence
 carries all the problem of inheritance.
 Therefore, when inheritance is a good solution, structure embedding
 also tents to be a good solution.
+
+
+Small Structure as Variable
+---------------------------
+
+Another solution is to treat small structure such as the original
+:code:`struct task_s t` as a variable and always pass it by value.
+
+.. code-block:: c
+
+
+   	struct task_s t = mktask(); /* return struct instead of pointer */
+   	double r = t.algo(t);
+   	rmtask(t);
+
+This way, :code:`mktask()` only needs to allocate memory for
+:code:`t.point` once and :code:`rmtask()` is only responsbile for
+freeing :code:`t.point`.
+There is also less indirectness in calling :code:`t.algo()` and within
+the implementation of :code:`t.algo()`.
+In fact, for many calling conventions, the small structure :code:`t`
+will be passed to functions through registers.
