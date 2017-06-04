@@ -95,6 +95,13 @@ AC_DEFINE_UNQUOTED(LUX_FACILITY_BIT,  $fbits, [Define to the number of required 
 AC_DEFINE_UNQUOTED(LUX_MESSAGE_BIT,   $mbits, [Define to the number of required bits to hold a message id.])
 AC_DEFINE_UNQUOTED(LUX_EXCEPTION_BIT, $ebits, [Define to the number of required bits to hold a lux exception code.])
 
+dnl Make assertion a configure option (default disabled)
+AC_ARG_ENABLE(assertion, [AC_HELP_STRING([--enable-assertion],[compile lux with assertion for debugging])], ok=$enableval, ok=no)
+if test "$ok" = "yes"; then
+	AC_DEFINE(USE_ASSERTION, [1], [Define to 1 if to enable assertion for debugging])
+fi
+AM_CONDITIONAL(USE_ASSERTION, [test "$ok" = "yes"])
+
 AH_BOTTOM([/*===========================================================================*/
 
 extern void lux_print(const char *, ...);
