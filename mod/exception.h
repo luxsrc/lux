@@ -16,8 +16,9 @@
 #ifndef _LUX_EXCEPTION_H_
 #define _LUX_EXCEPTION_H_
 
-#include <lux.h>   /* for LUX_EXCEPTION_BIT */
-#include <errno.h> /* for errno */
+#include <lux.h>    /* for LUX_EXCEPTION_BIT */
+#include <errno.h>  /* for errno */
+#include <string.h> /* for strerror() */
 
 #ifdef __cplusplus
 extern "C" {
@@ -26,8 +27,19 @@ extern "C" {
 #define EXCEPTION ((1U << LUX_EXCEPTION_BIT) - 1)
 #define exception errno
 
-extern const char *strexception(int); /* pseudo "standard" function
-                                         provided by "sys/strexception.c" */
+static inline const char *
+strexception(int e)
+{
+	e &= EXCEPTION;
+
+	switch(e) {
+	case EXCEPTION:
+		return "Generic exception";
+	default:
+		return strerror(e);
+	}
+}
+
 #ifdef __cplusplus
 }
 #endif
