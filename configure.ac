@@ -16,6 +16,14 @@ dnl Initialization for libtool
 LT_PREREQ([2.2.10])
 LT_INIT([dlopen disable-static]) dnl must be call after AM_PROG_AR
 
+dnl Check for functions
+AC_SEARCH_LIBS([dladdr],  [dl], [AC_DEFINE(HAVE_DLADDR,  1, [Define to 1 if you have the `dladdr' function.])],      [AC_MSG_WARN([failed to find the dladdr() function])]     )
+AC_SEARCH_LIBS([dlinfo],  [dl], [AC_DEFINE(HAVE_DLINFO,  1, [Define to 1 if you have the `dlinfo' function.])],      [AC_MSG_WARN([failed to find the dlinfo() function])]     )
+AC_SEARCH_LIBS([dlvsym],  [dl], [AC_DEFINE(HAVE_DLVSYM,  1, [Define to 1 if you have the `dlvsym' function.])],      [AC_MSG_WARN([failed to find the dlvsym() function])]     )
+AC_SEARCH_LIBS([dlmopen], [dl], [AC_DEFINE(HAVE_DLMOPEN, 1, [Define to 1 if you have the GNU `dlmopen' function.])], [AC_MSG_WARN([failed to find the GNU dlmopen() function])])
+AC_SEARCH_LIBS([fdlopen], [dl], [AC_DEFINE(HAVE_FDLOPEN, 1, [Define to 1 if you have the BSD `fdlopen' function.])], [AC_MSG_WARN([failed to find the BSD fdlopen() function])])
+AC_SEARCH_LIBS([dlfunc],  [dl], [AC_DEFINE(HAVE_DLFUNC,  1, [Define to 1 if you have the BSD `dlfunc' function.])],  [AC_MSG_WARN([failed to find the BSD dlfunc() function])] )
+
 dnl Find out the number of bits in int types
 AC_COMPUTE_INT([cbits], [                    CHAR_BIT], [#include <limits.h>], [AC_MSG_ERROR([failed to compute the size of char in bits])])
 AC_COMPUTE_INT([ubits], [sizeof(unsigned)  * CHAR_BIT], [#include <limits.h>], [AC_MSG_ERROR([failed to compute the size of unsigned in bits])])
