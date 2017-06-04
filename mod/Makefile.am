@@ -1,1 +1,2 @@
-pkginclude_HEADERS = task.h libux.h exception.h
+pkginclude_HEADERS = exception.h dltry.h task.h libux.h
+SUBDIRS            =
