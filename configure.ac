@@ -12,8 +12,14 @@ dnl Check for programs and compiler characteristics
 AC_PROG_RANLIB
 AC_PROG_LN_S
 
-dnl Find out the number of bits in int type
-AC_COMPUTE_INT([ibits], [sizeof(int) * CHAR_BIT], [#include <limits.h>], [AC_MSG_ERROR([failed to compute the size of int in bits])])
+dnl Find out the number of bits in int types
+AC_COMPUTE_INT([cbits], [                    CHAR_BIT], [#include <limits.h>], [AC_MSG_ERROR([failed to compute the size of char in bits])])
+AC_COMPUTE_INT([ubits], [sizeof(unsigned)  * CHAR_BIT], [#include <limits.h>], [AC_MSG_ERROR([failed to compute the size of unsigned in bits])])
+AC_COMPUTE_INT([ibits], [sizeof(int)       * CHAR_BIT], [#include <limits.h>], [AC_MSG_ERROR([failed to compute the size of int in bits])])
+AC_COMPUTE_INT([sbits], [sizeof(size_t)    * CHAR_BIT], [#include <limits.h>
+#include <stdlib.h>], [AC_MSG_ERROR([failed to compute the size of size_t in bits])])
+AC_COMPUTE_INT([pbits], [sizeof(ptrdiff_t) * CHAR_BIT], [#include <limits.h>
+#include <stddef.h>], [AC_MSG_ERROR([failed to compute the size of ptrdiff_t in bits])])
 
 dnl Find out the largest errno/exception
 AC_COMPUTE_INT([elast],  [ELAST],     [#include <errno.h>], [
@@ -75,6 +81,14 @@ extern "C" {
 #endif
 
 /*===========================================================================*/])
+
+dnl Define error code related macros
+
+AC_DEFINE_UNQUOTED(LUX_CHAR_BIT,      $cbits, [Define to the number of bits of char.])
+AC_DEFINE_UNQUOTED(LUX_INT_BIT,       $ibits, [Define to the number of bits of int.])
+AC_DEFINE_UNQUOTED(LUX_UNSIGNED_BIT,  $ubits, [Define to the number of bits of unsigned.])
+AC_DEFINE_UNQUOTED(LUX_SIZE_T_BIT,    $sbits, [Define to the number of bits of size_t.])
+AC_DEFINE_UNQUOTED(LUX_PTRDIFF_T_BIT, $pbits, [Define to the number of bits of ptrdiff_t.])
 
 AC_DEFINE_UNQUOTED(LUX_ELAST,         $elast, [Define to the largest system error code.])
 AC_DEFINE_UNQUOTED(LUX_FACILITY_BIT,  $fbits, [Define to the number of required bits to hold a facility id.])
