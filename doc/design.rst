@@ -1,5 +1,9 @@
-Task Abstractions and Run Time Optimization
-===========================================
+Design
+======
+
+
+Run Time Optimization
+---------------------
 
 According to the "README.hacks" file in the ``fftw2`` library,
 
@@ -40,6 +44,10 @@ twiddle factors for FFT, pointers to codelets);
 and ``ro``, ``rw``, and ``wo`` are pointers to the read-only,
 read-write, and write-only data structures in memory for input and/or
 output.
+
+
+Task Abstractions
+-----------------
 
 In principle, we can pack ``ispec``, ``xspec``, ``params``, ``ro``,
 ``rw``, and ``wo`` into a single structure.
