@@ -16,6 +16,22 @@ dnl Initialization for libtool
 LT_PREREQ([2.2.10])
 LT_INIT([dlopen disable-static]) dnl must be call after AM_PROG_AR
 
+dnl Find out the number of bits required to hold all error codes
+AC_COMPUTE_INT([elast], [ELAST],       [#include <errno.h>], [
+AC_COMPUTE_INT([elast], [_LAST_ERRNO], [#include <errno.h>], [
+AC_COMPUTE_INT([elast], [EDQUOT],      [#include <errno.h>], [
+AC_COMPUTE_INT([elast], [ERFKILL],     [#include <errno.h>], [
+	AC_MSG_ERROR([Failed to obtain the last error code; please describe your platform to <$PACKAGE_BUGREPORT>])
+])])])])
+
+if   test $elast -le  132; then ebits=8  # ERFKILL == 132 on generic architectures
+elif test $elast -le  388; then ebits=9  # ERFKILL == 134, 138, and 167 on SPARC, Alpha, and MIPS, respectively
+elif test $elast -le  900; then ebits=10 # _LAST_ERRNO ==  516 on PowerPC
+elif test $elast -le 1924; then ebits=11 # EDQUOT == 1133 on MIPS
+else
+	AC_MSG_ERROR([ELAST == $elast is unexpectedly large; please describe your platform to <$PACKAGE_BUGREPORT>])
+fi
+
 dnl Customize "config.h" and rename it to "lux.h"
 # The `configure` script produces a customized public header "lux.h"
 # instead of the standard configuration header "config.h".  This
@@ -47,6 +63,9 @@ extern "C" {
 #endif
 
 /*===========================================================================*/])
+
+AC_DEFINE_UNQUOTED(LUX_ELAST,         $elast, [Define to the largest system error code.])
+AC_DEFINE_UNQUOTED(LUX_EXCEPTION_BIT, $ebits, [Define to the required bits to hold a lux exception code.])
 
 AH_BOTTOM([/*===========================================================================*/
 
