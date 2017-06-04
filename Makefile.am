@@ -1,6 +1,6 @@
 ACLOCAL_AMFLAGS = -I .build-m4
 
-SUBDIRS = api mod tools tests
+SUBDIRS = sys api mod tools tests
 
 EXTRA_DIST = .autom4te.cfg .version bootstrap
 
