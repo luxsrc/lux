@@ -29,8 +29,9 @@ main(int argc, char *argv[])
 {
 	Lux_opencl *ocl;
 
-	struct LuxOopencl opts  = OPENCL_NULL;
-	const  char      *src[] = {"dummy", NULL};
+	struct LuxOopencl  opts  = OPENCL_NULL;
+	Lux_opencl_kernel *kern  = NULL;
+	const  char       *src[] = {"dummy", NULL};
 	opts.base = main; /* this function to pin location */
 	opts.src  = src;
 
@@ -39,6 +40,10 @@ main(int argc, char *argv[])
 	ocl = lux_load("../mod/opencl/.libs/opencl", &opts);
 	A(ocl);
 
+	kern = ocl->mkkern(ocl, "twice");
+	A(kern);
+
+	ocl->rmkern(ocl, kern);
 	lux_unload(ocl);
 
 	return 0;

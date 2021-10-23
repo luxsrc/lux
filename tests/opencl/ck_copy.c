@@ -28,9 +28,10 @@ int
 main(int argc, char *argv[])
 {
 	Lux_opencl *ocl1, *ocl2;
+	Lux_opencl_kernel *kern = NULL;
 
-	cl_context  ctx;
-	cl_uint     ndev, count;
+	cl_context ctx;
+	cl_uint    ndev, count;
 
 	struct LuxOopencl opts  = OPENCL_NULL;
 	const  char      *src[] = {"dummy", NULL};
@@ -45,6 +46,10 @@ main(int argc, char *argv[])
 	ctx = ocl1->ctx;
 	A(ctx);
 
+        kern = ocl1->mkkern(ocl1, "twice");
+        A(kern);
+        ocl1->rmkern(ocl1, kern);
+
 	clGetContextInfo(ctx, CL_CONTEXT_REFERENCE_COUNT,
 	                 sizeof(count), &count, NULL);
 	lux_print("refcnt(%p) == %u\n", ctx, (unsigned)count);
@@ -57,6 +62,10 @@ main(int argc, char *argv[])
 	ocl2 = lux_load("../mod/opencl/.libs/opencl", &opts);
 	A(ocl2);
 	A(ocl1->ctx == ocl2->ctx);
+
+        kern = ocl2->mkkern(ocl2, "twice");
+        A(kern);
+        ocl2->rmkern(ocl2, kern);
 
 	clGetContextInfo(ctx, CL_CONTEXT_REFERENCE_COUNT,
 	                 sizeof(count), &count, NULL);
